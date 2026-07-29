@@ -222,3 +222,10 @@ dashboard/ensemble power tool — rather than becoming the installer.
 5. **Fork nebius-tf-relay or borrow from it?** See the prior-art section —
    recommendation is fork-plus-upstream-conversation. This decision reshapes
    Phase 1 entirely, so it comes first.
+
+**Decided 2026-07-29:** points 1 and 5 — fork nebius-tf-relay as this repo
+(`opencolin/kimi-relay`, public, full-history port). The "Installer UX"
+section above described extending the Python proxy's Textual TUI and is
+superseded: this relay and its installer are now the base, and the
+multi-provider seam, Tenki sandbox, and K-command rebrand land here.
+Points 2–4 remain open.
