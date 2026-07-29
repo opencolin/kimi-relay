@@ -253,5 +253,5 @@ function debugLog(
   label: string,
   value: unknown | (() => unknown),
 ): void {
-  writeProxyDebugLog("nebiusrelay proxy", options, label, value);
+  writeProxyDebugLog("kimirelay proxy", options, label, value);
 }

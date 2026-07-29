@@ -1,6 +1,6 @@
 import { spawn } from "node:child_process";
 import { randomBytes } from "node:crypto";
-import type { ModelDefinition } from "@nebiusrelay/models";
+import type { ModelDefinition } from "@kimirelay/models";
 import {
   daemonFetch,
   daemonSessionUrl,
@@ -103,7 +103,7 @@ export type ProxiedSessionSpec = {
 };
 
 export async function runProxiedSession(spec: ProxiedSessionSpec): Promise<ProxiedSessionResult> {
-  const debug = process.env.NEBIUSRELAY_DEBUG === "1";
+  const debug = process.env.KIMIRELAY_DEBUG === "1";
   const sessionId = randomLocalProxyToken();
   const authToken = await localProxyAuthToken();
   const telemetrySessionId = randomSessionId();
@@ -129,7 +129,7 @@ export async function runProxiedSession(spec: ProxiedSessionSpec): Promise<Proxi
     await registerDaemonSession(proxyUrl, registration);
   } catch (err) {
     throw new Error(
-      `Could not register this ${spec.agent === "claude" ? "Claude" : "Codex"} session with the nebiusrelay daemon: ${err instanceof Error ? err.message : String(err)}`,
+      `Could not register this ${spec.agent === "claude" ? "Claude" : "Codex"} session with the kimirelay daemon: ${err instanceof Error ? err.message : String(err)}`,
     );
   }
 
@@ -144,9 +144,9 @@ export async function runProxiedSession(spec: ProxiedSessionSpec): Promise<Proxi
 
   process.stderr.write(spec.banner(spec.modelName));
   if (debug) {
-    process.stderr.write(`[nebiusrelay proxy] daemon: ${proxyUrl}\n`);
-    process.stderr.write(`[nebiusrelay proxy] session: ${agentProxyUrl}\n`);
-    process.stderr.write(`[nebiusrelay ${spec.agent}] model: ${spec.modelId}\n`);
+    process.stderr.write(`[kimirelay proxy] daemon: ${proxyUrl}\n`);
+    process.stderr.write(`[kimirelay proxy] session: ${agentProxyUrl}\n`);
+    process.stderr.write(`[kimirelay ${spec.agent}] model: ${spec.modelId}\n`);
   }
 
   const beforeSpawnResult = spec.beforeSpawn ? await spec.beforeSpawn() : undefined;
@@ -187,7 +187,7 @@ export async function runProxiedSession(spec: ProxiedSessionSpec): Promise<Proxi
 
   const result = await new Promise<ProxiedSessionResult>((resolve) => {
     child.on("error", (err) => {
-      process.stderr.write(`Nebius TF Relay ▸ Failed to launch ${spec.binary}: ${err.message}.\n`);
+      process.stderr.write(`Kimi Relay ▸ Failed to launch ${spec.binary}: ${err.message}.\n`);
       resolve({ status: 1, signal: null });
     });
     child.on("exit", (status, signal) => resolve({ status, signal }));
@@ -198,7 +198,7 @@ export async function runProxiedSession(spec: ProxiedSessionSpec): Promise<Proxi
   keepalive.stop();
   if (detachedSessionActive) {
     process.stderr.write(
-      "Nebius TF Relay ▸ Background Claude session remains routed through Nebius Token Factory.\n",
+      "Kimi Relay ▸ Background Claude session remains routed through Nebius Token Factory.\n",
     );
     return result;
   }
@@ -270,5 +270,5 @@ export async function printSessionCost(
 }
 
 export function randomLocalProxyToken(): string {
-  return `nebiusrelay-${randomBytes(24).toString("base64url")}`;
+  return `kimirelay-${randomBytes(24).toString("base64url")}`;
 }

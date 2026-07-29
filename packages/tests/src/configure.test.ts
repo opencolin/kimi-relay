@@ -15,9 +15,9 @@ afterEach(async () => {
   );
 });
 
-describe("nebiusrelay configure", () => {
+describe("kimirelay configure", () => {
   test("persists an Exa key across a cold start even when configure reads it from the environment", async () => {
-    const home = await mkdtemp(path.join(os.tmpdir(), "nebiusrelay-configure-"));
+    const home = await mkdtemp(path.join(os.tmpdir(), "kimirelay-configure-"));
     temporaryHomes.push(home);
     vi.stubEnv("NEBIUS_API_KEY", "nebius-test-key");
     vi.stubEnv("TAVILY_API_KEY", "exa-test-key");

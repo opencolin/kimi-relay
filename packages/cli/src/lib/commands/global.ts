@@ -13,19 +13,19 @@ import {
 import { VERSION } from "../version.js";
 
 export function printHelp() {
-  console.log(`nebiusrelay v${VERSION} - Nebius Token Factory for coding CLIs
+  console.log(`kimirelay v${VERSION} - Nebius Token Factory for coding CLIs
 
 Usage:
-  nebiusrelay configure
-  nebiusrelay whoami
-  nebiusrelay chatgpt [--model <model>] [--restore]  (alpha)
-  nebiusrelay codex [...]       (alias: ncodex)
-  nebiusrelay claude [...]      (alias: nclaude)
-  nebiusrelay pi [...]          (alias: npi)
-  nebiusrelay opencode [...]    (alias: nopencode)
+  kimirelay configure
+  kimirelay whoami
+  kimirelay chatgpt [--model <model>] [--restore]  (alpha)
+  kimirelay codex [...]       (alias: kodex)
+  kimirelay claude [...]      (alias: klaude)
+  kimirelay pi [...]          (alias: kpi)
+  kimirelay opencode [...]    (alias: openkode)
 
 Extra args after codex/claude/pi/opencode are passed through.
-ChatGPT App support is alpha; run \`nebiusrelay chatgpt --restore\` (alias: codex-app) to restore the previous desktop config.
+ChatGPT App support is alpha; run \`kimirelay chatgpt --restore\` (alias: codex-app) to restore the previous desktop config.
 
 Codex flags:
   --no-mcp   Skip your ~/.codex/config.toml MCP servers for a fast startup
@@ -34,14 +34,14 @@ Codex flags:
 Your last-used model is remembered per tool: change it with /model (or --model
 before the harness) and the next launch reuses it.
 
-Docs: https://nebius-tf-relay.vercel.app/llms.txt
+Docs: https://kimi-relay.vercel.app/llms.txt
   LLM-readable documentation - if you are an AI agent asked to install, configure,
-  or use nebiusrelay (including headless use), read that file first.
+  or use kimirelay (including headless use), read that file first.
 `);
 }
 
 export async function runConfigure(home = os.homedir()): Promise<boolean> {
-  clack.intro("nebiusrelay configure");
+  clack.intro("kimirelay configure");
 
   const detected = detectInstalledHarnesses();
   const notImplemented = ALL_HARNESSES.filter((h) => !isHarnessImplemented(h));
@@ -103,7 +103,7 @@ export async function runConfigure(home = os.homedir()): Promise<boolean> {
     clack.log.info(
       `Ready to launch: ${launchable
         .map((h) => HARNESS_LABEL[h])
-        .join(", ")}. Run \`nebiusrelay <harness>\` to start - nothing is written to disk.`,
+        .join(", ")}. Run \`kimirelay <harness>\` to start - nothing is written to disk.`,
     );
   }
 

@@ -4,7 +4,7 @@ import {
   getSelectableModels,
   getVisionPrimary,
   type ModelDefinition,
-} from "@nebiusrelay/models";
+} from "@kimirelay/models";
 
 export const OPENCODE_PROVIDER_ID = "nebius";
 

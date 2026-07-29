@@ -1,7 +1,7 @@
 import { type IncomingMessage, type ServerResponse } from "node:http";
 import { CLAUDE_HAIKU_MODEL, getClaudeSupportedModels } from "./defaults.js";
 import { recordAgentModel } from "../model-preferences.js";
-import { type ModelDefinition } from "@nebiusrelay/models";
+import { type ModelDefinition } from "@kimirelay/models";
 import { CostTracker } from "../cost.js";
 import { createProxyPerfTracer, type ProxyPerfSink } from "../proxy-perf.js";
 import { writeProxyDebugLog } from "../proxy-debug.js";
@@ -295,7 +295,7 @@ function debugLog(
   label: string,
   value: unknown | (() => unknown),
 ): void {
-  writeProxyDebugLog("nebiusrelay proxy", options, label, value);
+  writeProxyDebugLog("kimirelay proxy", options, label, value);
 }
 
 function summarizeAnthropicTools(

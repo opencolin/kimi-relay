@@ -29,7 +29,7 @@ importers:
       '@clack/prompts':
         specifier: ^0.8.2
         version: 0.8.2
-      '@nebiusrelay/models':
+      '@kimirelay/models':
         specifier: workspace:*
         version: link:../models
 
@@ -37,10 +37,10 @@ importers:
 
   packages/tests:
     devDependencies:
-      '@nebiusrelay/cli':
+      '@kimirelay/cli':
         specifier: workspace:*
         version: link:../cli
-      '@nebiusrelay/models':
+      '@kimirelay/models':
         specifier: workspace:*
         version: link:../models
       '@types/node':

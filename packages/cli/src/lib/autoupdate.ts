@@ -1,6 +1,6 @@
 /**
  * Self-update. The installed CLI lives as a single Bun-target JS bundle at
- * `<home>/.nebiusrelay/bin/nebiusrelay.js`, launched by a tiny `nebiusrelay`
+ * `<home>/.kimirelay/bin/kimirelay.js`, launched by a tiny `kimirelay`
  * shell wrapper that calls `bun run` on it. To update, we fetch a small
  * `latest.json` manifest from the project site, compare versions, and if newer
  * download the new bundle and atomically rename it over the installed file.
@@ -16,10 +16,10 @@ import os from "node:os";
 import { VERSION } from "./version.js";
 
 /** Single origin for the landing page, manifest, and downloadable bundle. */
-const UPDATE_ORIGIN = "https://nebius-tf-relay.vercel.app";
+const UPDATE_ORIGIN = "https://kimi-relay.vercel.app";
 /** Override for testing/local mirrors; normally unset. */
 function resolveManifestUrl(): string {
-  return process.env.NEBIUSRELAY_MANIFEST_URL ?? `${UPDATE_ORIGIN}/latest.json`;
+  return process.env.KIMIRELAY_MANIFEST_URL ?? `${UPDATE_ORIGIN}/latest.json`;
 }
 
 const THROTTLE_MS = 60 * 60 * 1000; // re-check at most once per hour
@@ -29,18 +29,18 @@ const FETCH_TIMEOUT_MS = 5_000;
 type Manifest = { version: string; url?: string };
 
 /**
- * Where the install lives. `NEBIUSRELAY_HOME` (when set) is the `.nebiusrelay`
+ * Where the install lives. `KIMIRELAY_HOME` (when set) is the `.kimirelay`
  * directory itself - matching `scripts/install.sh`, which installs the bundle
- * at `$NEBIUSRELAY_HOME/bin/nebiusrelay.js`. When unset, default to
- * `~/.nebiusrelay`.
+ * at `$KIMIRELAY_HOME/bin/kimirelay.js`. When unset, default to
+ * `~/.kimirelay`.
  */
 function resolveInstallDir(): string {
-  return process.env.NEBIUSRELAY_HOME || path.join(os.homedir(), ".nebiusrelay");
+  return process.env.KIMIRELAY_HOME || path.join(os.homedir(), ".kimirelay");
 }
 
-/** Installed bundle path. `nebiusrelay` wrapper runs `bun run` on this. */
+/** Installed bundle path. `kimirelay` wrapper runs `bun run` on this. */
 function installedBundlePath(): string {
-  return path.join(resolveInstallDir(), "bin", "nebiusrelay.js");
+  return path.join(resolveInstallDir(), "bin", "kimirelay.js");
 }
 
 /**
@@ -133,7 +133,7 @@ async function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
 async function fetchManifest(): Promise<Manifest> {
   const res = await withTimeout(
     fetch(resolveManifestUrl(), {
-      headers: { "User-Agent": `nebiusrelay/${VERSION}` },
+      headers: { "User-Agent": `kimirelay/${VERSION}` },
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     }),
     FETCH_TIMEOUT_MS,
@@ -151,7 +151,7 @@ async function fetchManifest(): Promise<Manifest> {
 async function downloadTo(url: string, dest: string): Promise<void> {
   const res = await withTimeout(
     fetch(url, {
-      headers: { "User-Agent": `nebiusrelay/${VERSION}` },
+      headers: { "User-Agent": `kimirelay/${VERSION}` },
       signal: AbortSignal.timeout(OVERALL_TIMEOUT_MS),
     }),
     OVERALL_TIMEOUT_MS,
@@ -177,8 +177,8 @@ export async function maybeSelfUpdate(): Promise<void> {
   // Only the installed bundle self-updates, and only against the deployed
   // release site the bundle was installed from - so this is a safe default-on:
   // dev/source runs no-op, and every failure below is swallowed. Set
-  // NEBIUSRELAY_DISABLE_AUTOUPDATE=1 to opt out.
-  if (process.env.NEBIUSRELAY_DISABLE_AUTOUPDATE === "1") {
+  // KIMIRELAY_DISABLE_AUTOUPDATE=1 to opt out.
+  if (process.env.KIMIRELAY_DISABLE_AUTOUPDATE === "1") {
     return;
   }
   if (!isInstalledBundle()) {
@@ -195,9 +195,9 @@ export async function maybeSelfUpdate(): Promise<void> {
       return;
     }
     const dest = installedBundlePath();
-    const url = manifest.url ?? `${UPDATE_ORIGIN}/nebiusrelay.js`;
+    const url = manifest.url ?? `${UPDATE_ORIGIN}/kimirelay.js`;
     await downloadTo(url, dest);
-    process.stderr.write(`nebiusrelay: updated to v${manifest.version} (next run uses it)\n`);
+    process.stderr.write(`kimirelay: updated to v${manifest.version} (next run uses it)\n`);
   } catch {
     // Swallowed: update failure never breaks the user's command.
   }

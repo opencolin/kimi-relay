@@ -1,5 +1,5 @@
 import { CostTracker } from "../cost.js";
-import type { ModelDefinition } from "@nebiusrelay/models";
+import type { ModelDefinition } from "@kimirelay/models";
 import { NEBIUS_BASE_URL } from "../nebius-core.js";
 import type { ClaudeProxyOptions } from "../claude/proxy.js";
 import type { CodexProxyOptions } from "../codex/proxy.js";
@@ -17,15 +17,15 @@ const DEFAULT_NO_PID_SESSION_IDLE_TTL_MS = 24 * 60 * 60 * 1000;
 const DEFAULT_MAX_NO_PID_SESSIONS = 50;
 const DEFAULT_LAST_SEEN_PERSIST_INTERVAL_MS = 5 * 60 * 1000;
 const NO_PID_SESSION_IDLE_TTL_MS = envInt(
-  "NEBIUSRELAY_DAEMON_NO_PID_SESSION_IDLE_TTL_MS",
+  "KIMIRELAY_DAEMON_NO_PID_SESSION_IDLE_TTL_MS",
   DEFAULT_NO_PID_SESSION_IDLE_TTL_MS,
 );
 const MAX_NO_PID_SESSIONS = envInt(
-  "NEBIUSRELAY_DAEMON_MAX_NO_PID_SESSIONS",
+  "KIMIRELAY_DAEMON_MAX_NO_PID_SESSIONS",
   DEFAULT_MAX_NO_PID_SESSIONS,
 );
 const LAST_SEEN_PERSIST_INTERVAL_MS = envInt(
-  "NEBIUSRELAY_DAEMON_LAST_SEEN_PERSIST_INTERVAL_MS",
+  "KIMIRELAY_DAEMON_LAST_SEEN_PERSIST_INTERVAL_MS",
   DEFAULT_LAST_SEEN_PERSIST_INTERVAL_MS,
 );
 
@@ -221,7 +221,7 @@ export class SessionRegistry {
         this.store.markSessionEnded(
           session.token,
           now,
-          "[nebiusrelay cost] session total: $0.0000 (0 in, 0 out)",
+          "[kimirelay cost] session total: $0.0000 (0 in, 0 out)",
           { promptTokens: 0, cachedTokens: 0, completionTokens: 0, costUsd: 0 },
         );
         continue;
@@ -231,7 +231,7 @@ export class SessionRegistry {
         this.store.markSessionEnded(
           session.token,
           now,
-          session.externalSummary ?? "[nebiusrelay cost] session total: $0.0000 (0 in, 0 out)",
+          session.externalSummary ?? "[kimirelay cost] session total: $0.0000 (0 in, 0 out)",
           {
             promptTokens: session.promptTokens ?? 0,
             cachedTokens: session.cachedTokens ?? 0,
@@ -399,7 +399,7 @@ export function buildSession(req: RegisterSessionRequest): SessionState {
         : {}),
       ...(req.debug !== undefined ? { debug: req.debug } : {}),
       costTracker,
-      ...(process.env.NEBIUSRELAY_PERF === "1"
+      ...(process.env.KIMIRELAY_PERF === "1"
         ? { perfSink: (payload: ProxyPerfPayload) => recordSessionProxyPerf(state, payload) }
         : {}),
     };
@@ -510,8 +510,7 @@ function storedSessionToPersistInput(session: StoredSession): SessionPersistInpu
   return {
     ...session,
     lastSeenAt: session.lastSeenAt ?? session.startedAt,
-    costSummary:
-      session.externalSummary ?? "[nebiusrelay cost] session total: $0.0000 (0 in, 0 out)",
+    costSummary: session.externalSummary ?? "[kimirelay cost] session total: $0.0000 (0 in, 0 out)",
     costTotals: {
       promptTokens: session.promptTokens ?? 0,
       cachedTokens: session.cachedTokens ?? 0,

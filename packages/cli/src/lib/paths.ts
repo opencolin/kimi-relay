@@ -2,9 +2,9 @@ import os from "node:os";
 import path from "node:path";
 
 /**
- * Resolve the nebiusrelay home directory - the one source of truth for where
+ * Resolve the kimirelay home directory - the one source of truth for where
  * the pid file, the sqlite session database, and the codex-app registration
- * file live. Replaces the four byte-identical `resolveNebiusrelayHome()`
+ * file live. Replaces the four byte-identical `resolveKimirelayHome()`
  * copies that previously lived in `daemon/{storage,server,launch,
  * app-registration}.ts` plus `daemon/state.ts`, plus the cross-process-boundary
  * `isAlive`/`isProcessAlive` duplicates in `state.ts`/`launch.ts`/`codex-app.ts`.
@@ -13,8 +13,8 @@ import path from "node:path";
  * as duplicated logic: if one copy changed the resolution, the others would
  * break silently. One home, one liveness check.
  */
-export function nebiusrelayHome(): string {
-  return process.env.NEBIUSRELAY_HOME || path.join(os.homedir(), ".nebiusrelay");
+export function kimirelayHome(): string {
+  return process.env.KIMIRELAY_HOME || path.join(os.homedir(), ".kimirelay");
 }
 
 /**

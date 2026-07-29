@@ -1,5 +1,5 @@
 import path from "node:path";
-import { nebiusrelayHome } from "./paths.js";
+import { kimirelayHome } from "./paths.js";
 import { readJsonIfExists, writeJsonAtomic } from "./nebius-core.js";
 
 /**
@@ -18,11 +18,11 @@ type PreferencesFile = {
   models?: Record<string, string>;
 };
 
-// nebiusrelayHome() is the one home both the daemon and the launcher resolve
-// (via NEBIUSRELAY_HOME or ~/.nebiusrelay), so the daemon's writes and the
+// kimirelayHome() is the one home both the daemon and the launcher resolve
+// (via KIMIRELAY_HOME or ~/.kimirelay), so the daemon's writes and the
 // launcher's reads always hit the same file.
 function preferencesPath(): string {
-  return path.join(nebiusrelayHome(), "preferences.json");
+  return path.join(kimirelayHome(), "preferences.json");
 }
 
 // Debounce disk writes: the daemon only writes when the model actually changes.

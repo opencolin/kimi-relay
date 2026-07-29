@@ -10,8 +10,8 @@ import {
 } from "../../cli/src/lib/context-fit.js";
 import { postChatCompletion, postChatCompletionStream } from "../../cli/src/lib/nebius-client.js";
 
-const TRIM_MARKER = "[nebiusrelay trimmed older context to fit the model window]";
-const IMAGE_PLACEHOLDER = "[nebiusrelay removed an older image to fit the model window]";
+const TRIM_MARKER = "[kimirelay trimmed older context to fit the model window]";
+const IMAGE_PLACEHOLDER = "[kimirelay removed an older image to fit the model window]";
 
 const model: ModelDefinition = {
   id: "test/fit-model",
