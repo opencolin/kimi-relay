@@ -1,77 +1,77 @@
-# nebiusrelay
+# kimirelay
 
-> Use Nebius Token Factory models in the coding-agent CLIs you already run - OpenCode, Claude Code, Codex CLI, and Pi Code. nebiusrelay injects Nebius settings for a single run so your normal tool configs stay untouched.
+> Use Nebius Token Factory models in the coding-agent CLIs you already run - OpenCode, Claude Code, Codex CLI, and Pi Code. kimirelay injects Nebius settings for a single run so your normal tool configs stay untouched.
 
-nebiusrelay is an MIT-licensed CLI router. Install once, then launch your agent with short commands (`ncodex`, `nclaude`, `nopencode`, `npi`). For Claude Code and Codex CLI it routes the agent's API traffic to Nebius Token Factory through a local translation proxy; for OpenCode and Pi Code it injects ephemeral per-run config. The installed binary keeps itself up to date automatically from nebius-tf-relay.vercel.app.
+kimirelay is an MIT-licensed CLI router. Install once, then launch your agent with short commands (`kodex`, `klaude`, `openkode`, `kpi`). For Claude Code and Codex CLI it routes the agent's API traffic to Nebius Token Factory through a local translation proxy; for OpenCode and Pi Code it injects ephemeral per-run config. The installed binary keeps itself up to date automatically from kimi-relay.vercel.app.
 
-This is the LLM-readable documentation file for the project. If you are an AI agent asked to install, configure, or use nebiusrelay (headless or interactive), read this file first. It covers installation, configuration, every command, the available models, headless/agentic usage patterns, how to keep the tool up to date, and the routing architecture.
+This is the LLM-readable documentation file for the project. If you are an AI agent asked to install, configure, or use kimirelay (headless or interactive), read this file first. It covers installation, configuration, every command, the available models, headless/agentic usage patterns, how to keep the tool up to date, and the routing architecture.
 
-- Project: https://github.com
-- Website: https://nebius-tf-relay.vercel.app
-- Installer: https://nebius-tf-relay.vercel.app/install.sh
-- Version manifest: https://nebius-tf-relay.vercel.app/latest.json
-- README: https://github.com
-- This file: https://nebius-tf-relay.vercel.app/llms.txt
+- Project: https://github.com/opencolin/kimi-relay
+- Website: https://kimi-relay.vercel.app
+- Installer: https://kimi-relay.vercel.app/install.sh
+- Version manifest: https://kimi-relay.vercel.app/latest.json
+- README: https://github.com/opencolin/kimi-relay/blob/main/README.md
+- This file: https://kimi-relay.vercel.app/llms.txt
 
 ## Install
 
-One command installs the `nebiusrelay`, `nclaude`, `nopencode`, `ncodex`, and `npi` commands to `~/.nebiusrelay/bin/` and installs Bun for you if it isn't already present:
+One command installs the `kimirelay`, `klaude`, `openkode`, `kodex`, and `kpi` commands to `~/.kimirelay/bin/` and installs Bun for you if it isn't already present:
 
 ```
-curl -fsSL https://nebius-tf-relay.vercel.app/install.sh | sh
+curl -fsSL https://kimi-relay.vercel.app/install.sh | sh
 ```
 
 After install, restart your shell (or run the `export PATH=...` line it prints) so the commands are on PATH. The install:
 
-- Downloads the self-contained JS bundle to `~/.nebiusrelay/bin/nebiusrelay.js`.
-- Writes shell wrappers (`nebiusrelay`, `ncodex`, `nclaude`, `nopencode`, `npi`) that run the bundle with `bun`.
+- Downloads the self-contained JS bundle to `~/.kimirelay/bin/kimirelay.js`.
+- Writes shell wrappers (`kimirelay`, `kodex`, `klaude`, `openkode`, `kpi`) that run the bundle with `bun`.
 - Links them into a writable directory on your PATH.
-- Does NOT install the underlying agent CLIs. If a tool is missing, nebiusrelay prints its official install command and exits.
+- Does NOT install the underlying agent CLIs. If a tool is missing, kimirelay prints its official install command and exits.
 
-To verify: `nebiusrelay --version`.
+To verify: `kimirelay --version`.
 
 ## Configure
 
 Before the first launch you need a Nebius API key (get one at https://tokenfactory.nebius.com/?modals=create-api-key):
 
 ```
-nebiusrelay configure
+kimirelay configure
 ```
 
-This stores your Nebius API key in `~/.nebiusrelay/` and optionally an Exa API key (https://exa.ai) that powers web-search emulation in Claude Code. Web search is optional - without it, searches return a clear "TAVILY_API_KEY not set" error instead of failing silently.
+This stores your Nebius API key in `~/.kimirelay/` and optionally an Exa API key (https://exa.ai) that powers web-search emulation in Claude Code. Web search is optional - without it, searches return a clear "TAVILY_API_KEY not set" error instead of failing silently.
 
 You can also set the key non-interactively:
 
 ```
 export NEBIUS_API_KEY=...
-nebiusrelay configure        # stores it (skip prompts with the env present)
+kimirelay configure        # stores it (skip prompts with the env present)
 ```
 
 The API key is required to actually route traffic; the installer lets you skip it (press Enter) and add it later.
 
 ## Commands
 
-Running `nebiusrelay` with no arguments opens an interactive launcher (requires a TTY) that lets you pick a tool. Run a tool directly with a subcommand:
+Running `kimirelay` with no arguments opens an interactive launcher (requires a TTY) that lets you pick a tool. Run a tool directly with a subcommand:
 
 ```
-nebiusrelay configure                      # set API keys
-nebiusrelay whoami                         # print your anonymous install id
-nebiusrelay --version | -v                 # print the version
-nebiusrelay help | --help | -h             # print this usage
+kimirelay configure                      # set API keys
+kimirelay whoami                         # print your anonymous install id
+kimirelay --version | -v                 # print the version
+kimirelay help | --help | -h             # print this usage
 
-nebiusrelay codex [...]        # alias: ncodex   (Codex CLI)
-nebiusrelay claude [...]       # alias: nclaude  (Claude Code)
-nebiusrelay pi [...]           # alias: npi      (Pi Code)
-nebiusrelay opencode [...]     # alias: nopencode (OpenCode)
+kimirelay codex [...]        # alias: kodex   (Codex CLI)
+kimirelay claude [...]       # alias: klaude  (Claude Code)
+kimirelay pi [...]           # alias: kpi      (Pi Code)
+kimirelay opencode [...]     # alias: openkode (OpenCode)
 
-nebiusrelay chatgpt [--model <model>] [--restore]   # alpha: ChatGPT Desktop (alias: codex-app)
+kimirelay chatgpt [--model <model>] [--restore]   # alpha: ChatGPT Desktop (alias: codex-app)
 
-nebiusrelay daemon stop                   # stop the background proxy daemon
+kimirelay daemon stop                   # stop the background proxy daemon
 ```
 
-Any arguments after the harness name are passed straight through to the underlying agent CLI. For example, `ncodex exec "fix the typo"` runs `codex exec` with nebiusrelay routing.
+Any arguments after the harness name are passed straight through to the underlying agent CLI. For example, `kodex exec "fix the typo"` runs `codex exec` with kimirelay routing.
 
-Recognized nebiusrelay flags (parsed before the passthrough):
+Recognized kimirelay flags (parsed before the passthrough):
 
 - `--api-key <key>` - use this Nebius API key for the run.
 - `--main <model>` / `--model <model>` - select the model for this run.
@@ -82,31 +82,31 @@ Recognized nebiusrelay flags (parsed before the passthrough):
 
 ### ChatGPT Desktop App (alpha)
 
-`nebiusrelay chatgpt` persistently patches the ChatGPT Desktop config so the desktop app routes through Nebius. Unlike the CLI wrappers, this change stays active until you restore it:
+`kimirelay chatgpt` persistently patches the ChatGPT Desktop config so the desktop app routes through Nebius. Unlike the CLI wrappers, this change stays active until you restore it:
 
 ```
-nebiusrelay chatgpt                     # configure (patches config)
-nebiusrelay chatgpt --restore           # restore your OpenAI profile
-nebiusrelay chatgpt --model <model>     # use a specific model
+kimirelay chatgpt                     # configure (patches config)
+kimirelay chatgpt --restore           # restore your OpenAI profile
+kimirelay chatgpt --model <model>     # use a specific model
 ```
 
-Backups of your original config live under `~/.nebiusrelay/backup/codex-app/`.
+Backups of your original config live under `~/.kimirelay/backup/codex-app/`.
 
 ## Models
 
-The model list is fetched live from Nebius (`GET /v1/models?verbose=true`) at startup, so every model Nebius serves is available and each model's vision support (modality) comes straight from the API, not a hand-maintained list. Results are cached in `~/.nebiusrelay/model-catalog.json` and fall back to a bundled snapshot when offline. The default for Codex and Claude Code is Kimi K3.
+The model list is fetched live from Nebius (`GET /v1/models?verbose=true`) at startup, so every model Nebius serves is available and each model's vision support (modality) comes straight from the API, not a hand-maintained list. Results are cached in `~/.kimirelay/model-catalog.json` and fall back to a bundled snapshot when offline. The default for Codex and Claude Code is Kimi K3.
 
 ### Selecting a model (flag order matters)
 
-Put `--model` (or `--main` for Claude) BEFORE the harness subcommand - nebiusrelay consumes it there and routes to that model:
+Put `--model` (or `--main` for Claude) BEFORE the harness subcommand - kimirelay consumes it there and routes to that model:
 
 ```
-nebiusrelay --model moonshotai/Kimi-K2.6 codex exec "task"
-nebiusrelay --model moonshotai/Kimi-K2.6 claude -p "task"
-nebiusrelay --main nebius-kimi-k2-7-code claude -p "task"   # Claude matches alias OR id
+kimirelay --model moonshotai/Kimi-K2.6 codex exec "task"
+kimirelay --model moonshotai/Kimi-K2.6 claude -p "task"
+kimirelay --main nebius-kimi-k2-7-code claude -p "task"   # Claude matches alias OR id
 ```
 
-Do NOT put `--model` after the harness (e.g. `ncodex --model X` or `nclaude --model X`). The short aliases expand to `nebiusrelay <harness> ...`, so the flag lands after the harness name, goes to the agent's passthrough, and is then stripped - it is silently ignored and the run uses the default (Kimi K3), not the model you asked for. Always use the long form with the flag first.
+Do NOT put `--model` after the harness (e.g. `kodex --model X` or `klaude --model X`). The short aliases expand to `kimirelay <harness> ...`, so the flag lands after the harness name, goes to the agent's passthrough, and is then stripped - it is silently ignored and the run uses the default (Kimi K3), not the model you asked for. Always use the long form with the flag first.
 
 Featured flagship models (any live Nebius id also works with `--model`):
 
@@ -124,26 +124,26 @@ Vision-capable models (those whose API modality includes image input, e.g. Kimi 
 
 ## Headless & agentic usage
 
-Both Claude Code and Codex CLI run headlessly (no TTY), so you can delegate code changes to an AI agent from scripts, CI, or another orchestrating agent. The patterns below were verified against the installed `ncodex` and `nclaude` (v0.5.26) and apply to both. They differ in the headless subcommand and in how permissions are handled; the stdin, banner, and model-selection behavior is identical.
+Both Claude Code and Codex CLI run headlessly (no TTY), so you can delegate code changes to an AI agent from scripts, CI, or another orchestrating agent. The patterns below were verified against the installed `kodex` and `klaude` (v0.5.26) and apply to both. They differ in the headless subcommand and in how permissions are handled; the stdin, banner, and model-selection behavior is identical.
 
 ### The working invocation pattern
 
 Both wrappers spawn the agent pointed at the local Nebius proxy and pass your flags through to the underlying binary. Always close stdin and capture stderr. To run a non-default model, put `--model <id>` before the harness (see Models above).
 
-### Prefer native subagents for delegated nebiusrelay runs
+### Prefer native subagents for delegated kimirelay runs
 
-If you are an orchestrating agent running inside Claude Code, Codex, or another CLI that has its own native subagent/delegation tool, prefer this pattern for non-trivial nebiusrelay work:
+If you are an orchestrating agent running inside Claude Code, Codex, or another CLI that has its own native subagent/delegation tool, prefer this pattern for non-trivial kimirelay work:
 
 1. Spawn a native subagent first.
-2. Tell that subagent to run the needed `nebiusrelay` command itself (`ncodex`, `nclaude`, `nopencode`, or `npi`) with a tight task, explicit files, `< /dev/null`, and the guardrails below.
-3. Have the subagent wait for the delegated nebiusrelay run, inspect its result/diff, and report only the useful summary back to you.
+2. Tell that subagent to run the needed `kimirelay` command itself (`kodex`, `klaude`, `openkode`, or `kpi`) with a tight task, explicit files, `< /dev/null`, and the guardrails below.
+3. Have the subagent wait for the delegated kimirelay run, inspect its result/diff, and report only the useful summary back to you.
 
-Do this instead of having the main orchestrating agent call `ncodex`/`nclaude` directly for every delegated edit. It keeps the main agent's context and inference budget focused on coordination/review, lets the native subagent own the details of launching and monitoring nebiusrelay, and works especially well when Claude Code delegates to a subagent that then uses Codex through `ncodex`.
+Do this instead of having the main orchestrating agent call `kodex`/`klaude` directly for every delegated edit. It keeps the main agent's context and inference budget focused on coordination/review, lets the native subagent own the details of launching and monitoring kimirelay, and works especially well when Claude Code delegates to a subagent that then uses Codex through `kodex`.
 
 Codex CLI - non-interactive `exec` (the `-s workspace-write` sandbox grants write access; `exec` never prompts interactively):
 
 ```
-nebiusrelay codex exec -s workspace-write -C /abs/repo "<tight, single-concern task with explicit files + guardrails>" < /dev/null 2>&1
+kimirelay codex exec -s workspace-write -C /abs/repo "<tight, single-concern task with explicit files + guardrails>" < /dev/null 2>&1
 ```
 
 If the working directory isn't a git repo, codex refuses to start ("Not inside a trusted directory"); add `--skip-git-repo-check`, or run inside a git repo.
@@ -151,7 +151,7 @@ If the working directory isn't a git repo, codex refuses to start ("Not inside a
 Claude Code - print mode `-p` (runs once and exits). Add `--dangerously-skip-permissions` so a headless subagent never blocks on a permission prompt:
 
 ```
-nebiusrelay claude -p "<tight, single-concern task with explicit files + guardrails>" --dangerously-skip-permissions --output-format json < /dev/null 2>&1
+kimirelay claude -p "<tight, single-concern task with explicit files + guardrails>" --dangerously-skip-permissions --output-format json < /dev/null 2>&1
 ```
 
 Run it in the background, health-check at ~60s, review the diff, run lint, then commit. One file or one concern per task gives the cleanest reviews.
@@ -199,52 +199,52 @@ Per-task cost varies a lot with how verbose the agent is. Mechanical, well-scope
 5. Review the diff + re-run lint yourself before committing.
 6. To select a model, put `--model` (or `--main` for Claude) before the harness subcommand - after the harness it is silently ignored and the default runs.
 7. For Claude `-p`, pass `--dangerously-skip-permissions` so a headless subagent never blocks on a permission prompt. Codex `exec` is non-interactive by design; use `-s workspace-write` for edits and `--skip-git-repo-check` outside a git repo.
-8. If your current CLI has native subagents, delegate nebiusrelay launches to one of those subagents and let it return the result, instead of spending the main orchestrator's context on the full `ncodex`/`nclaude` run.
+8. If your current CLI has native subagents, delegate kimirelay launches to one of those subagents and let it return the result, instead of spending the main orchestrator's context on the full `kodex`/`klaude` run.
 
-## Keeping nebiusrelay up to date
+## Keeping kimirelay up to date
 
-The installed binary self-updates automatically in the background. The check is throttled and bounded, never throws, and runs before argument parsing - so even `nebiusrelay help` keeps an install current. The update is pulled from https://nebius-tf-relay.vercel.app/latest.json, which contains `version`, `url`, and `publishedAt`.
+The installed binary self-updates automatically in the background. The check is throttled and bounded, never throws, and runs before argument parsing - so even `kimirelay help` keeps an install current. The update is pulled from https://kimi-relay.vercel.app/latest.json, which contains `version`, `url`, and `publishedAt`.
 
 To force a refresh, re-run the install one-liner:
 
 ```
-curl -fsSL https://nebius-tf-relay.vercel.app/install.sh | sh
+curl -fsSL https://kimi-relay.vercel.app/install.sh | sh
 ```
 
-You can check the installed version with `nebiusrelay --version` and compare it against the published manifest at https://nebius-tf-relay.vercel.app/latest.json.
+You can check the installed version with `kimirelay --version` and compare it against the published manifest at https://kimi-relay.vercel.app/latest.json.
 
 ## Architecture (how routing works)
 
 There are two harness families behind the four tools:
 
-- **Proxied harnesses - Claude Code, Codex CLI.** `nclaude` and `ncodex` spawn a shared local daemon and route the agent's `/v1/*` traffic through it. The daemon translates the agent's native wire format (Anthropic Messages for Claude, OpenAI Responses for Codex) to Nebius's chat-completions API and back. Per run: it resolves the model, ensures the daemon, registers a session with your token, prints a banner, spawns the agent pointed at the local proxy, tracks cost, and deregisters on exit. Nothing is written to your real agent config - close it and your setup is exactly as it was.
+- **Proxied harnesses - Claude Code, Codex CLI.** `klaude` and `kodex` spawn a shared local daemon and route the agent's `/v1/*` traffic through it. The daemon translates the agent's native wire format (Anthropic Messages for Claude, OpenAI Responses for Codex) to Nebius's chat-completions API and back. Per run: it resolves the model, ensures the daemon, registers a session with your token, prints a banner, spawns the agent pointed at the local proxy, tracks cost, and deregisters on exit. Nothing is written to your real agent config - close it and your setup is exactly as it was.
 
-- **Spawned harnesses - OpenCode, Pi Code.** `nopencode` and `npi` spawn the agent binary directly. The binary talks to Nebius itself, using ephemeral config injected only for that launch (OpenCode) or a temporary `models.json` on disk (Pi). No daemon, no proxy.
+- **Spawned harnesses - OpenCode, Pi Code.** `openkode` and `kpi` spawn the agent binary directly. The binary talks to Nebius itself, using ephemeral config injected only for that launch (OpenCode) or a temporary `models.json` on disk (Pi). No daemon, no proxy.
 
 The daemon is one persistent local process shared by all proxied sessions. If you ever need to stop it manually:
 
 ```
-nebiusrelay daemon stop
+kimirelay daemon stop
 ```
 
-`nebiusrelay chatgpt` (alpha) is the exception: it persistently patches ChatGPT Desktop config to route through Nebius (instead of per-run injection), with backups under `~/.nebiusrelay/backup/codex-app/`. Restore with `nebiusrelay chatgpt --restore`.
+`kimirelay chatgpt` (alpha) is the exception: it persistently patches ChatGPT Desktop config to route through Nebius (instead of per-run injection), with backups under `~/.kimirelay/backup/codex-app/`. Restore with `kimirelay chatgpt --restore`.
 
 ## Troubleshooting
 
-- **"No Nebius API key found"** - run `nebiusrelay configure` or set `NEBIUS_API_KEY`.
-- **A tool command is not found** - nebiusrelay does not install the agent CLIs for you. It prints the official install command (e.g. `npm install -g @openai/codex`) and the docs link when the tool is missing; install it, then re-run.
-- **Web search fails in Claude Code** - set an Exa API key via `nebiusrelay configure`. Without it, searches return a clear "TAVILY_API_KEY not set" error.
+- **"No Nebius API key found"** - run `kimirelay configure` or set `NEBIUS_API_KEY`.
+- **A tool command is not found** - kimirelay does not install the agent CLIs for you. It prints the official install command (e.g. `npm install -g @openai/codex`) and the docs link when the tool is missing; install it, then re-run.
+- **Web search fails in Claude Code** - set an Exa API key via `kimirelay configure`. Without it, searches return a clear "TAVILY_API_KEY not set" error.
 - **Headless run hangs and produces no edits** - you forgot `< /dev/null`. Close stdin and relaunch; see the Headless usage section.
 - **Cost seems high for a small change** - the agent over-documented. Scope the task tighter and add a "don't over-explain" instruction.
-- **Want your normal config back** - stop using the wrappers. No agent config was saved, so your OpenCode / Claude Code / Codex CLI / Pi Code setup is untouched. For ChatGPT Desktop, run `nebiusrelay chatgpt --restore`.
+- **Want your normal config back** - stop using the wrappers. No agent config was saved, so your OpenCode / Claude Code / Codex CLI / Pi Code setup is untouched. For ChatGPT Desktop, run `kimirelay chatgpt --restore`.
 
 ## Links
 
-- [GitHub](https://github.com): source repository and issues
-- [README](https://github.com): human-readable project overview
-- [Website](https://nebius-tf-relay.vercel.app): landing page
-- [Install script](https://nebius-tf-relay.vercel.app/install.sh): one-command installer (`curl -fsSL https://nebius-tf-relay.vercel.app/install.sh | sh`)
-- [Version manifest](https://nebius-tf-relay.vercel.app/latest.json): current published version and release timestamp
-- [This LLM docs file](https://nebius-tf-relay.vercel.app/llms.txt): the file you are reading now
+- [GitHub](https://github.com/opencolin/kimi-relay): source repository and issues
+- [README](https://github.com/opencolin/kimi-relay/blob/main/README.md): human-readable project overview
+- [Website](https://kimi-relay.vercel.app): landing page
+- [Install script](https://kimi-relay.vercel.app/install.sh): one-command installer (`curl -fsSL https://kimi-relay.vercel.app/install.sh | sh`)
+- [Version manifest](https://kimi-relay.vercel.app/latest.json): current published version and release timestamp
+- [This LLM docs file](https://kimi-relay.vercel.app/llms.txt): the file you are reading now
 - [Nebius Token Factory API keys](https://tokenfactory.nebius.com/?modals=create-api-key): get a key to route traffic
 - [llms.txt specification](https://llmstxt.org): the convention this file follows

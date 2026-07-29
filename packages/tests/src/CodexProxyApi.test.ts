@@ -1,7 +1,7 @@
 import http from "node:http";
 import { asRecord } from "./json-lines.js";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { GLM_5_2, MINIMAX_M3, QWEN_2_5_VL_72B, QWEN_3_5_397B } from "@nebiusrelay/models";
+import { GLM_5_2, MINIMAX_M3, QWEN_2_5_VL_72B, QWEN_3_5_397B } from "@kimirelay/models";
 import { handleCodexProxyRequest, type CodexProxyOptions } from "../../cli/src/lib/codex/proxy.js";
 
 const realFetch = globalThis.fetch.bind(globalThis);
@@ -222,9 +222,9 @@ describe("Codex Responses proxy tool compatibility", () => {
   });
 
   test("retries streamed Codex turns when Nebius never returns response headers", async () => {
-    vi.stubEnv("NEBIUSRELAY_RESPONSE_HEADER_TIMEOUT_MS", "100");
-    vi.stubEnv("NEBIUSRELAY_STREAM_RETRIES", "1");
-    vi.stubEnv("NEBIUSRELAY_REQUEST_DIAGNOSTICS", "0");
+    vi.stubEnv("KIMIRELAY_RESPONSE_HEADER_TIMEOUT_MS", "100");
+    vi.stubEnv("KIMIRELAY_STREAM_RETRIES", "1");
+    vi.stubEnv("KIMIRELAY_REQUEST_DIAGNOSTICS", "0");
     let upstreamCalls = 0;
     vi.stubGlobal(
       "fetch",
@@ -1026,8 +1026,8 @@ describe("Codex Responses proxy tool compatibility", () => {
 
   test("retries streamed Codex turns when upstream SSE goes idle before output", async () => {
     const requests: Array<{ body: any }> = [];
-    vi.stubEnv("NEBIUSRELAY_CODEX_STREAM_IDLE_TIMEOUT_MS", "100");
-    vi.stubEnv("NEBIUSRELAY_CODEX_STREAM_IDLE_RETRIES", "1");
+    vi.stubEnv("KIMIRELAY_CODEX_STREAM_IDLE_TIMEOUT_MS", "100");
+    vi.stubEnv("KIMIRELAY_CODEX_STREAM_IDLE_RETRIES", "1");
     vi.stubGlobal(
       "fetch",
       vi.fn(async (url: string, init?: RequestInit) => {
@@ -1401,8 +1401,8 @@ describe("Codex Responses proxy tool compatibility", () => {
   test("fails streamed native web_search completion when upstream SSE goes idle", async () => {
     const requests: Array<{ url: string; body: any }> = [];
     vi.stubEnv("TAVILY_API_KEY", "test-exa-key");
-    vi.stubEnv("NEBIUSRELAY_CODEX_STREAM_IDLE_TIMEOUT_MS", "100");
-    vi.stubEnv("NEBIUSRELAY_CODEX_STREAM_IDLE_RETRIES", "1");
+    vi.stubEnv("KIMIRELAY_CODEX_STREAM_IDLE_TIMEOUT_MS", "100");
+    vi.stubEnv("KIMIRELAY_CODEX_STREAM_IDLE_RETRIES", "1");
     vi.stubGlobal(
       "fetch",
       vi.fn(async (url: string, init?: RequestInit) => {
@@ -1446,8 +1446,8 @@ describe("Codex Responses proxy tool compatibility", () => {
 
   test("fails when upstream SSE keepalives make no Codex progress", async () => {
     const requests: Array<{ url: string; body: any }> = [];
-    vi.stubEnv("NEBIUSRELAY_CODEX_STREAM_IDLE_TIMEOUT_MS", "100");
-    vi.stubEnv("NEBIUSRELAY_CODEX_STREAM_IDLE_RETRIES", "1");
+    vi.stubEnv("KIMIRELAY_CODEX_STREAM_IDLE_TIMEOUT_MS", "100");
+    vi.stubEnv("KIMIRELAY_CODEX_STREAM_IDLE_RETRIES", "1");
     vi.stubGlobal(
       "fetch",
       vi.fn(async (url: string, init?: RequestInit) => {
@@ -1479,7 +1479,7 @@ describe("Codex Responses proxy tool compatibility", () => {
 
   test("fails when native stream emits reasoning but never final output", async () => {
     const requests: Array<{ url: string; body: any }> = [];
-    vi.stubEnv("NEBIUSRELAY_CODEX_STREAM_TURN_TIMEOUT_MS", "100");
+    vi.stubEnv("KIMIRELAY_CODEX_STREAM_TURN_TIMEOUT_MS", "100");
     vi.stubGlobal(
       "fetch",
       vi.fn(async (url: string, init?: RequestInit) => {
@@ -1834,10 +1834,10 @@ describe("Codex Responses proxy tool compatibility", () => {
             {
               message: {
                 content: JSON.stringify({
-                  rollout_summary: "Captured Nebius TF Relay memory support investigation.",
-                  rollout_slug: "nebiusrelay_codex_memory_support",
+                  rollout_summary: "Captured Kimi Relay memory support investigation.",
+                  rollout_slug: "kimirelay_codex_memory_support",
                   raw_memory:
-                    "Nebius TF Relay should route Codex memory extraction separately from the main coding model.",
+                    "Kimi Relay should route Codex memory extraction separately from the main coding model.",
                 }),
               },
             },
@@ -1901,7 +1901,7 @@ describe("Codex Responses proxy tool compatibility", () => {
 
   test("allows Codex memory extraction model override from env", async () => {
     const requests: unknown[] = [];
-    vi.stubEnv("NEBIUSRELAY_CODEX_MEMORY_MODEL", QWEN_2_5_VL_72B.id);
+    vi.stubEnv("KIMIRELAY_CODEX_MEMORY_MODEL", QWEN_2_5_VL_72B.id);
     vi.stubGlobal(
       "fetch",
       vi.fn(async (url: string, init?: RequestInit) => {
@@ -2252,7 +2252,7 @@ describe("Codex Responses proxy tool compatibility", () => {
     const retryMessages = requests[1]?.body?.messages;
     expect(retryMessages).toBeDefined();
     const hasTrimMarker = retryMessages.some(
-      (m: any) => typeof m.content === "string" && m.content.includes("[nebiusrelay trimmed"),
+      (m: any) => typeof m.content === "string" && m.content.includes("[kimirelay trimmed"),
     );
     expect(hasTrimMarker).toBe(true);
   });

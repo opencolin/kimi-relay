@@ -1,26 +1,26 @@
 import { describe, expect, test } from "vitest";
-import { nebiusrelayHome, isProcessAlive } from "@nebiusrelay/cli/dist/lib/paths.js";
+import { kimirelayHome, isProcessAlive } from "@kimirelay/cli/dist/lib/paths.js";
 
 describe("paths.ts - single source of truth for home + liveness (#7)", () => {
-  test("nebiusrelayHome honors NEBIUSRELAY_HOME env", () => {
-    const original = process.env.NEBIUSRELAY_HOME;
-    process.env.NEBIUSRELAY_HOME = "/tmp/nebiusrelay-test-home-xyz";
+  test("kimirelayHome honors KIMIRELAY_HOME env", () => {
+    const original = process.env.KIMIRELAY_HOME;
+    process.env.KIMIRELAY_HOME = "/tmp/kimirelay-test-home-xyz";
     try {
-      expect(nebiusrelayHome()).toBe("/tmp/nebiusrelay-test-home-xyz");
+      expect(kimirelayHome()).toBe("/tmp/kimirelay-test-home-xyz");
     } finally {
-      if (original === undefined) delete process.env.NEBIUSRELAY_HOME;
-      else process.env.NEBIUSRELAY_HOME = original;
+      if (original === undefined) delete process.env.KIMIRELAY_HOME;
+      else process.env.KIMIRELAY_HOME = original;
     }
   });
 
-  test("nebiusrelayHome falls back to ~/.nebiusrelay when env unset", () => {
-    const original = process.env.NEBIUSRELAY_HOME;
-    delete process.env.NEBIUSRELAY_HOME;
+  test("kimirelayHome falls back to ~/.kimirelay when env unset", () => {
+    const original = process.env.KIMIRELAY_HOME;
+    delete process.env.KIMIRELAY_HOME;
     try {
-      const home = nebiusrelayHome();
-      expect(home.endsWith("/.nebiusrelay")).toBe(true);
+      const home = kimirelayHome();
+      expect(home.endsWith("/.kimirelay")).toBe(true);
     } finally {
-      if (original !== undefined) process.env.NEBIUSRELAY_HOME = original;
+      if (original !== undefined) process.env.KIMIRELAY_HOME = original;
     }
   });
 

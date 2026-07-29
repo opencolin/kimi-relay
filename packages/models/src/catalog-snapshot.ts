@@ -4,7 +4,7 @@
  * when the live fetch fails or has not run yet, and as the deterministic
  * source for the named model constants the test-suite imports.
  *
- * Regenerate with: pnpm -F @nebiusrelay/cli exec nebiusrelay ... (see
+ * Regenerate with: pnpm -F @kimirelay/cli exec kimirelay ... (see
  * scripts/list-nebius-models.mjs) or re-run the capture in the models package.
  * Only the fields buildCatalog() reads are kept.
  */

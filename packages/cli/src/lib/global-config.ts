@@ -12,12 +12,12 @@ export type GlobalConfig = {
   tavilyApiKey: string;
 };
 
-export function nebiusrelayHome(home = os.homedir()): string {
-  return path.join(home, ".nebiusrelay");
+export function kimirelayHome(home = os.homedir()): string {
+  return path.join(home, ".kimirelay");
 }
 
 function globalConfigPath(home = os.homedir()): string {
-  return path.join(nebiusrelayHome(home), "config.json");
+  return path.join(kimirelayHome(home), "config.json");
 }
 
 export async function readGlobalConfig(home = os.homedir()): Promise<GlobalConfig> {

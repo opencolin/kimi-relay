@@ -1,7 +1,7 @@
 > Provenance: this plan originated in opencolin/claude-codex-nebius-proxy PR #1
 > and moved here when kimi-relay was forked from nebius-tf-relay on 2026-07-29.
 
-# Plan: Kimi K3 installer — `klaude`, `kodex`, `openkode` (+ Tenki sandbox)
+# Plan: Kimi K3 installer — `klaude`, `kodex`, `openkode` (+ Token Factory sandbox)
 
 Status: draft for discussion — nothing here is implemented yet.
 Date: 2026-07-29 (facts below verified against live sources on this date).
@@ -14,20 +14,21 @@ already know, on non-Chinese hosting, with an optional disposable-VM sandbox:
 - `klaude` — Claude Code driven by Kimi K3
 - `kodex` — Codex CLI driven by Kimi K3
 - `openkode` — OpenCode driven by Kimi K3 (stretch)
-- optional: Tenki sandbox integration so agents run in a disposable VM
+- optional: Token Factory Sandboxes integration so agents run in a disposable
+  microVM sandbox, on the same Nebius account/key as inference
 
-The pitch: *"Try Kimi K3 in your favorite coding agent in 60 seconds. EU or US
-hosting. No Chinese provider in the data path. Optionally fully sandboxed."*
+The pitch: _"Try Kimi K3 in your favorite coding agent in 60 seconds. EU or US
+hosting. No Chinese provider in the data path. Optionally fully sandboxed."_
 
 ## Verified facts (2026-07-29)
 
-| Fact | Status |
-| --- | --- |
-| Kimi K3: 2.8T-param MoE (16/896 experts active), 1M context, native vision, always-on "thinking" mode, OpenAI-SDK compatible | Released; weights public since 2026-07-27 |
-| Nebius Token Factory | **Day-0 K3 partner, live now.** OpenAI-compatible only (`/v1/chat/completions`) — no Anthropic `/v1/messages` surface. EU hosting. |
-| Vercel AI Gateway | `moonshotai/kimi-k3` and `moonshotai/kimi-k3-fast` live, served by Baseten + Fireworks (both US). Exposes **both** an OpenAI-compatible `/v1` **and a native Anthropic-compatible `/v1/messages`** at `https://ai-gateway.vercel.sh`. |
-| Google (Vertex AI MaaS) | Kimi K2 Thinking is on Vertex; **K3 is not yet available**. Treat Google as a future provider slot, not a launch provider. |
-| Tenki (tenki.cloud) | Disposable hardware-isolated Linux VMs for AI agents. CLI: `curl -fsSL https://tenki.cloud/install.sh \| bash`, then `tenki onboard`. Documents Claude Code + Codex support. |
+| Fact                                                                                                                         | Status                                                                                                                                                                                                                                |
+| ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Kimi K3: 2.8T-param MoE (16/896 experts active), 1M context, native vision, always-on "thinking" mode, OpenAI-SDK compatible | Released; weights public since 2026-07-27                                                                                                                                                                                             |
+| Nebius Token Factory                                                                                                         | **Day-0 K3 partner, live now.** OpenAI-compatible only (`/v1/chat/completions`) — no Anthropic `/v1/messages` surface. EU hosting.                                                                                                    |
+| Vercel AI Gateway                                                                                                            | `moonshotai/kimi-k3` and `moonshotai/kimi-k3-fast` live, served by Baseten + Fireworks (both US). Exposes **both** an OpenAI-compatible `/v1` **and a native Anthropic-compatible `/v1/messages`** at `https://ai-gateway.vercel.sh`. |
+| Google (Vertex AI MaaS)                                                                                                      | Kimi K2 Thinking is on Vertex; **K3 is not yet available**. Treat Google as a future provider slot, not a launch provider.                                                                                                            |
+| Tenki (tenki.cloud)                                                                                                          | Disposable hardware-isolated Linux VMs for AI agents. CLI: `curl -fsSL https://tenki.cloud/install.sh \| bash`, then `tenki onboard`. Documents Claude Code + Codex support.                                                          |
 
 Consequence that shapes the whole architecture: **the proxy in this repo is
 only required for the Nebius path.** Vercel's gateway speaks Anthropic
@@ -36,11 +37,11 @@ no local process at all.
 
 ## Per-command wiring matrix
 
-| Command | Nebius (EU) | Vercel (US) |
-| --- | --- | --- |
-| `klaude` (Claude Code) | Start this repo's proxy; `ANTHROPIC_BASE_URL=http://localhost:8083`, `ANTHROPIC_AUTH_TOKEN=claude-local`, `BIG_MODEL=<K3 id on Nebius>` | No proxy. `ANTHROPIC_BASE_URL=https://ai-gateway.vercel.sh`, `ANTHROPIC_AUTH_TOKEN=<gateway key>`, `ANTHROPIC_API_KEY=""`, `ANTHROPIC_MODEL=moonshotai/kimi-k3` |
-| `kodex` (Codex CLI) | Existing `/v1/responses` bridge (proxy), or direct `wire_api = "chat"` against Nebius. Recommend the proxy for its tool-compat/repair layer. | Direct: `[model_providers.kimi-vercel]` with `base_url = "https://ai-gateway.vercel.sh/v1"`, `wire_api = "chat"` |
-| `openkode` (OpenCode) | Direct custom provider (OpenAI-compatible) in opencode config | Direct: Vercel AI Gateway is a documented OpenCode provider |
+| Command                | Nebius (EU)                                                                                                                                  | Vercel (US)                                                                                                                                                     |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `klaude` (Claude Code) | Start this repo's proxy; `ANTHROPIC_BASE_URL=http://localhost:8083`, `ANTHROPIC_AUTH_TOKEN=claude-local`, `BIG_MODEL=<K3 id on Nebius>`      | No proxy. `ANTHROPIC_BASE_URL=https://ai-gateway.vercel.sh`, `ANTHROPIC_AUTH_TOKEN=<gateway key>`, `ANTHROPIC_API_KEY=""`, `ANTHROPIC_MODEL=moonshotai/kimi-k3` |
+| `kodex` (Codex CLI)    | Existing `/v1/responses` bridge (proxy), or direct `wire_api = "chat"` against Nebius. Recommend the proxy for its tool-compat/repair layer. | Direct: `[model_providers.kimi-vercel]` with `base_url = "https://ai-gateway.vercel.sh/v1"`, `wire_api = "chat"`                                                |
+| `openkode` (OpenCode)  | Direct custom provider (OpenAI-compatible) in opencode config                                                                                | Direct: Vercel AI Gateway is a documented OpenCode provider                                                                                                     |
 
 Implementation shape for the commands themselves:
 
@@ -80,30 +81,39 @@ The Vercel-only path therefore installs in seconds: pick provider → paste key
 → get `klaude`/`kodex` on PATH. That is the viral-tweet path; keep it free of
 Python/venv friction.
 
-## Tenki sandbox integration (opt-in step)
+## Token Factory sandbox integration (opt-in step)
+
+The sandbox layer is [Nebius Token Factory
+Sandboxes](https://tokenfactory.nebius.com/sandboxes/about) — beta, a
+ConTree-powered secure sandbox API inside Token Factory: microVM isolation,
+0.4–2s cold start, branchable execution state, instant rollback, disposable
+executions. Access is by request at tokenfactory.nebius.com/sandboxes/about,
+and it uses the **same Nebius account/key as inference**, so the relay's
+existing key flow covers it — no second provider onboarding.
 
 Two mechanisms, layered — the wrapper is the enforcement, AGENTS.md is the
 advisory:
 
 1. **Wrapper-level (reliable):** `klaude --sandbox` / `kodex --sandbox` run
-   the agent *inside* a Tenki VM instead of locally. This is the interesting
-   product angle: full-permission / yolo-mode agents driving a brand-new
-   third-party model are exactly what you want inside a disposable,
-   hardware-isolated VM. The installer offers to install the Tenki CLI and run
-   `tenki onboard`. Optionally: a "sandbox by default" toggle that makes bare
-   `klaude` sandboxed with `--local` as the escape hatch.
+   the agent _inside_ a Token Factory sandbox instead of locally. This is the
+   interesting product angle: full-permission / yolo-mode agents driving a
+   brand-new third-party model are exactly what you want inside a disposable,
+   microVM-isolated execution — with branchable state and instant rollback on
+   top. Optionally: a "sandbox by default" toggle that makes bare `klaude`
+   sandboxed with `--local` as the escape hatch.
 2. **AGENTS.md-level (advisory):** the installer offers to append a short
    block to the user's global agent instructions (`~/.claude/CLAUDE.md`,
    `~/.codex/AGENTS.md`) telling the agent to prefer executing risky/untrusted
-   commands inside a Tenki sandbox when one is available. Honest framing:
-   instructions steer the model but do not enforce anything — the wrapper does.
+   commands inside a Token Factory sandbox when one is available. Honest
+   framing: instructions steer the model but do not enforce anything — the
+   wrapper does.
 
 **Needs a spike before committing to this design:** exact mechanics of running
-Claude Code/Codex inside a Tenki session with the user's project present
-(clone into the VM? file sync? what does `tenki onboard` actually configure?),
-auth handoff (the provider API key must reach the VM), and latency/cost. The
-spike outcome decides whether sandbox mode is Phase 2 or gets cut to a
-documented recipe.
+Claude Code/Codex inside a sandbox with the user's project present (clone into
+the sandbox? file sync?), auth handoff (the Nebius key must reach the sandbox
+— same-account helps), interactive-TUI support, and latency/cost. The spike
+outcome decides whether sandbox mode is Phase 2 or gets cut to a documented
+recipe.
 
 ## Phases
 
@@ -123,10 +133,11 @@ documented recipe.
 - README repositioning: lead with "Run Kimi K3 in Claude Code / Codex", keep
   the generic Nebius-proxy story secondary.
 
-### Phase 2 — Tenki sandbox
+### Phase 2 — Token Factory sandbox
 
-- Spike (above), then: TUI step installing Tenki CLI + onboard, `--sandbox`
-  flag in the launchers, AGENTS.md/CLAUDE.md advisory block, docs page.
+- Spike (above), then: Sandboxes access request + setup step in the installer,
+  `--sandbox` flag in the launchers, AGENTS.md/CLAUDE.md advisory block, docs
+  page.
 
 ### Phase 3 — reach
 
@@ -153,8 +164,8 @@ documented recipe.
   the README, not just the storefront.
 - **Vercel account friction**: the US path requires a Vercel account + AI
   Gateway key; the copy should say so up front.
-- **Tenki unknowns**: platform support, pricing, project-file sync — spike
-  before promising.
+- **Sandboxes beta unknowns**: access gating, API surface, interactive-TUI
+  support, pricing, project-file sync — spike before promising.
 
 ## Prior art: nebius-tf-relay (reviewed 2026-07-29)
 
@@ -235,6 +246,14 @@ like upstream. The multi-provider seam and the Vercel column of the wiring
 matrix above are historical context, not planned work. (Hosting the install
 site on Vercel is unrelated to this cut and stays.) Consequence to note
 honestly: without the provider seam, this fork's delta over upstream is
-K-branding + Tenki sandboxing, which raises the value of upstreaming Tenki
+K-branding + sandboxing, which raises the value of upstreaming sandbox
 support to nebius-tf-relay while kimi-relay remains the branded
 distribution.
+
+**Decided 2026-07-29 (later still): sandbox layer is Token Factory
+Sandboxes.** The sandbox integration switches from Tenki to Nebius Token
+Factory Sandboxes (beta) — see the sandbox section above; it runs on the same
+Nebius account/key as inference. The planning PR
+[opencolin/claude-codex-nebius-proxy#1](https://github.com/opencolin/claude-codex-nebius-proxy/pull/1)
+has been **reopened as the canonical planning record**; this ROADMAP mirrors
+it.

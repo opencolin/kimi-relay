@@ -1,30 +1,26 @@
-# Nebius TF Relay
+# kimi-relay
 
-> **Fork notice — kimi-relay.** This repository is a friendly fork of
-> [shivaylamba/nebius-tf-relay](https://github.com/shivaylamba/nebius-tf-relay)
-> (MIT), being rebranded as **kimi-relay**: `klaude` / `kodex` / `openkode`
-> launchers for Kimi K3 with a choice of non-Chinese hosting — Nebius Token
-> Factory (EU) or Vercel AI Gateway (US) — plus optional
-> [Tenki](https://tenki.cloud) sandboxing. See `docs/ROADMAP.md` for the roadmap.
-> Until the rebrand lands, everything below documents the upstream behavior.
+**Run Kimi K3 in Claude Code, Codex, and OpenCode on [Nebius Token Factory](https://tokenfactory.nebius.com/) (EU hosting).**
 
-Run your local coding agents on [Nebius Token Factory](https://tokenfactory.nebius.com/) open models. One install, and **Claude Code**, **Codex**, **OpenCode**, and **Pi** all talk to open-weight models (Kimi K3, Kimi K2.6, Qwen 3.5, DeepSeek V4, MiniMax M3) instead of their default backends.
+One install, and **Claude Code**, **Codex**, **OpenCode**, and **Pi** all talk to open-weight models (Kimi K3, Kimi K2.6, Qwen 3.5, DeepSeek V4, MiniMax M3) served from the EU instead of their default backends.
 
 ```bash
-curl -fsSL https://nebius-tf-relay.vercel.app/install.sh | sh
+curl -fsSL https://kimi-relay.vercel.app/install.sh | sh
 ```
 
 Then:
 
 ```bash
-nebiusrelay claude     # Claude Code on Nebius models (alias: nclaude)
+klaude     # Claude Code on Kimi K3 (long form: kimirelay claude)
 ```
+
+> **Note:** `kimi-relay.vercel.app` is the project's future home and is **not deployed yet**. Until it is, install from a local checkout (see [Local development](#local-development)).
 
 ---
 
 ## What it does
 
-Nebius Token Factory serves open models over an OpenAI-compatible API. It does **not** speak the Anthropic Messages API (Claude Code) or the OpenAI Responses API (Codex). Nebius TF Relay runs a small local daemon that translates those wire formats to Nebius `/chat/completions` on the fly, so your agent believes it is talking to its native backend while every token is served by Nebius.
+Nebius Token Factory serves open models over an OpenAI-compatible API. It does **not** speak the Anthropic Messages API (Claude Code) or the OpenAI Responses API (Codex). kimi-relay runs a small local daemon that translates those wire formats to Nebius `/chat/completions` on the fly, so your agent believes it is talking to its native backend while every token is served by Nebius.
 
 - **Proxied harnesses** (Claude Code, Codex): a local daemon translates each request/response, tracks cost, retries transient failures, trims context to fit, and emulates native web search.
 - **Spawned harnesses** (OpenCode, Pi): launched with a generated provider config pointed at Nebius, no proxy needed.
@@ -33,16 +29,16 @@ Nothing about your agent install changes. The relay injects a base URL and API k
 
 ## Install
 
-The one-liner installs the `nebiusrelay`, `nclaude`, `nopencode`, `ncodex`, and `npi` commands to `~/.nebiusrelay/bin/` and installs [Bun](https://bun.sh) for you if it isn't already present:
+The one-liner installs the `kimirelay`, `klaude`, `kodex`, `openkode`, and `kpi` commands to `~/.kimirelay/bin/` and installs [Bun](https://bun.sh) for you if it isn't already present:
 
 ```bash
-curl -fsSL https://nebius-tf-relay.vercel.app/install.sh | sh
+curl -fsSL https://kimi-relay.vercel.app/install.sh | sh
 ```
 
 First run walks you through configuration (or run it directly):
 
 ```bash
-nebiusrelay configure
+kimirelay configure
 ```
 
 You'll be asked for two keys:
@@ -52,7 +48,7 @@ You'll be asked for two keys:
 | **Nebius API key** | <https://tokenfactory.nebius.com/?modals=create-api-key> | Yes                           |
 | **Tavily API key** | <https://app.tavily.com>                                 | Optional (enables web search) |
 
-Both are stored in `~/.nebiusrelay/` and never leave your machine. You can also set `NEBIUS_API_KEY` / `TAVILY_API_KEY` in the environment instead.
+Both are stored in `~/.kimirelay/` and never leave your machine. You can also set `NEBIUS_API_KEY` / `TAVILY_API_KEY` in the environment instead.
 
 If the underlying agent CLI (Claude Code, Codex, etc.) isn't installed, the relay prints its official install command and exits. It never installs agents for you.
 
@@ -61,29 +57,29 @@ If the underlying agent CLI (Claude Code, Codex, etc.) isn't installed, the rela
 Pick a tool interactively:
 
 ```bash
-nebiusrelay
+kimirelay
 ```
 
 Or launch one directly (each has a short alias):
 
 ```bash
-nebiusrelay claude       # alias: nclaude
-nebiusrelay codex        # alias: ncodex
-nebiusrelay opencode     # alias: nopencode
-nebiusrelay pi           # alias: npi
-nebiusrelay chatgpt      # alpha: ChatGPT Desktop session with restore (alias: codex-app)
+kimirelay claude       # alias: klaude
+kimirelay codex        # alias: kodex
+kimirelay opencode     # alias: openkode
+kimirelay pi           # alias: kpi
+kimirelay chatgpt      # alpha: ChatGPT Desktop session with restore (alias: codex-app)
 ```
 
 Any extra arguments are passed straight through to the underlying agent:
 
 ```bash
-nclaude -p "explain this repo"
-ncodex exec "add a test for the parser"
+klaude -p "explain this repo"
+kodex exec "add a test for the parser"
 ```
 
 ## Models
 
-The model list is **fetched live** from Nebius (`GET /v1/models?verbose=true`) at startup, so every model Nebius serves is available and each model's vision support comes straight from the API's modality field, never a hand-maintained list. Results are cached in `~/.nebiusrelay/` and fall back to a bundled snapshot when offline. The default coding model is **Kimi K3**; switch inside your agent or with `--model`.
+The model list is **fetched live** from Nebius (`GET /v1/models?verbose=true`) at startup, so every model Nebius serves is available and each model's vision support comes straight from the API's modality field, never a hand-maintained list. Results are cached in `~/.kimirelay/` and fall back to a bundled snapshot when offline. The default coding model is **Kimi K3**; switch inside your agent or with `--model`.
 
 Featured flagships:
 
@@ -105,38 +101,42 @@ Claude Code and Codex expose a native `web_search` tool. The relay backs it with
 
 ## Configuration & env vars
 
-| Variable                           | Effect                                                                                                                                           |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `NEBIUS_API_KEY`                   | Nebius Token Factory key (or set via `configure`).                                                                                               |
-| `TAVILY_API_KEY`                   | Enables web search (or set via `configure`).                                                                                                     |
-| `NEBIUS_BASE_URL`                  | Override the API base (default `https://api.tokenfactory.nebius.com/v1`).                                                                        |
-| `NEBIUSRELAY_REASONING_EFFORT`     | `none`\|`low`\|`medium`\|`high`\|`max`. Default `none` for speed; raise for harder tasks.                                                        |
-| `NEBIUSRELAY_FALLBACK_MODEL`       | Model to fail over to when the target model returns no response headers (down/overloaded). Default `moonshotai/Kimi-K2.6`; set `off` to disable. |
-| `NEBIUSRELAY_DISABLE_AUTOUPDATE=1` | Stop the installed binary from self-updating.                                                                                                    |
-| `NEBIUSRELAY_TELEMETRY_URL`        | Opt in to telemetry by pointing at your own collector. Off by default.                                                                           |
+| Variable                         | Effect                                                                                                                                           |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `NEBIUS_API_KEY`                 | Nebius Token Factory key (or set via `configure`).                                                                                               |
+| `TAVILY_API_KEY`                 | Enables web search (or set via `configure`).                                                                                                     |
+| `NEBIUS_BASE_URL`                | Override the API base (default `https://api.tokenfactory.nebius.com/v1`).                                                                        |
+| `KIMIRELAY_REASONING_EFFORT`     | `none`\|`low`\|`medium`\|`high`\|`max`. Default `none` for speed; raise for harder tasks.                                                        |
+| `KIMIRELAY_FALLBACK_MODEL`       | Model to fail over to when the target model returns no response headers (down/overloaded). Default `moonshotai/Kimi-K2.6`; set `off` to disable. |
+| `KIMIRELAY_DISABLE_AUTOUPDATE=1` | Stop the installed binary from self-updating.                                                                                                    |
+| `KIMIRELAY_TELEMETRY_URL`        | Opt in to telemetry by pointing at your own collector. Off by default.                                                                           |
 
-The installed binary keeps itself up to date from `nebius-tf-relay.vercel.app`, throttled to once an hour, and swallows every failure. Dev/source runs never self-update.
+The installed binary keeps itself up to date from `kimi-relay.vercel.app`, throttled to once an hour, and swallows every failure. Dev/source runs never self-update.
+
+## Sandboxing (roadmap)
+
+Integration with [Nebius Token Factory Sandboxes](https://tokenfactory.nebius.com/sandboxes/about) — running agents inside disposable microVM sandboxes with branchable execution state, using the same Nebius account and key as inference — is **planned, not shipped**. See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the current plan.
 
 ## For AI agents
 
-An LLM-readable doc is published at <https://nebius-tf-relay.vercel.app/llms.txt>. If you are an agent asked to install, configure, or drive nebiusrelay (including headless), read that first. It covers install, configure, every command, the models, and headless usage patterns.
+An LLM-readable doc is published at <https://kimi-relay.vercel.app/llms.txt>. If you are an agent asked to install, configure, or drive kimirelay (including headless), read that first. It covers install, configure, every command, the models, and headless usage patterns.
 
 ## Local development
 
 Monorepo: pnpm workspaces + Turbo. `packages/cli` (the relay), `packages/models` (the catalog), `packages/tests`, and `site/` (the install/update host).
 
 ```bash
-pnpm install                       # from repo root
-pnpm -F @nebiusrelay/cli build     # build the CLI
-pnpm dev                           # rebuild on change (run relay commands from another terminal)
-pnpm test                          # offline test suite
+pnpm install                     # from repo root
+pnpm -F @kimirelay/cli build     # build the CLI
+pnpm dev                         # rebuild on change (run relay commands from another terminal)
+pnpm test                        # offline test suite
 ```
 
 Run the built CLI directly, or through the workspace bin (closest to how users invoke it):
 
 ```bash
-node packages/cli/dist/bin/nebiusrelay.js help
-pnpm -F @nebiusrelay/cli exec nebiusrelay help
+node packages/cli/dist/bin/kimirelay.js help
+pnpm -F @kimirelay/cli exec kimirelay help
 ```
 
 Testing commands and live-smoke notes are in [TESTING.md](TESTING.md).
@@ -150,7 +150,11 @@ pnpm build:site        # builds the CLI bundle + latest.json + the site
 # deploy site/ to Vercel (or any static host)
 ```
 
-`scripts/build-bundle.sh` writes `site/public/nebiusrelay.js` (the installed bundle) and `site/public/latest.json` (the self-update manifest). Cut a release with `pnpm bump-version`, rebuild, and redeploy so installed binaries pick it up.
+`scripts/build-bundle.sh` writes `site/public/kimirelay.js` (the installed bundle) and `site/public/latest.json` (the self-update manifest). Cut a release with `pnpm bump-version`, rebuild, and redeploy so installed binaries pick it up.
+
+## Credits
+
+kimi-relay is a friendly fork of [shivaylamba/nebius-tf-relay](https://github.com/shivaylamba/nebius-tf-relay) (MIT). The daemon, wire-format translation, live model catalog, cost tracking, web-search emulation, and installer are that project's work; this fork rebrands the commands around Kimi K3 (`klaude` / `kodex` / `openkode` / `kpi`) and plans Token Factory Sandboxes integration on top.
 
 ## License
 

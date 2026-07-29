@@ -1,4 +1,4 @@
-import type { ModelDefinition } from "@nebiusrelay/models";
+import type { ModelDefinition } from "@kimirelay/models";
 
 export type ResponsesContentPart = {
   type?: string;

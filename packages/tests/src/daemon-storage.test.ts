@@ -14,7 +14,7 @@ afterEach(() => {
 
 describe("daemon session persistence", () => {
   test("restores the session-scoped Nebius base URL", async () => {
-    const home = mkdtempSync(join(tmpdir(), "nebiusrelay-daemon-store-"));
+    const home = mkdtempSync(join(tmpdir(), "kimirelay-daemon-store-"));
     cleanup.push(home);
     const output = execFileSync(
       process.execPath,

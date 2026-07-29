@@ -3,7 +3,7 @@ import type { AgentId, RegisterSessionRequest } from "./state.js";
 import { chmod, mkdir } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { nebiusrelayHome } from "../paths.js";
+import { kimirelayHome } from "../paths.js";
 
 const DATABASE_FILE = "daemon.sqlite";
 
@@ -58,7 +58,7 @@ export type SessionStore = {
   close(): void;
 };
 
-export async function createSessionStore(home = nebiusrelayHome()): Promise<SessionStore> {
+export async function createSessionStore(home = kimirelayHome()): Promise<SessionStore> {
   await mkdir(home, { recursive: true });
   const sqlite = await openSqlite(path.join(home, DATABASE_FILE));
   if (sqlite) {
@@ -73,7 +73,7 @@ export async function createSessionStore(home = nebiusrelayHome()): Promise<Sess
   return new ResilientSessionStore(new MemorySessionStore());
 }
 
-export function resolveSessionDatabasePath(home = nebiusrelayHome()): string {
+export function resolveSessionDatabasePath(home = kimirelayHome()): string {
   return path.join(home, DATABASE_FILE);
 }
 
@@ -217,7 +217,7 @@ class ResilientSessionStore implements SessionStore {
 
 function warnStoreError(action: string, err: unknown): void {
   const message = err instanceof Error ? err.message : String(err);
-  process.stderr.write(`[nebiusrelay daemon] Could not ${action}: ${message}\n`);
+  process.stderr.write(`[kimirelay daemon] Could not ${action}: ${message}\n`);
 }
 
 class SqliteSessionStore implements SessionStore {

@@ -2,9 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 
-const installCommand = "curl -fsSL https://nebius-tf-relay.vercel.app/install.sh | sh";
-const githubUrl = "https://github.com/shivaylamba/nebius-tf-relay";
-const docsUrl = "https://github.com/shivaylamba/nebius-tf-relay/blob/main/README.md";
+const installCommand = "curl -fsSL https://kimi-relay.vercel.app/install.sh | sh";
+const githubUrl = "https://github.com/opencolin/kimi-relay";
+const docsUrl = "https://github.com/opencolin/kimi-relay/blob/main/README.md";
 const nebiusApiKeysUrl = "https://tokenfactory.nebius.com/?modals=create-api-key";
 const tavilyKeysUrl = "https://app.tavily.com";
 const llmsUrl = "/llms.txt";
@@ -20,7 +20,7 @@ type Agent = {
 const agents: Agent[] = [
   {
     name: "Claude Code",
-    command: "nclaude",
+    command: "klaude",
     status: "Beta",
     mark: <ClaudeMark />,
     blurb:
@@ -28,7 +28,7 @@ const agents: Agent[] = [
   },
   {
     name: "Codex CLI",
-    command: "ncodex",
+    command: "kodex",
     status: "Beta",
     mark: <CodexMark />,
     blurb:
@@ -36,7 +36,7 @@ const agents: Agent[] = [
   },
   {
     name: "OpenCode",
-    command: "nopencode",
+    command: "openkode",
     status: "Stable",
     mark: <OpenCodeMark />,
     blurb:
@@ -44,7 +44,7 @@ const agents: Agent[] = [
   },
   {
     name: "Pi Code",
-    command: "npi",
+    command: "kpi",
     status: "Stable",
     mark: <PiMark />,
     blurb:
@@ -57,9 +57,9 @@ const steps = [
     title: "Install once",
     body: (
       <>
-        Run the one-liner. It drops <code>nebiusrelay</code> plus <code>nclaude</code>,{" "}
-        <code>ncodex</code>, <code>nopencode</code>, and <code>npi</code> onto your PATH and
-        installs Bun if you don&apos;t have it.
+        Run the one-liner. It drops <code>kimirelay</code> plus <code>klaude</code>,{" "}
+        <code>kodex</code>, <code>openkode</code>, and <code>kpi</code> onto your PATH and installs
+        Bun if you don&apos;t have it.
       </>
     ),
   },
@@ -67,7 +67,7 @@ const steps = [
     title: "Add your keys",
     body: (
       <>
-        On first run, <code>nebiusrelay configure</code> asks for your{" "}
+        On first run, <code>kimirelay configure</code> asks for your{" "}
         <a className="link" href={nebiusApiKeysUrl} target="_blank" rel="noopener noreferrer">
           Nebius Token Factory
         </a>{" "}
@@ -83,7 +83,7 @@ const steps = [
     title: "Launch an agent",
     body: (
       <>
-        Type <code>nclaude</code> or <code>ncodex</code> and keep working. The Relay injects Nebius
+        Type <code>klaude</code> or <code>kodex</code> and keep working. The Relay injects Nebius
         settings for that run only. Nothing is written to your real agent config.
       </>
     ),
@@ -172,7 +172,7 @@ function Home() {
             <BrandMark />
             <span className="flex items-baseline gap-1.5">
               <span className="text-[15.5px] font-semibold tracking-tight text-ink">
-                Nebius TF Relay
+                Kimi Relay
               </span>
             </span>
           </a>
@@ -442,7 +442,7 @@ function Home() {
           >
             <span className="text-lime">$</span>
             <span className="max-[520px]:hidden">
-              curl -fsSL nebius-tf-relay.vercel.app/install.sh | sh
+              curl -fsSL kimi-relay.vercel.app/install.sh | sh
             </span>
             <span className="hidden max-[520px]:inline">curl … | sh</span>
             <span className="ml-1 text-white/50">{copyState === "copied" ? "✓" : "⧉"}</span>
@@ -453,7 +453,7 @@ function Home() {
         <footer className="mt-4 flex flex-col gap-4 border-t border-line py-8 text-[13px] text-muted sm:flex-row sm:items-center">
           <div className="flex items-center gap-2.5">
             <BrandMark />
-            <span className="font-semibold text-ink">Nebius TF Relay</span>
+            <span className="font-semibold text-ink">Kimi Relay</span>
           </div>
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2 sm:ml-auto">
             <a

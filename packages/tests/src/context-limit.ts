@@ -37,13 +37,13 @@ export async function assertClaudeContextLimitRetry(context: TestContext): Promi
     assert(!looksLikeContextError(text), "context-length error leaked to the client");
     const stderr = daemon.stderr();
     assert(
-      stderr.includes("[nebiusrelay proxy] context-fit retry") ||
+      stderr.includes("[kimirelay proxy] context-fit retry") ||
         stderr.includes('"maxTokens":28000') ||
         stderr.includes("retrying nebius request with reduced max_tokens") ||
         stderr.includes("clamped request max_tokens to estimated context budget") ||
         stderr.includes("trimmed request input to reserve requested output") ||
-        (stderr.includes("nebiusrelay: trimmed") && stderr.includes("(retry path")) ||
-        (stderr.includes("nebiusrelay: DROPPED A LARGE PORTION") && stderr.includes("(retry path")),
+        (stderr.includes("kimirelay: trimmed") && stderr.includes("(retry path")) ||
+        (stderr.includes("kimirelay: DROPPED A LARGE PORTION") && stderr.includes("(retry path")),
       `daemon did not log context-limit prevention; stderr=${stderr.slice(-2000)}`,
     );
     assert(/CONTEXT_RETRY_OK/i.test(text), "retry response did not include expected final answer");
@@ -81,7 +81,7 @@ export async function assertCodexContextLimitRetry(context: TestContext): Promis
     );
     assert(!looksLikeContextError(text), "context-length error leaked to the client");
     assert(
-      daemon.stderr().includes("[nebiusrelay proxy] context-fit retry"),
+      daemon.stderr().includes("[kimirelay proxy] context-fit retry"),
       "daemon did not log Codex context-limit retry",
     );
     assert(

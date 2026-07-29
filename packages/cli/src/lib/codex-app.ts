@@ -42,8 +42,8 @@ import {
 } from "./codex-app/process.js";
 
 const CODEX_APP_PROVIDER_ID = `${CODEX_PROVIDER_ID}_codex_app`;
-const CODEX_APP_CONFIG_MARKER_START = "# >>> nebiusrelay codex-app alpha >>>";
-const CODEX_APP_CONFIG_MARKER_END = "# <<< nebiusrelay codex-app alpha <<<";
+const CODEX_APP_CONFIG_MARKER_START = "# >>> kimirelay codex-app alpha >>>";
+const CODEX_APP_CONFIG_MARKER_END = "# <<< kimirelay codex-app alpha <<<";
 const CODEX_APP_REQUIRES_OPENAI_AUTH_WORKAROUND = true;
 const BACKUP_MANIFEST = "latest.json";
 
@@ -75,7 +75,7 @@ export async function runCodexAppCommand(ctx: HarnessContext): Promise<HarnessRe
   });
   if (!apiKey) {
     throw new Error(
-      "No Nebius API key found. Pass --api-key, run `nebiusrelay configure`, or set NEBIUS_API_KEY.",
+      "No Nebius API key found. Pass --api-key, run `kimirelay configure`, or set NEBIUS_API_KEY.",
     );
   }
 
@@ -98,13 +98,13 @@ export async function runCodexAppCommand(ctx: HarnessContext): Promise<HarnessRe
     targetModelId: selectedModel.definition.id,
     modelName: selectedModel.definition.name,
     modelDefinition: selectedModel.definition,
-    ...(process.env.NEBIUSRELAY_DEBUG === "1" ? { debug: true } : {}),
+    ...(process.env.KIMIRELAY_DEBUG === "1" ? { debug: true } : {}),
   };
   await registerDaemonSession(proxyUrl, registration);
   // This command exits after configuring, so no launcher stays alive to
   // re-register the session. Persist the register body so the daemon can
   // rebuild the session on demand (restart, idle reap) from disk.
-  await writeAppRegistration(registration, nebiusrelayHomeDir(ctx.home));
+  await writeAppRegistration(registration, kimirelayHomeDir(ctx.home));
 
   const configPath = codexConfigPath(ctx.home);
   const backup = await backupCodexAppConfig(ctx.home, configPath);
@@ -112,7 +112,7 @@ export async function runCodexAppCommand(ctx: HarnessContext): Promise<HarnessRe
   const next = buildCodexAppConfig(existing ?? "", {
     modelId: selectedModel.definition.id,
     providerId: CODEX_APP_PROVIDER_ID,
-    providerName: "Nebius TF Relay",
+    providerName: "Kimi Relay",
     baseUrl: `${agentProxyUrl}/v1`,
     bearerToken: authToken,
     catalogPath,
@@ -154,10 +154,10 @@ export async function runCodexAppCommand(ctx: HarnessContext): Promise<HarnessRe
     },
   });
   const intro = [
-    "ChatGPT App profile changed to Nebius TF Relay. (alpha)",
+    "ChatGPT App profile changed to Kimi Relay. (alpha)",
     `Model: ${selectedModel.definition.name}`,
     "Start a task or open a repository in ChatGPT App as usual.",
-    "Restore your previous ChatGPT App profile with: nebiusrelay chatgpt --restore",
+    "Restore your previous ChatGPT App profile with: kimirelay chatgpt --restore",
     `Backup: ${backup}`,
     codexAppLaunchMessage(launch),
   ]
@@ -207,21 +207,21 @@ export function buildCodexAppConfig(
     "openai_base_url",
     "profile",
     // Strip legacy global context-window overrides that were emitted by early
-    // versions of the nebiusrelay managed config. They become stale the
+    // versions of the kimirelay managed config. They become stale the
     // moment the user switches models inside ChatGPT Desktop.
     "model_context_window",
     "model_auto_compact_token_limit",
   ]);
   const providerBlock = [
     CODEX_APP_CONFIG_MARKER_START,
-    "# nebiusrelay codex-app configures a dedicated alpha provider for ChatGPT Desktop.",
+    "# kimirelay codex-app configures a dedicated alpha provider for ChatGPT Desktop.",
     `[model_providers.${options.providerId}]`,
     `name = ${tomlString(options.providerName)}`,
     `base_url = ${tomlString(options.baseUrl)}`,
     'wire_api = "responses"',
     "# ChatGPT Desktop currently gates its model picker on provider auth state.",
     "# Setting this true is a Desktop workaround for custom providers; the",
-    "# actual model requests still go to the local Nebius TF Relay base_url above.",
+    "# actual model requests still go to the local Kimi Relay base_url above.",
     "# See https://github.com/openai/codex/issues/10867",
     `requires_openai_auth = ${CODEX_APP_REQUIRES_OPENAI_AUTH_WORKAROUND ? "true" : "false"}`,
     CODEX_APP_CONFIG_MARKER_END,
@@ -255,9 +255,9 @@ async function restoreCodexApp(home: string): Promise<HarnessResult> {
   await rm(appSessionLockPath(home), { force: true });
   // Drop the persisted registration so the daemon stops lazily resurrecting
   // the codex-app session after the user restores their original profile.
-  await clearAppRegistration(nebiusrelayHomeDir(home));
+  await clearAppRegistration(kimirelayHomeDir(home));
   // Restore should also drop the models cache: a stale OpenAI-only cache left
-  // behind by a nebiusrelay session would make Codex show "Unknown model"
+  // behind by a kimirelay session would make Codex show "Unknown model"
   // warnings for the user's real (restored) model until the cache expires.
   await bustStaleModelsCache(home);
 
@@ -363,14 +363,14 @@ function sleep(ms: number): Promise<void> {
 
 function backupDir(home: string): string {
   return path.join(
-    process.env.NEBIUSRELAY_HOME || path.join(home, ".nebiusrelay"),
+    process.env.KIMIRELAY_HOME || path.join(home, ".kimirelay"),
     "backup",
     "codex-app",
   );
 }
 
 function modelCatalogPath(home: string): string {
-  return path.join(home, ".codex", "nebiusrelay-codex-app-models.json");
+  return path.join(home, ".codex", "kimirelay-codex-app-models.json");
 }
 
 /**
@@ -391,8 +391,8 @@ async function bustStaleModelsCache(home: string): Promise<void> {
   }
 }
 
-function nebiusrelayHomeDir(home: string): string {
-  return process.env.NEBIUSRELAY_HOME || path.join(home, ".nebiusrelay");
+function kimirelayHomeDir(home: string): string {
+  return process.env.KIMIRELAY_HOME || path.join(home, ".kimirelay");
 }
 
 function codexAppSessionToken(authToken: string): string {
