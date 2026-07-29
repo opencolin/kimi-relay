@@ -227,5 +227,14 @@ dashboard/ensemble power tool — rather than becoming the installer.
 (`opencolin/kimi-relay`, public, full-history port). The "Installer UX"
 section above described extending the Python proxy's Textual TUI and is
 superseded: this relay and its installer are now the base, and the
-multi-provider seam, Tenki sandbox, and K-command rebrand land here.
-Points 2–4 remain open.
+Tenki sandbox and K-command rebrand land here. Points 2–4 remain open.
+
+**Decided 2026-07-29 (later): Nebius-only.** The Vercel AI Gateway provider
+path is cut from scope — kimi-relay stays a Nebius Token Factory product,
+like upstream. The multi-provider seam and the Vercel column of the wiring
+matrix above are historical context, not planned work. (Hosting the install
+site on Vercel is unrelated to this cut and stays.) Consequence to note
+honestly: without the provider seam, this fork's delta over upstream is
+K-branding + Tenki sandboxing, which raises the value of upstreaming Tenki
+support to nebius-tf-relay while kimi-relay remains the branded
+distribution.
