@@ -1,5 +1,13 @@
 # Nebius TF Relay
 
+> **Fork notice — kimi-relay.** This repository is a friendly fork of
+> [shivaylamba/nebius-tf-relay](https://github.com/shivaylamba/nebius-tf-relay)
+> (MIT), being rebranded as **kimi-relay**: `klaude` / `kodex` / `openkode`
+> launchers for Kimi K3 with a choice of non-Chinese hosting — Nebius Token
+> Factory (EU) or Vercel AI Gateway (US) — plus optional
+> [Tenki](https://tenki.cloud) sandboxing. See `docs/ROADMAP.md` for the roadmap.
+> Until the rebrand lands, everything below documents the upstream behavior.
+
 Run your local coding agents on [Nebius Token Factory](https://tokenfactory.nebius.com/) open models. One install, and **Claude Code**, **Codex**, **OpenCode**, and **Pi** all talk to open-weight models (Kimi K3, Kimi K2.6, Qwen 3.5, DeepSeek V4, MiniMax M3) instead of their default backends.
 
 ```bash
