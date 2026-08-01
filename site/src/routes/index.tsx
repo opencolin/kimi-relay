@@ -115,7 +115,7 @@ const stats = [
   { value: "0", label: "config files rewritten" },
 ];
 
-const heroAgents = ["Claude", "Codex", "OpenCode", "Pi"];
+const heroAgents = ["Claude", "Codex", "OpenCode", "Pi", "ChatGPT"];
 
 const kimiModelCardUrl = "https://huggingface.co/moonshotai/Kimi-K3";
 const artificialAnalysisUrl = "https://artificialanalysis.ai/models";
