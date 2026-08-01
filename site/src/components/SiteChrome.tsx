@@ -23,7 +23,9 @@ export function SiteNav() {
         <a href="/" className="flex items-center gap-2.5">
           <BrandMark />
           <span className="flex items-baseline gap-1.5">
-            <span className="text-[15.5px] font-semibold tracking-tight text-ink">Kimi.Guide</span>
+            <span className="text-[15.5px] font-semibold tracking-tight text-ink">
+              KimiRelay.com
+            </span>
           </span>
         </a>
         <nav className="ml-auto flex items-center gap-1 text-[14px] font-medium text-muted">
