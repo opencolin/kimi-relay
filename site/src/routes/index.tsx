@@ -209,7 +209,7 @@ function Home() {
         <SiteNav />
 
         {/* HERO */}
-        <section className="relative pt-14 pb-6 text-center max-[520px]:pt-10">
+        <section className="relative isolate pt-14 pb-6 text-center max-[520px]:pt-10">
           <a
             href={nebiusApiKeysUrl}
             target="_blank"
@@ -229,7 +229,7 @@ function Home() {
 
           {/* mascot: in-flow above the headline on narrow screens, floating
               beside the install card on wide ones */}
-          <HeroRobot className="pointer-events-none relative mx-auto mb-2 h-[210px] w-[200px] min-[1200px]:absolute min-[1200px]:top-[252px] min-[1200px]:right-[-56px] min-[1200px]:mx-0 min-[1200px]:mb-0 min-[1200px]:h-[360px] min-[1200px]:w-[280px]" />
+          <HeroRobot className="pointer-events-none absolute inset-x-0 top-10 -z-10 mx-auto h-[300px] w-[260px] opacity-55 min-[640px]:h-[360px] min-[640px]:w-[320px]" />
 
           <h1 className="mx-auto max-w-[860px] text-balance text-[clamp(36px,6.4vw,60px)] font-semibold leading-[1.04] tracking-[-0.02em] text-ink">
             <span className="relative whitespace-nowrap">
