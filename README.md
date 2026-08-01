@@ -5,7 +5,7 @@
 One install, and **Claude Code**, **Codex**, **OpenCode**, and **Pi** all talk to open-weight models (Kimi K3, Kimi K2.6, Qwen 3.5, DeepSeek V4, MiniMax M3) served from the EU instead of their default backends.
 
 ```bash
-curl -fsSL https://kimi-relay.vercel.app/install.sh | sh
+curl -fsSL https://kimirelay.com/install.sh | sh
 ```
 
 Then:
@@ -14,7 +14,7 @@ Then:
 klaude     # Claude Code on Kimi K3 (long form: kimirelay claude)
 ```
 
-> **Note:** `kimi-relay.vercel.app` is the project's future home and is **not deployed yet**. Until it is, install from a local checkout (see [Local development](#local-development)).
+> **Note:** [kimirelay.com](https://kimirelay.com) is the project's home; [kimi.guide](https://kimi.guide) serves the same content.
 
 ---
 
@@ -32,7 +32,7 @@ Nothing about your agent install changes. The relay injects a base URL and API k
 The one-liner installs the `kimirelay`, `klaude`, `kodex`, `openkode`, and `kpi` commands to `~/.kimirelay/bin/` and installs [Bun](https://bun.sh) for you if it isn't already present:
 
 ```bash
-curl -fsSL https://kimi-relay.vercel.app/install.sh | sh
+curl -fsSL https://kimirelay.com/install.sh | sh
 ```
 
 First run walks you through configuration (or run it directly):
@@ -111,7 +111,7 @@ Claude Code and Codex expose a native `web_search` tool. The relay backs it with
 | `KIMIRELAY_DISABLE_AUTOUPDATE=1` | Stop the installed binary from self-updating.                                                                                                    |
 | `KIMIRELAY_TELEMETRY_URL`        | Opt in to telemetry by pointing at your own collector. Off by default.                                                                           |
 
-The installed binary keeps itself up to date from `kimi-relay.vercel.app`, throttled to once an hour, and swallows every failure. Dev/source runs never self-update.
+The installed binary keeps itself up to date from `kimirelay.com`, throttled to once an hour, and swallows every failure. Dev/source runs never self-update.
 
 ## Sandboxing (roadmap)
 
@@ -119,7 +119,7 @@ Integration with [Nebius Token Factory Sandboxes](https://tokenfactory.nebius.co
 
 ## For AI agents
 
-An LLM-readable doc is published at <https://kimi-relay.vercel.app/llms.txt>. If you are an agent asked to install, configure, or drive kimirelay (including headless), read that first. It covers install, configure, every command, the models, and headless usage patterns.
+An LLM-readable doc is published at <https://kimirelay.com/llms.txt>. If you are an agent asked to install, configure, or drive kimirelay (including headless), read that first. It covers install, configure, every command, the models, and headless usage patterns.
 
 ## Local development
 

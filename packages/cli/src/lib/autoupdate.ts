@@ -16,7 +16,7 @@ import os from "node:os";
 import { VERSION } from "./version.js";
 
 /** Single origin for the landing page, manifest, and downloadable bundle. */
-const UPDATE_ORIGIN = "https://kimi-relay.vercel.app";
+const UPDATE_ORIGIN = "https://kimirelay.com";
 /** Override for testing/local mirrors; normally unset. */
 function resolveManifestUrl(): string {
   return process.env.KIMIRELAY_MANIFEST_URL ?? `${UPDATE_ORIGIN}/latest.json`;
