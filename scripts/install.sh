@@ -60,38 +60,33 @@ if ! curl -fsSL "$ORIGIN/kimirelay.js" -o "$BIN_DIR/kimirelay.js"; then
 fi
 ok "Bundle saved → $BIN_DIR/kimirelay.js"
 
-# --- 3. Write the `kimirelay` wrapper that runs the bundle with bun --------
-cat > "$BIN_DIR/kimirelay" <<EOF
+# --- 3. Write the launcher wrappers that run the bundle with bun -------------
+# The wrappers locate bun themselves (PATH first, then ~/.bun/bin) so they
+# work in shells that haven't picked up bun's PATH line yet - a fresh install
+# in a fresh terminal must never die with "exec: bun: not found".
+write_launcher() {
+  launcher_name="$1"
+  launcher_subcmd="$2"
+  cat > "$BIN_DIR/$launcher_name" <<EOF
 #!/usr/bin/env sh
 # kimirelay launcher - runs the installed Bun-target JS bundle.
-exec bun "$BIN_DIR/kimirelay.js" "\$@"
+BUN_BIN="\$(command -v bun 2>/dev/null || true)"
+[ -n "\$BUN_BIN" ] || BUN_BIN="\$HOME/.bun/bin/bun"
+if [ ! -x "\$BUN_BIN" ]; then
+  echo "kimirelay: the bun runtime was not found (looked on PATH and in ~/.bun/bin)." >&2
+  echo "Install it with: curl -fsSL https://bun.sh/install | bash" >&2
+  exit 127
+fi
+exec "\$BUN_BIN" "$BIN_DIR/kimirelay.js"${launcher_subcmd:+ $launcher_subcmd} "\$@"
 EOF
-chmod +x "$BIN_DIR/kimirelay"
+  chmod +x "$BIN_DIR/$launcher_name"
+}
 
-# Short aliases: klaude / openkode / kodex / kpi
-cat > "$BIN_DIR/klaude" <<EOF
-#!/usr/bin/env sh
-exec bun "$BIN_DIR/kimirelay.js" claude "\$@"
-EOF
-chmod +x "$BIN_DIR/klaude"
-
-cat > "$BIN_DIR/openkode" <<EOF
-#!/usr/bin/env sh
-exec bun "$BIN_DIR/kimirelay.js" opencode "\$@"
-EOF
-chmod +x "$BIN_DIR/openkode"
-
-cat > "$BIN_DIR/kodex" <<EOF
-#!/usr/bin/env sh
-exec bun "$BIN_DIR/kimirelay.js" codex "\$@"
-EOF
-chmod +x "$BIN_DIR/kodex"
-
-cat > "$BIN_DIR/kpi" <<EOF
-#!/usr/bin/env sh
-exec bun "$BIN_DIR/kimirelay.js" pi "\$@"
-EOF
-chmod +x "$BIN_DIR/kpi"
+write_launcher kimirelay ""
+write_launcher klaude claude
+write_launcher openkode opencode
+write_launcher kodex codex
+write_launcher kpi pi
 
 ok "Wrappers installed: kimirelay, klaude, openkode, kodex, kpi → $BIN_DIR"
 
@@ -222,17 +217,25 @@ case ":$PATH:" in
 esac
 
 # Verify the install works right now if already on PATH, else with explicit PATH.
+INSTALLED_VERSION=""
 if PATH="$BIN_DIR:$PATH" kimirelay --version >/dev/null 2>&1; then
-  ok "Verified: $(PATH="$BIN_DIR:$PATH" kimirelay --version)"
+  INSTALLED_VERSION="$(PATH="$BIN_DIR:$PATH" kimirelay --version)"
   PATH="$BIN_DIR:$PATH" kimirelay __telemetry-install-completed >/dev/null 2>&1 || true
 fi
 
-bold "Done. Run \`kimirelay help\` to get started."
-info "On first run, kimirelay will ask for your Nebius API key (Enter to skip)."
+# --- Post-install summary ----------------------------------------------------
+echo ""
+bold "✔ kimirelay installed"
+info "Version:  ${INSTALLED_VERSION:-unknown (verify with: kimirelay --version)}"
+info "Location: $BIN_DIR"
+info "Next:     run \`klaude\` (Claude Code on Kimi K3) or \`kimirelay\` to pick a tool."
+info "          First run asks for your Nebius API key (Enter to skip)."
 
-# The PATH hint above scrolls away easily; if the command still isn't
-# reachable in THIS shell, repeat it as the very last thing the user sees.
+# Setup notes come LAST so they can't scroll away. The PATH line was already
+# appended to the shell rc above; the current shell just hasn't loaded it.
 if ! command -v kimirelay >/dev/null 2>&1; then
-  bold "One more step for this terminal (or just open a new one):"
+  echo ""
+  bold "⚠ Setup note: kimirelay is not on this shell's PATH yet. Run:"
   info "  export PATH=\"$BIN_DIR:\$PATH\""
+  info "or open a new terminal (your shell profile already has the PATH line)."
 fi
