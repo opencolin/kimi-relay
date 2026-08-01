@@ -346,6 +346,19 @@ function Home() {
               </div>
             ))}
           </div>
+
+          {/* trust row */}
+          <div className="mx-auto mt-6 flex max-w-[640px] flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-[12.5px] text-faint">
+            <span className="inline-flex items-center gap-1.5">
+              <span aria-hidden="true">🔒</span>SOC 2-compliant data centers
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span aria-hidden="true">🇫🇷</span>Hosted in Paris, France
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span aria-hidden="true">🚫</span>Zero data retention supported
+            </span>
+          </div>
         </section>
 
         {/* KIMI K3 */}
@@ -359,7 +372,8 @@ function Home() {
             mixture-of-experts (104B active per token) with a 1-million-token context window, built
             for agentic coding. On Moonshot&apos;s published evals it beats leading proprietary
             models on long-horizon software engineering and agentic search — and through Nebius
-            Token Factory every token is served from EU datacenters.
+            Token Factory every token is served from SOC 2-compliant data centers in Paris, France,
+            with zero data retention supported.
           </p>
           <div className="mt-6 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
             {kimiBenchmarks.map((b) => (
