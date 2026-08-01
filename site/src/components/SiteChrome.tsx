@@ -15,7 +15,7 @@ export function SiteNav() {
         rel="noopener noreferrer"
         className="mx-[calc(50%-50vw)] flex items-center justify-center gap-2 border-b border-line bg-lime/10 px-6 py-2 text-center text-[13px] font-medium text-lime transition hover:bg-lime/15"
       >
-        🎁 New: $25 in free Token Factory credits for new accounts — claim yours
+        🎁 New: $25 in Token Factory credits + $25 in Tavily credits for new accounts — claim yours
         <ArrowUpRight />
       </a>
       <header className="flex items-center gap-3 py-5">

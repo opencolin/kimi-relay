@@ -505,11 +505,12 @@ function Home() {
               Limited-time promo
             </span>
             <h2 className="mx-auto mt-4 max-w-[560px] text-balance text-[28px] font-semibold tracking-tight text-white">
-              Start with <span className="text-lime">$25 in free credits</span>
+              Start with <span className="text-lime">$25 + $25 in free credits</span>
             </h2>
             <p className="mx-auto mt-3 max-w-[520px] text-[15px] leading-relaxed text-white/65">
-              New Nebius Token Factory accounts get $25 in credits through the Nebius builders
-              program — enough for millions of Kimi K3 tokens through the relay.
+              The Nebius builders program gives new accounts $25 in Token Factory credits and $25 in
+              Tavily credits — millions of Kimi K3 tokens plus the live web search the relay runs on
+              Tavily.
             </p>
             <a
               href={freeCreditsUrl}
@@ -517,7 +518,7 @@ function Home() {
               rel="noopener noreferrer"
               className="mt-7 inline-flex items-center gap-1.5 rounded-lg bg-lime px-5 py-2.5 text-[13.5px] font-semibold text-surface transition hover:brightness-[1.03] active:scale-[.98]"
             >
-              Claim $25 free credits
+              Claim your free credits
               <ArrowUpRight />
             </a>
           </div>
