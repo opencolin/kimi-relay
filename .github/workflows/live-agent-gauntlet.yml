@@ -28,7 +28,7 @@ concurrency:
 jobs:
   live:
     name: Real inference harness tests
-    runs-on: ubuntu-latest
+    runs-on: tenki-standard-medium-4c-8g
     timeout-minutes: 45
     env:
       CI: "true"
