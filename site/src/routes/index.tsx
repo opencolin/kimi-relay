@@ -246,8 +246,22 @@ function Home() {
               <span className="relative">Kimi K3</span>
             </span>{" "}
             for{" "}
-            <span key={heroAgents[heroAgentIndex]} className="hero-agent-swap inline-block">
-              {heroAgents[heroAgentIndex]}
+            <span className="inline-grid justify-items-start text-left">
+              {heroAgents.map((name) => (
+                <span
+                  key={`ghost-${name}`}
+                  aria-hidden="true"
+                  className="invisible col-start-1 row-start-1"
+                >
+                  {name}
+                </span>
+              ))}
+              <span
+                key={heroAgents[heroAgentIndex]}
+                className="hero-agent-swap col-start-1 row-start-1"
+              >
+                {heroAgents[heroAgentIndex]}
+              </span>
             </span>
           </h1>
           <p className="mx-auto mt-6 mb-9 max-w-[600px] text-pretty text-[18.5px] leading-relaxed text-muted">
