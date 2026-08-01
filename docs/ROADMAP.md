@@ -37,9 +37,9 @@ Add Cursor as the fifth harness. Two candidate mechanisms, spike decides:
 
 Spike questions: does `cursor-agent` accept base-URL/model overrides per
 invocation; which wire format does it speak (chat completions vs responses);
-does the relay's existing Codex bridge cover it. Deliverable: `kursor` command
-
-- site/README updates, or an honest write-up of why it's recipe-only.
+does the relay's existing Codex bridge cover it. Deliverable: the `kursor`
+command plus site/README updates, or an honest write-up of why it's
+recipe-only.
 
 ### 2. Remote sessions on Token Factory Sandboxes
 
