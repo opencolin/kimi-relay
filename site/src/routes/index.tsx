@@ -261,6 +261,10 @@ function Home() {
             <span className="text-ink">open models</span>
           </a>
 
+          {/* mascot: in-flow above the headline on narrow screens, floating
+              beside the install card on wide ones */}
+          <HeroRobot className="pointer-events-none relative mx-auto mb-2 h-[210px] w-[200px] min-[1200px]:absolute min-[1200px]:top-[252px] min-[1200px]:right-[-56px] min-[1200px]:mx-0 min-[1200px]:mb-0 min-[1200px]:h-[360px] min-[1200px]:w-[280px]" />
+
           <h1 className="mx-auto max-w-[860px] text-balance text-[clamp(36px,6.4vw,60px)] font-semibold leading-[1.04] tracking-[-0.02em] text-ink">
             Add{" "}
             <span className="relative whitespace-nowrap">
@@ -359,10 +363,6 @@ function Home() {
               </div>
             ))}
           </div>
-
-          {/* mascot: in-flow below the stats on narrow screens, floating beside
-              the install card on wide ones */}
-          <HeroRobot className="pointer-events-none relative mx-auto mt-8 h-[240px] w-[220px] min-[1200px]:absolute min-[1200px]:top-[252px] min-[1200px]:right-[-56px] min-[1200px]:mx-0 min-[1200px]:mt-0 min-[1200px]:h-[360px] min-[1200px]:w-[280px]" />
         </section>
 
         {/* START / HOW IT WORKS */}
