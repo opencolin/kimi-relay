@@ -4,8 +4,7 @@ export const githubUrl = "https://github.com/opencolin/kimi-relay";
 export const docsUrl = "https://github.com/opencolin/kimi-relay/blob/main/README.md";
 export const nebiusApiKeysUrl = "https://tokenfactory.nebius.com/?modals=create-api-key";
 export const llmsUrl = "/llms.txt";
-export const freeCreditsUrl =
-  "https://nebius.com/promo-code?utm_promo_event_code=tokenfactory-credits-50&utm_promo_code_type=Token_Factory&utm_promo_activation_code=TOKENFACTORY-50-KUE&utm_promo_campaign_id=FUTURECARIBBEAN";
+export const freeCreditsUrl = "https://dev.nebius.com/builders";
 
 export function SiteNav() {
   return (
@@ -16,7 +15,7 @@ export function SiteNav() {
         rel="noopener noreferrer"
         className="mx-[calc(50%-50vw)] flex items-center justify-center gap-2 border-b border-line bg-lime/10 px-6 py-2 text-center text-[13px] font-medium text-lime transition hover:bg-lime/15"
       >
-        🎁 New: $50 in free Token Factory credits for new accounts — claim yours
+        🎁 New: $25 in Token Factory credits + $25 in Tavily credits for new accounts — claim yours
         <ArrowUpRight />
       </a>
       <header className="flex items-center gap-3 py-5">
