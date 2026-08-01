@@ -244,6 +244,14 @@ async function main() {
     throw new Error(`Unknown "daemon ${verb}" command. Expected: stop.`);
   }
 
+  // Token Factory Sandboxes: `kimirelay sandbox <status|run|advisory>`.
+  if (command === "sandbox") {
+    const { runSandboxCli } = await import("../lib/commands/sandbox.js");
+    const index = process.argv.indexOf("sandbox");
+    await runSandboxCli(index === -1 ? [] : process.argv.slice(index + 1));
+    return;
+  }
+
   if (command === "codex-app") {
     if (!parsed.flags.restore && !(await ensureConfiguredForInteractiveLaunch())) {
       throw new Error("No Nebius API key found. Run `kimirelay configure` or set NEBIUS_API_KEY.");
@@ -260,6 +268,36 @@ async function main() {
   }
 
   const invocation = resolveHarnessInvocation(parsed.positional, parsed.flags);
+
+  // `klaude --sandbox ...` / `kodex --sandbox ...`: the wrapper scripts put
+  // everything after the harness token into passthrough, so a leading
+  // --sandbox there selects the remote Token Factory Sandbox session instead
+  // of a local launch. Remaining passthrough goes to the harness inside the
+  // sandbox.
+  if (
+    (invocation.command === "claude" || invocation.command === "codex") &&
+    invocation.flags.passthrough?.[0] === "--sandbox"
+  ) {
+    let rest = invocation.flags.passthrough.slice(1);
+    let image: string | undefined;
+    if (rest[0] === "--image" && rest[1] !== undefined) {
+      image = rest[1];
+      rest = rest.slice(2);
+    }
+    if (rest[0] === "--") {
+      rest = rest.slice(1);
+    }
+    if (!(await ensureConfiguredForInteractiveLaunch())) {
+      throw new Error("No Nebius API key found. Run `kimirelay configure` or set NEBIUS_API_KEY.");
+    }
+    void sendTelemetryEvent({ event: "cli_started", agent: `${invocation.command}-sandbox` });
+    const { runHarnessSandbox } = await import("../lib/commands/sandbox.js");
+    await runHarnessSandbox(invocation.command, rest, {
+      apiKey: invocation.flags.apiKey,
+      image,
+    });
+    return;
+  }
 
   // First-run key setup only matters for the harness-launching commands.
   if (

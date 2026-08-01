@@ -113,9 +113,13 @@ Claude Code and Codex expose a native `web_search` tool. The relay backs it with
 
 The installed binary keeps itself up to date from `kimirelay.com`, throttled to once an hour, and swallows every failure. Dev/source runs never self-update.
 
-## Sandboxing (roadmap)
+## Sandboxing (beta)
 
-Integration with [Nebius Token Factory Sandboxes](https://tokenfactory.nebius.com/sandboxes/about) — running agents inside disposable microVM sandboxes with branchable execution state, using the same Nebius account and key as inference — is **planned, not shipped**. See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the current plan.
+[Nebius Token Factory Sandboxes](https://tokenfactory.nebius.com/sandboxes/about) integration ships as a first pass: `kimirelay sandbox status|run|advisory`, plus headless remote sessions with `klaude --sandbox -p "<task>"` / `kodex --sandbox exec "<task>"` — the harness runs inside a disposable microVM against your repo's pushed state, on the same Nebius key as inference. Sandboxes itself is a beta behind an access request; the CLI says so when access is missing. Details, limitations, and the advisory block: [`docs/SANDBOXES.md`](docs/SANDBOXES.md).
+
+## Cursor
+
+Cursor has no injectable CLI endpoint yet, so there is no `kursor` command — the editor recipe (pointing Cursor's custom-model slot straight at Nebius) and the reasoning live in [`docs/CURSOR.md`](docs/CURSOR.md).
 
 ## For AI agents
 
