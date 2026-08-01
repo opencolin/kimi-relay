@@ -8,10 +8,10 @@ import {
   nebiusApiKeysUrl,
   SiteFooter,
   SiteNav,
+  tavilyKeysUrl,
 } from "../components/SiteChrome";
 
 const installCommand = "curl -fsSL https://kimirelay.com/install.sh | sh";
-const tavilyKeysUrl = "https://app.tavily.com";
 
 type Agent = {
   name: string;
@@ -252,8 +252,8 @@ function Home() {
           </h1>
           <p className="mx-auto mt-6 mb-9 max-w-[600px] text-pretty text-[18.5px] leading-relaxed text-muted">
             A local relay that connects Claude Code, Codex, OpenCode, and Pi Code to Kimi K3 and
-            other open models on Nebius Token Factory, with short commands and zero edits to your
-            real tool config.
+            other open models on Nebius Token Factory — with live Tavily web search, short commands,
+            and zero edits to your real tool config.
           </p>
 
           {/* dark install card: the focal surface */}
@@ -455,7 +455,8 @@ function Home() {
               <p className="mt-4 max-w-[280px] text-[14.5px] leading-relaxed text-white/65">
                 One Nebius Token Factory key powers all four agents through a single local proxy.
                 The model list is pulled live from Nebius, so every model they serve is one command
-                away.
+                away. Add an optional Tavily key and every agent gets live web search with real
+                citations.
               </p>
               <div className="mt-6 flex flex-wrap gap-2">
                 {["Kimi K3", "Kimi K2.6", "Qwen 3.5", "DeepSeek V4", "MiniMax M3"].map((m) => (
