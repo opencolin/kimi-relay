@@ -47,7 +47,7 @@ const fs = require('node:fs');
 const version = '${VERSION}';
 const manifest = {
   version,
-  url: 'https://kimi-relay.vercel.app/kimirelay.js',
+  url: 'https://kimirelay.com/kimirelay.js',
   publishedAt: new Date().toISOString(),
 };
 const json = JSON.stringify(manifest, null, 2) + '\n';

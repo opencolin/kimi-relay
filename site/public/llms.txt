@@ -2,23 +2,23 @@
 
 > Use Nebius Token Factory models in the coding-agent CLIs you already run - OpenCode, Claude Code, Codex CLI, and Pi Code. kimirelay injects Nebius settings for a single run so your normal tool configs stay untouched.
 
-kimirelay is an MIT-licensed CLI router. Install once, then launch your agent with short commands (`kodex`, `klaude`, `openkode`, `kpi`). For Claude Code and Codex CLI it routes the agent's API traffic to Nebius Token Factory through a local translation proxy; for OpenCode and Pi Code it injects ephemeral per-run config. The installed binary keeps itself up to date automatically from kimi-relay.vercel.app.
+kimirelay is an MIT-licensed CLI router. Install once, then launch your agent with short commands (`kodex`, `klaude`, `openkode`, `kpi`). For Claude Code and Codex CLI it routes the agent's API traffic to Nebius Token Factory through a local translation proxy; for OpenCode and Pi Code it injects ephemeral per-run config. The installed binary keeps itself up to date automatically from kimirelay.com.
 
 This is the LLM-readable documentation file for the project. If you are an AI agent asked to install, configure, or use kimirelay (headless or interactive), read this file first. It covers installation, configuration, every command, the available models, headless/agentic usage patterns, how to keep the tool up to date, and the routing architecture.
 
 - Project: https://github.com/opencolin/kimi-relay
-- Website: https://kimi-relay.vercel.app
-- Installer: https://kimi-relay.vercel.app/install.sh
-- Version manifest: https://kimi-relay.vercel.app/latest.json
+- Website: https://kimirelay.com
+- Installer: https://kimirelay.com/install.sh
+- Version manifest: https://kimirelay.com/latest.json
 - README: https://github.com/opencolin/kimi-relay/blob/main/README.md
-- This file: https://kimi-relay.vercel.app/llms.txt
+- This file: https://kimirelay.com/llms.txt
 
 ## Install
 
 One command installs the `kimirelay`, `klaude`, `openkode`, `kodex`, and `kpi` commands to `~/.kimirelay/bin/` and installs Bun for you if it isn't already present:
 
 ```
-curl -fsSL https://kimi-relay.vercel.app/install.sh | sh
+curl -fsSL https://kimirelay.com/install.sh | sh
 ```
 
 After install, restart your shell (or run the `export PATH=...` line it prints) so the commands are on PATH. The install:
@@ -203,15 +203,15 @@ Per-task cost varies a lot with how verbose the agent is. Mechanical, well-scope
 
 ## Keeping kimirelay up to date
 
-The installed binary self-updates automatically in the background. The check is throttled and bounded, never throws, and runs before argument parsing - so even `kimirelay help` keeps an install current. The update is pulled from https://kimi-relay.vercel.app/latest.json, which contains `version`, `url`, and `publishedAt`.
+The installed binary self-updates automatically in the background. The check is throttled and bounded, never throws, and runs before argument parsing - so even `kimirelay help` keeps an install current. The update is pulled from https://kimirelay.com/latest.json, which contains `version`, `url`, and `publishedAt`.
 
 To force a refresh, re-run the install one-liner:
 
 ```
-curl -fsSL https://kimi-relay.vercel.app/install.sh | sh
+curl -fsSL https://kimirelay.com/install.sh | sh
 ```
 
-You can check the installed version with `kimirelay --version` and compare it against the published manifest at https://kimi-relay.vercel.app/latest.json.
+You can check the installed version with `kimirelay --version` and compare it against the published manifest at https://kimirelay.com/latest.json.
 
 ## Architecture (how routing works)
 
@@ -242,9 +242,9 @@ kimirelay daemon stop
 
 - [GitHub](https://github.com/opencolin/kimi-relay): source repository and issues
 - [README](https://github.com/opencolin/kimi-relay/blob/main/README.md): human-readable project overview
-- [Website](https://kimi-relay.vercel.app): landing page
-- [Install script](https://kimi-relay.vercel.app/install.sh): one-command installer (`curl -fsSL https://kimi-relay.vercel.app/install.sh | sh`)
-- [Version manifest](https://kimi-relay.vercel.app/latest.json): current published version and release timestamp
-- [This LLM docs file](https://kimi-relay.vercel.app/llms.txt): the file you are reading now
+- [Website](https://kimirelay.com): landing page
+- [Install script](https://kimirelay.com/install.sh): one-command installer (`curl -fsSL https://kimirelay.com/install.sh | sh`)
+- [Version manifest](https://kimirelay.com/latest.json): current published version and release timestamp
+- [This LLM docs file](https://kimirelay.com/llms.txt): the file you are reading now
 - [Nebius Token Factory API keys](https://tokenfactory.nebius.com/?modals=create-api-key): get a key to route traffic
 - [llms.txt specification](https://llmstxt.org): the convention this file follows

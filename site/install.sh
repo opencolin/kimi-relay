@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # kimirelay installer.
 #
-#   curl -fsSL https://kimi-relay.vercel.app/install.sh | sh
+#   curl -fsSL https://kimirelay.com/install.sh | sh
 #
 # Installs the kimirelay CLI as a Bun-target JS bundle at
 # ~/.kimirelay/bin/kimirelay.js, with a `kimirelay` wrapper script on
@@ -13,7 +13,7 @@
 
 set -euo pipefail
 
-ORIGIN="${KIMIRELAY_ORIGIN:-https://kimi-relay.vercel.app}"
+ORIGIN="${KIMIRELAY_ORIGIN:-https://kimirelay.com}"
 INSTALL_DIR="${KIMIRELAY_HOME:-$HOME/.kimirelay}"
 BIN_DIR="$INSTALL_DIR/bin"
 
