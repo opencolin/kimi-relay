@@ -559,7 +559,17 @@ function Home() {
             >
               Nebius keys
             </a>
-            <span className="text-faint">MIT licensed</span>
+            <span className="text-faint">
+              MIT licensed · a friendly fork of{" "}
+              <a
+                className="underline decoration-faint/40 underline-offset-2 transition hover:text-ink"
+                href="https://github.com/shivaylamba/nebius-tf-relay"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                nebius-tf-relay
+              </a>
+            </span>
           </div>
         </footer>
       </div>

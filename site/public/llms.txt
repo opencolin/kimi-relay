@@ -2,7 +2,7 @@
 
 > Use Nebius Token Factory models in the coding-agent CLIs you already run - OpenCode, Claude Code, Codex CLI, and Pi Code. kimirelay injects Nebius settings for a single run so your normal tool configs stay untouched.
 
-kimirelay is an MIT-licensed CLI router. Install once, then launch your agent with short commands (`kodex`, `klaude`, `openkode`, `kpi`). For Claude Code and Codex CLI it routes the agent's API traffic to Nebius Token Factory through a local translation proxy; for OpenCode and Pi Code it injects ephemeral per-run config. The installed binary keeps itself up to date automatically from kimirelay.com.
+kimirelay is an MIT-licensed CLI router. Install once, then launch your agent with short commands (`kodex`, `klaude`, `openkode`, `kpi`). For Claude Code and Codex CLI it routes the agent's API traffic to Nebius Token Factory through a local translation proxy; for OpenCode and Pi Code it injects ephemeral per-run config. The installed binary keeps itself up to date automatically from kimirelay.com. kimirelay is a friendly fork of nebius-tf-relay (https://github.com/shivaylamba/nebius-tf-relay, MIT), whose daemon, wire-format translation, and installer this project builds on.
 
 This is the LLM-readable documentation file for the project. If you are an AI agent asked to install, configure, or use kimirelay (headless or interactive), read this file first. It covers installation, configuration, every command, the available models, headless/agentic usage patterns, how to keep the tool up to date, and the routing architecture.
 
