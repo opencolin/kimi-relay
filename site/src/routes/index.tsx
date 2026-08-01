@@ -243,9 +243,10 @@ function Home() {
             <span className="text-ink">open models</span>
           </a>
 
-          {/* mascot: in-flow above the headline on narrow screens, floating
-              beside the install card on wide ones */}
-          <HeroRobot className="pointer-events-none absolute top-12 right-0 left-0 -z-10 mx-auto h-[220px] w-[190px] opacity-55 min-[1200px]:top-[190px] min-[1200px]:right-[-48px] min-[1200px]:left-auto min-[1200px]:mx-0 min-[1200px]:h-[300px] min-[1200px]:w-[240px] min-[1200px]:opacity-100" />
+          {/* mascot: centered behind the headline on narrow screens, docked on
+              the right edge from medium widths (smaller, no overhang so it
+              stays inside the viewport), full-size with overhang on wide */}
+          <HeroRobot className="pointer-events-none absolute top-12 right-0 left-0 -z-10 mx-auto h-[220px] w-[190px] opacity-55 min-[1000px]:top-[170px] min-[1000px]:left-auto min-[1000px]:mx-0 min-[1000px]:h-[225px] min-[1000px]:w-[180px] min-[1000px]:opacity-100 min-[1200px]:top-[190px] min-[1200px]:right-[-48px] min-[1200px]:h-[300px] min-[1200px]:w-[240px]" />
 
           <h1 className="mx-auto max-w-[860px] text-balance text-[clamp(36px,6.4vw,60px)] font-semibold leading-[1.04] tracking-[-0.02em] text-ink">
             <span className="relative whitespace-nowrap">
