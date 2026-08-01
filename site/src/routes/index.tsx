@@ -2,7 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 import { HeroRobot } from "../components/HeroRobot";
-import { ArrowUpRight, nebiusApiKeysUrl, SiteFooter, SiteNav } from "../components/SiteChrome";
+import {
+  ArrowUpRight,
+  freeCreditsUrl,
+  nebiusApiKeysUrl,
+  SiteFooter,
+  SiteNav,
+} from "../components/SiteChrome";
 
 const installCommand = "curl -fsSL https://kimirelay.com/install.sh | sh";
 const tavilyKeysUrl = "https://app.tavily.com";
@@ -485,6 +491,38 @@ function Home() {
                 <p className="mt-2 text-[13.5px] leading-relaxed text-muted">{f.body}</p>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* FREE CREDITS */}
+        <section className="relative mt-20 overflow-hidden rounded-2xl bg-[linear-gradient(150deg,var(--color-surface)_0%,var(--color-surface-2)_100%)] px-8 py-10 text-center ring-1 ring-lime/25 max-[520px]:px-5">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -top-20 left-1/2 size-64 -translate-x-1/2 rounded-full bg-lime/15 blur-3xl"
+          />
+          <div className="relative">
+            <span className="inline-flex items-center gap-2 rounded-full bg-lime/[.12] px-3 py-1 text-[12px] font-semibold tracking-[0.08em] text-lime uppercase">
+              Limited-time promo
+            </span>
+            <h2 className="mx-auto mt-4 max-w-[560px] text-balance text-[28px] font-semibold tracking-tight text-white">
+              Start with <span className="text-lime">$50 in free credits</span>
+            </h2>
+            <p className="mx-auto mt-3 max-w-[520px] text-[15px] leading-relaxed text-white/65">
+              New Nebius Token Factory accounts get $50 in credits with code{" "}
+              <code className="rounded bg-white/[.08] px-1.5 py-0.5 font-mono text-[13px] text-white/85">
+                TOKENFACTORY-50-KUE
+              </code>{" "}
+              — enough for millions of Kimi K3 tokens through the relay.
+            </p>
+            <a
+              href={freeCreditsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-7 inline-flex items-center gap-1.5 rounded-lg bg-lime px-5 py-2.5 text-[13.5px] font-semibold text-surface transition hover:brightness-[1.03] active:scale-[.98]"
+            >
+              Claim $50 free credits
+              <ArrowUpRight />
+            </a>
           </div>
         </section>
 
