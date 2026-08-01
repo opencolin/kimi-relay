@@ -28,6 +28,22 @@
     text-rendering: optimizeLegibility;
   }
 
+  /* Dark theme scope: re-points the semantic color tokens for everything
+     inside it (Tailwind v4 utilities resolve var(--color-*) per element).
+     Applied to the homepage; the dashboard keeps the light palette. */
+  .theme-dark {
+    --color-ink: #e9edf6;
+    --color-muted: #9fa9c3;
+    --color-faint: #6f7a96;
+    --color-line: #1a2237;
+    --color-line-strong: #27304a;
+    --color-code: #141c30;
+    --color-canvas: #0e1526;
+    background: #070c19;
+    color: var(--color-ink);
+    color-scheme: dark;
+  }
+
   body {
     margin: 0;
     background: #ffffff;

@@ -115,6 +115,32 @@ const stats = [
   { value: "0", label: "config files rewritten" },
 ];
 
+const kimiModelCardUrl = "https://huggingface.co/moonshotai/Kimi-K3";
+const artificialAnalysisUrl = "https://artificialanalysis.ai/models";
+
+const kimiBenchmarks = [
+  {
+    value: "42.0",
+    label: "SWE-Marathon",
+    detail: "#1 on long-horizon software engineering, ahead of Claude Opus 4.8 (40.0).",
+  },
+  {
+    value: "91.2",
+    label: "BrowseComp",
+    detail: "#1 on agentic web research, ahead of GPT-5.6 (90.4).",
+  },
+  {
+    value: "67.5",
+    label: "DeepSWE",
+    detail: "Deep repository engineering, well ahead of Claude Opus 4.8 (59.0).",
+  },
+  {
+    value: "#1",
+    label: "Open-weight model",
+    detail: "Top open-weight model on the Artificial Analysis Intelligence Index at launch.",
+  },
+];
+
 export const Route = createFileRoute("/")({
   component: Home,
 });
@@ -158,11 +184,11 @@ function Home() {
     [release.version, release.age].filter(Boolean).join(" · ") || "auto-updating";
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="theme-dark min-h-screen">
       {/* subtle top glow */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[520px] bg-[radial-gradient(60%_100%_at_50%_-10%,#f1f0ff_0%,rgba(255,255,255,0)_70%)]"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[520px] bg-[radial-gradient(60%_100%_at_50%_-10%,rgba(106,92,243,.18)_0%,rgba(7,12,25,0)_70%)]"
       />
 
       <div className="mx-auto max-w-[1120px] px-6 max-[520px]:px-4">
@@ -211,7 +237,7 @@ function Home() {
             href={nebiusApiKeysUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mb-7 inline-flex items-center gap-2 rounded-full border border-line-strong bg-white/80 py-1.5 pr-3.5 pl-1.5 text-[13px] font-medium text-muted shadow-[0_1px_2px_rgba(10,10,10,.04)] backdrop-blur transition hover:text-ink"
+            className="mb-7 inline-flex items-center gap-2 rounded-full border border-line-strong bg-white/[.04] py-1.5 pr-3.5 pl-1.5 text-[13px] font-medium text-muted shadow-[0_1px_2px_rgba(10,10,10,.04)] backdrop-blur transition hover:text-ink"
           >
             <img
               src="/nebius-token-factory.png"
@@ -225,24 +251,24 @@ function Home() {
           </a>
 
           <h1 className="mx-auto max-w-[860px] text-balance text-[clamp(36px,6.4vw,60px)] font-semibold leading-[1.04] tracking-[-0.02em] text-ink">
-            Run your coding agents on{" "}
+            Connect your coding agents to{" "}
             <span className="relative whitespace-nowrap">
-              Nebius Token Factory
               <span
                 aria-hidden="true"
-                className="absolute inset-x-0 -bottom-1 h-[10px] rounded-full bg-lime/70"
-                style={{ zIndex: -1 }}
+                className="absolute inset-x-0 -bottom-1 h-[10px] rounded-full bg-lime/40"
               />
+              <span className="relative">Kimi K3</span>
             </span>
           </h1>
           <p className="mx-auto mt-6 mb-9 max-w-[600px] text-pretty text-[18.5px] leading-relaxed text-muted">
-            A local relay that points Claude Code, Codex, OpenCode, and Pi Code at open models on
-            Nebius Token Factory, with short commands and zero edits to your real tool config.
+            A local relay that connects Claude Code, Codex, OpenCode, and Pi Code to Kimi K3 and
+            other open models on Nebius Token Factory, with short commands and zero edits to your
+            real tool config.
           </p>
 
           {/* dark install card: the focal surface */}
           <div className="mx-auto max-w-[680px]">
-            <div className="relative overflow-hidden rounded-2xl bg-[linear-gradient(150deg,var(--color-surface)_0%,var(--color-surface-2)_100%)] p-2 shadow-[0_1px_2px_rgba(10,10,10,.1),0_30px_60px_-30px_rgba(10,15,30,.6)]">
+            <div className="relative overflow-hidden rounded-2xl bg-[linear-gradient(150deg,var(--color-surface)_0%,var(--color-surface-2)_100%)] p-2 shadow-[0_1px_2px_rgba(10,10,10,.1),0_30px_60px_-30px_rgba(10,15,30,.6)] ring-1 ring-white/10">
               <div
                 aria-hidden="true"
                 className="pointer-events-none absolute -top-16 right-6 size-40 rounded-full bg-lime/18 blur-3xl"
@@ -267,7 +293,7 @@ function Home() {
                   type="button"
                   onClick={handleCopy}
                   aria-label="Copy install command"
-                  className="inline-flex min-w-[92px] cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-white/10 px-3 py-2 font-sans text-[13px] font-semibold text-white ring-1 ring-white/15 transition hover:bg-white/15 active:scale-95 data-[copied=true]:bg-lime data-[copied=true]:text-ink data-[copied=true]:ring-lime"
+                  className="inline-flex min-w-[92px] cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-white/10 px-3 py-2 font-sans text-[13px] font-semibold text-white ring-1 ring-white/15 transition hover:bg-white/15 active:scale-95 data-[copied=true]:bg-lime data-[copied=true]:text-surface data-[copied=true]:ring-lime"
                   data-copied={copyState === "copied"}
                 >
                   {copyState === "copied" ? (
@@ -294,7 +320,7 @@ function Home() {
             {agents.map((a) => (
               <div
                 key={a.command}
-                className="inline-flex items-center gap-2 rounded-full border border-line-strong bg-white py-1.5 pr-3.5 pl-2 text-[13.5px] shadow-[0_1px_2px_rgba(10,10,10,.03)]"
+                className="inline-flex items-center gap-2 rounded-full border border-line-strong bg-white/[.04] py-1.5 pr-3.5 pl-2 text-[13.5px] shadow-[0_1px_2px_rgba(10,10,10,.03)]"
               >
                 <span className="flex size-6 items-center justify-center text-ink">{a.mark}</span>
                 <span className="font-mono font-medium text-ink">{a.command}</span>
@@ -322,7 +348,7 @@ function Home() {
 
         {/* START / HOW IT WORKS */}
         <section className="mt-20 grid gap-4 lg:grid-cols-[1.35fr_1fr]">
-          <div className="rounded-2xl border border-line-strong bg-white p-7 max-[520px]:p-6">
+          <div className="rounded-2xl border border-line-strong bg-canvas p-7 max-[520px]:p-6">
             <SectionEyebrow>Start relaying</SectionEyebrow>
             <h2 className="mt-3 mb-6 text-[24px] font-semibold tracking-tight text-ink">
               Three commands from zero to running.
@@ -330,7 +356,7 @@ function Home() {
             <ol className="flex flex-col gap-5">
               {steps.map((step, i) => (
                 <li key={step.title} className="flex gap-4">
-                  <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-ink text-[13px] font-semibold text-white tabular-nums">
+                  <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-ink text-[13px] font-semibold text-surface tabular-nums">
                     {i + 1}
                   </span>
                   <div>
@@ -345,7 +371,7 @@ function Home() {
           </div>
 
           {/* dark accent card: echoes the dashboard's dedicated-endpoints panel */}
-          <div className="relative overflow-hidden rounded-2xl bg-[linear-gradient(155deg,var(--color-surface)_0%,var(--color-surface-2)_100%)] p-7 max-[520px]:p-6">
+          <div className="relative overflow-hidden rounded-2xl bg-[linear-gradient(155deg,var(--color-surface)_0%,var(--color-surface-2)_100%)] p-7 ring-1 ring-white/10 max-[520px]:p-6">
             <div
               aria-hidden="true"
               className="pointer-events-none absolute -bottom-20 -right-10 size-56 rounded-full bg-violet/25 blur-3xl"
@@ -375,7 +401,7 @@ function Home() {
                 href={nebiusApiKeysUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-7 inline-flex items-center gap-1.5 rounded-lg bg-lime px-4 py-2.5 text-[13.5px] font-semibold text-ink transition hover:brightness-[1.03] active:scale-[.98]"
+                className="mt-7 inline-flex items-center gap-1.5 rounded-lg bg-lime px-4 py-2.5 text-[13.5px] font-semibold text-surface transition hover:brightness-[1.03] active:scale-[.98]"
               >
                 Get a Token Factory key
                 <ArrowUpRight />
@@ -394,10 +420,10 @@ function Home() {
             {agents.map((a) => (
               <article
                 key={a.name}
-                className="group flex flex-col rounded-2xl border border-line-strong bg-white p-6 transition hover:border-faint hover:shadow-[0_1px_2px_rgba(10,10,10,.04),0_16px_40px_-24px_rgba(10,15,30,.28)]"
+                className="group flex flex-col rounded-2xl border border-line-strong bg-canvas p-6 transition hover:border-faint hover:shadow-[0_1px_2px_rgba(10,10,10,.04),0_16px_40px_-24px_rgba(10,15,30,.28)]"
               >
                 <div className="flex items-center justify-between">
-                  <span className="flex size-11 items-center justify-center rounded-xl border border-line-strong bg-canvas text-ink">
+                  <span className="flex size-11 items-center justify-center rounded-xl border border-line-strong bg-code text-ink">
                     {a.mark}
                   </span>
                   <StatusBadge status={a.status} />
@@ -412,12 +438,59 @@ function Home() {
           </div>
         </section>
 
+        {/* KIMI K3 */}
+        <section className="mt-20" id="kimi-k3">
+          <SectionEyebrow>The model</SectionEyebrow>
+          <h2 className="mt-3 max-w-[620px] text-[26px] font-semibold tracking-tight text-ink">
+            What is Kimi K3?
+          </h2>
+          <p className="mt-3 max-w-[700px] text-[15px] leading-relaxed text-muted">
+            Kimi K3 is Moonshot AI&apos;s open-weight frontier model: a 2.8-trillion-parameter
+            mixture-of-experts (104B active per token) with a 1-million-token context window, built
+            for agentic coding. On Moonshot&apos;s published evals it beats leading proprietary
+            models on long-horizon software engineering and agentic search — and through Nebius
+            Token Factory every token is served from EU datacenters.
+          </p>
+          <div className="mt-6 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+            {kimiBenchmarks.map((b) => (
+              <div key={b.label} className="rounded-2xl border border-line-strong bg-canvas p-5">
+                <div className="text-[26px] font-semibold leading-none text-lime tabular-nums">
+                  {b.value}
+                </div>
+                <h3 className="mt-2.5 text-[15px] font-semibold text-ink">{b.label}</h3>
+                <p className="mt-1.5 text-[13.5px] leading-relaxed text-muted">{b.detail}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 text-[13px] text-faint">
+            Scores from the official{" "}
+            <a
+              className="font-medium underline decoration-faint/40 underline-offset-2 transition hover:text-ink"
+              href={kimiModelCardUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Kimi K3 model card
+            </a>{" "}
+            and{" "}
+            <a
+              className="font-medium underline decoration-faint/40 underline-offset-2 transition hover:text-ink"
+              href={artificialAnalysisUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Artificial Analysis
+            </a>
+            .
+          </p>
+        </section>
+
         {/* FEATURES */}
         <section className="mt-20">
           <SectionEyebrow>Why route through the Relay</SectionEyebrow>
           <div className="mt-6 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
             {features.map((f) => (
-              <div key={f.title} className="rounded-2xl border border-line-strong bg-white p-5">
+              <div key={f.title} className="rounded-2xl border border-line-strong bg-canvas p-5">
                 <span className="mb-4 block h-1 w-8 rounded-full bg-lime" />
                 <h3 className="text-[15px] font-semibold text-ink">{f.title}</h3>
                 <p className="mt-2 text-[13.5px] leading-relaxed text-muted">{f.body}</p>
@@ -438,12 +511,12 @@ function Home() {
           <button
             type="button"
             onClick={handleCopy}
-            className="inline-flex items-center gap-2.5 rounded-xl bg-ink px-5 py-3 font-mono text-[13.5px] text-white shadow-[0_1px_2px_rgba(10,10,10,.14),0_16px_40px_-20px_rgba(10,15,30,.6)] transition hover:brightness-110 active:scale-[.98]"
+            className="inline-flex items-center gap-2.5 rounded-xl bg-ink px-5 py-3 font-mono text-[13.5px] text-surface shadow-[0_1px_2px_rgba(10,10,10,.14),0_16px_40px_-20px_rgba(10,15,30,.6)] transition hover:brightness-110 active:scale-[.98]"
           >
-            <span className="text-lime">$</span>
+            <span className="text-lime-ink">$</span>
             <span className="max-[520px]:hidden">curl -fsSL kimirelay.com/install.sh | sh</span>
             <span className="hidden max-[520px]:inline">curl … | sh</span>
-            <span className="ml-1 text-white/50">{copyState === "copied" ? "✓" : "⧉"}</span>
+            <span className="ml-1 text-surface/60">{copyState === "copied" ? "✓" : "⧉"}</span>
           </button>
         </section>
 
@@ -511,13 +584,13 @@ function StatusBadge({ status }: Readonly<{ status: "Stable" | "Beta" }>) {
     <span
       className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-wide uppercase"
       style={{
-        background: stable ? "rgba(198,241,53,.16)" : "rgba(106,92,243,.1)",
-        color: stable ? "var(--color-lime-ink)" : "var(--color-violet)",
+        background: stable ? "rgba(198,241,53,.14)" : "rgba(106,92,243,.16)",
+        color: stable ? "var(--color-lime)" : "#a49aff",
       }}
     >
       <span
         className="size-1.5 rounded-full"
-        style={{ background: stable ? "#7fae00" : "var(--color-violet)" }}
+        style={{ background: stable ? "#a4c92e" : "#a49aff" }}
       />
       {status === "Stable" ? "100% supported" : "Beta"}
     </span>
@@ -526,7 +599,7 @@ function StatusBadge({ status }: Readonly<{ status: "Stable" | "Beta" }>) {
 
 function BrandMark() {
   return (
-    <span className="relative flex size-8 items-center justify-center rounded-[9px] bg-ink">
+    <span className="relative flex size-8 items-center justify-center rounded-[9px] bg-surface ring-1 ring-white/10">
       <span className="absolute inset-0 rounded-[9px] bg-[radial-gradient(120%_120%_at_20%_0%,rgba(198,241,53,.4)_0%,rgba(198,241,53,0)_55%)]" />
       <PiMarkWhite />
     </span>
@@ -563,8 +636,8 @@ function ArrowUpRight() {
 function OpenCodeMark() {
   return (
     <svg className="h-6 w-[19px]" viewBox="0 0 240 300" fill="none" aria-hidden="true">
-      <path d="M180 240H60V120H180V240Z" fill="#CFCECD" />
-      <path d="M180 60H60V240H180V60ZM240 300H0V0H240V300Z" fill="#211E1E" />
+      <path d="M180 240H60V120H180V240Z" fill="#0f1626" />
+      <path d="M180 60H60V240H180V60ZM240 300H0V0H240V300Z" fill="currentColor" />
     </svg>
   );
 }
