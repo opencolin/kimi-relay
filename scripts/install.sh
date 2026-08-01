@@ -64,6 +64,8 @@ ok "Bundle saved → $BIN_DIR/kimirelay.js"
 # The wrappers locate bun themselves (PATH first, then ~/.bun/bin) so they
 # work in shells that haven't picked up bun's PATH line yet - a fresh install
 # in a fresh terminal must never die with "exec: bun: not found".
+# Keep the generated text in lockstep with launcherScript() in
+# packages/cli/src/lib/wrappers.ts, which rewrites these on self-update.
 write_launcher() {
   launcher_name="$1"
   launcher_subcmd="$2"

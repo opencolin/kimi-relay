@@ -14,6 +14,7 @@ import { readFile, writeFile, rename, stat } from "node:fs/promises";
 import path from "node:path";
 import os from "node:os";
 import { VERSION } from "./version.js";
+import { refreshLauncherWrappers } from "./wrappers.js";
 
 /** Single origin for the landing page, manifest, and downloadable bundle. */
 const UPDATE_ORIGIN = "https://kimirelay.com";
@@ -188,6 +189,16 @@ export async function maybeSelfUpdate(): Promise<void> {
     return;
   }
   await touchThrottle();
+
+  // The launcher wrappers next to the bundle are written by install.sh and
+  // otherwise never change; refresh them on the same hourly cadence so wrapper
+  // fixes reach existing installs, not just fresh ones. Runs even when the
+  // bundle itself is already current.
+  try {
+    await refreshLauncherWrappers(path.join(resolveInstallDir(), "bin"));
+  } catch {
+    // Swallowed: wrapper refresh must never break the user's command.
+  }
 
   try {
     const manifest = await withTimeout(fetchManifest(), OVERALL_TIMEOUT_MS);

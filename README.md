@@ -111,7 +111,7 @@ Claude Code and Codex expose a native `web_search` tool. The relay backs it with
 | `KIMIRELAY_DISABLE_AUTOUPDATE=1` | Stop the installed binary from self-updating.                                                                                                    |
 | `KIMIRELAY_TELEMETRY_URL`        | Opt in to telemetry by pointing at your own collector. Off by default.                                                                           |
 
-The installed binary keeps itself up to date from `kimirelay.com`, throttled to once an hour, and swallows every failure. Dev/source runs never self-update.
+The installed binary keeps itself up to date from `kimirelay.com`, throttled to once an hour, and swallows every failure. On the same cadence it refreshes the launcher wrappers (`kimirelay`, `klaude`, …) next to the bundle, so wrapper fixes reach existing installs too. Dev/source runs never self-update.
 
 ## Sandboxing (beta)
 
