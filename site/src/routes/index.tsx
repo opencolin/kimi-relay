@@ -124,7 +124,26 @@ const stats = [
   { value: "0", label: "config files rewritten" },
 ];
 
-const heroAgents = ["Claude", "Codex", "OpenCode", "Pi", "ChatGPT"];
+type HeroAgent = { name: string; mark: ReactNode };
+
+const heroAgents: HeroAgent[] = [
+  { name: "Claude", mark: <ClaudeMark /> },
+  { name: "Codex", mark: <CodexMark /> },
+  { name: "OpenCode", mark: <OpenCodeMark /> },
+  { name: "Pi", mark: <PiMark /> },
+  { name: "ChatGPT", mark: <img src="/chatgpt-icon.png" alt="" className="rounded-[22%]" /> },
+];
+
+function HeroAgentLabel({ agent }: Readonly<{ agent: HeroAgent }>) {
+  return (
+    <span className="inline-flex items-baseline gap-[0.2em]">
+      <span className="flex size-[0.72em] items-center justify-center self-center [&>img]:size-full [&>svg]:size-full">
+        {agent.mark}
+      </span>
+      {agent.name}
+    </span>
+  );
+}
 
 const kimiModelCardUrl = "https://huggingface.co/moonshotai/Kimi-K3";
 const artificialAnalysisUrl = "https://artificialanalysis.ai/models";
@@ -247,20 +266,20 @@ function Home() {
             </span>{" "}
             for{" "}
             <span className="inline-grid justify-items-start text-left">
-              {heroAgents.map((name) => (
+              {heroAgents.map((a) => (
                 <span
-                  key={`ghost-${name}`}
+                  key={`ghost-${a.name}`}
                   aria-hidden="true"
                   className="invisible col-start-1 row-start-1"
                 >
-                  {name}
+                  <HeroAgentLabel agent={a} />
                 </span>
               ))}
               <span
-                key={heroAgents[heroAgentIndex]}
+                key={heroAgents[heroAgentIndex].name}
                 className="hero-agent-swap col-start-1 row-start-1"
               >
-                {heroAgents[heroAgentIndex]}
+                <HeroAgentLabel agent={heroAgents[heroAgentIndex]} />
               </span>
             </span>
           </h1>
