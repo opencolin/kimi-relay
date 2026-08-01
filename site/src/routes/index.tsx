@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
+import { HeroRobot } from "../components/HeroRobot";
 
 const installCommand = "curl -fsSL https://kimirelay.com/install.sh | sh";
 const githubUrl = "https://github.com/opencolin/kimi-relay";
@@ -242,7 +243,8 @@ function Home() {
         </header>
 
         {/* HERO */}
-        <section className="pt-14 pb-6 text-center max-[520px]:pt-10">
+        <section className="relative pt-14 pb-6 text-center max-[520px]:pt-10">
+          <HeroRobot className="pointer-events-none absolute top-[252px] right-[-56px] hidden h-[360px] w-[280px] min-[1200px]:block" />
           <a
             href={nebiusApiKeysUrl}
             target="_blank"
