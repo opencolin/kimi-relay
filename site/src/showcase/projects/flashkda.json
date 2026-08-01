@@ -1,0 +1,8 @@
+{
+  "name": "FlashKDA",
+  "description": "High-performance CUDA kernels for Kimi Delta Attention — the attention architecture at the heart of Kimi K3 — optimised for training and decoding.",
+  "url": "https://github.com/moonshotai/FlashKDA",
+  "author": "moonshotai",
+  "emoji": "🔥",
+  "tags": ["kernels", "cuda", "official"]
+}

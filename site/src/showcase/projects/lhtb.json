@@ -1,0 +1,8 @@
+{
+  "name": "LHTB",
+  "description": "The Long Horizon Terminal Benchmark: dense-reward grading for AI agents on extended terminal tasks — the kind of long-running work Kimi K3 tops leaderboards on.",
+  "url": "https://github.com/zli12321/LHTB",
+  "author": "zli12321",
+  "emoji": "📊",
+  "tags": ["benchmark", "evals"]
+}

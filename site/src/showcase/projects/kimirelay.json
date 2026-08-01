@@ -1,0 +1,8 @@
+{
+  "name": "kimirelay",
+  "description": "This site's own CLI: run Kimi K3 inside Claude Code, Codex, OpenCode, and Pi Code via a local translating relay. One install, four harnesses, zero config edits.",
+  "url": "https://github.com/opencolin/kimi-relay",
+  "author": "opencolin",
+  "emoji": "🔀",
+  "tags": ["cli", "relay", "agents"]
+}
