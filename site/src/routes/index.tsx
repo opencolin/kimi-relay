@@ -10,6 +10,7 @@ const tavilyKeysUrl = "https://app.tavily.com";
 type Agent = {
   name: string;
   command: string;
+  pill: string;
   status: "Stable" | "Beta";
   mark: ReactNode;
   blurb: string;
@@ -19,6 +20,7 @@ const agents: Agent[] = [
   {
     name: "Claude Code",
     command: "klaude",
+    pill: "claude",
     status: "Beta",
     mark: <ClaudeMark />,
     blurb:
@@ -27,6 +29,7 @@ const agents: Agent[] = [
   {
     name: "Codex CLI",
     command: "kodex",
+    pill: "codex",
     status: "Beta",
     mark: <CodexMark />,
     blurb:
@@ -35,6 +38,7 @@ const agents: Agent[] = [
   {
     name: "OpenCode",
     command: "openkode",
+    pill: "opencode",
     status: "Stable",
     mark: <OpenCodeMark />,
     blurb:
@@ -43,6 +47,7 @@ const agents: Agent[] = [
   {
     name: "Pi Code",
     command: "kpi",
+    pill: "pi",
     status: "Stable",
     mark: <PiMark />,
     blurb:
@@ -302,7 +307,7 @@ function Home() {
                 className="inline-flex items-center gap-2 rounded-full border border-line-strong bg-white/[.04] py-1.5 pr-3.5 pl-2 text-[13.5px] shadow-[0_1px_2px_rgba(10,10,10,.03)]"
               >
                 <span className="flex size-6 items-center justify-center text-ink">{a.mark}</span>
-                <span className="font-mono font-medium text-ink">{a.command}</span>
+                <span className="font-mono font-medium text-ink">{a.pill}</span>
               </div>
             ))}
           </div>
