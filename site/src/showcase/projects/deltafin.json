@@ -1,0 +1,8 @@
+{
+  "name": "deltafin",
+  "description": "Run the full Kimi K3 on a single device, with an OpenAI-compatible API server for local chat and coding agents.",
+  "url": "https://github.com/gavamedia/deltafin",
+  "author": "gavamedia",
+  "emoji": "🖥️",
+  "tags": ["inference", "local", "server"]
+}

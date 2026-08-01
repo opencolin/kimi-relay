@@ -1,0 +1,8 @@
+{
+  "name": "PapersGPT for Zotero",
+  "description": "A research assistant plugin that chats with your papers inside Zotero, with Kimi K3 among its supported models for summarising and querying PDFs.",
+  "url": "https://github.com/papersgpt/papersgpt-for-zotero",
+  "author": "papersgpt",
+  "emoji": "📚",
+  "tags": ["research", "plugin", "mcp"]
+}

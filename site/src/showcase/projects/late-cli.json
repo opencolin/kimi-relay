@@ -1,0 +1,8 @@
+{
+  "name": "late-cli",
+  "description": "A minimal AI coding agent built around Kimi K3, preserving context across long sessions with ephemeral subagents.",
+  "url": "https://github.com/mlhher/late-cli",
+  "author": "mlhher",
+  "emoji": "⚡",
+  "tags": ["cli", "agent", "minimal"]
+}

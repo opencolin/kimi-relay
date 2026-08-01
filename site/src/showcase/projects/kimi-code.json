@@ -1,0 +1,8 @@
+{
+  "name": "Kimi Code",
+  "description": "Moonshot AI's official open-source coding agent CLI — \"the starting point for next-gen agents\", built to drive Kimi K3 in the terminal.",
+  "url": "https://github.com/moonshotai/kimi-code",
+  "author": "moonshotai",
+  "emoji": "🌙",
+  "tags": ["cli", "agent", "official"]
+}

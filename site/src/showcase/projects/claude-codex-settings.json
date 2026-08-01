@@ -1,0 +1,8 @@
+{
+  "name": "claude-codex-settings",
+  "description": "Battle-tested configuration files and plugins for Claude Code, Codex, and Cursor with first-class support for the Kimi API.",
+  "url": "https://github.com/fcakyon/claude-codex-settings",
+  "author": "fcakyon",
+  "emoji": "🛠️",
+  "tags": ["config", "plugins"]
+}
