@@ -118,12 +118,6 @@ const features = [
   },
 ];
 
-const stats = [
-  { value: "4", label: "coding agents" },
-  { value: "1", label: "install command" },
-  { value: "0", label: "config files rewritten" },
-];
-
 type HeroAgent = { name: string; mark: ReactNode };
 
 const heroAgents: HeroAgent[] = [
@@ -150,22 +144,19 @@ const artificialAnalysisUrl = "https://artificialanalysis.ai/models";
 
 const kimiBenchmarks = [
   {
-    value: "42.0",
     label: "SWE-Marathon",
-    detail: "#1 on long-horizon software engineering, ahead of Claude Opus 4.8 (40.0).",
+    detail: "Long-horizon software engineering: 42.0, ahead of Claude Opus 4.8 (40.0).",
   },
   {
-    value: "91.2",
     label: "BrowseComp",
-    detail: "#1 on agentic web research, ahead of GPT-5.6 (90.4).",
+    detail: "Agentic web research: 91.2, ahead of GPT-5.6 (90.4).",
   },
   {
-    value: "67.5",
     label: "DeepSWE",
-    detail: "Deep repository engineering, well ahead of Claude Opus 4.8 (59.0).",
+    detail:
+      "Deep repository engineering: 67.5, ahead of GPT-5.5 (67.0) and Claude Opus 4.8 (59.0).",
   },
   {
-    value: "#1",
     label: "Open-weight model",
     detail: "Top open-weight model on the Artificial Analysis Intelligence Index at launch.",
   },
@@ -355,23 +346,6 @@ function Home() {
               </div>
             ))}
           </div>
-
-          {/* stats */}
-          <div className="mx-auto mt-10 grid max-w-[560px] grid-cols-3 gap-3">
-            {stats.map((s) => (
-              <div
-                key={s.label}
-                className="rounded-xl border border-line-strong bg-canvas px-4 py-3.5 text-left"
-              >
-                <div className="text-[26px] font-semibold leading-none text-ink tabular-nums">
-                  {s.value}
-                </div>
-                <div className="mt-1.5 text-[12.5px] font-medium leading-snug text-muted">
-                  {s.label}
-                </div>
-              </div>
-            ))}
-          </div>
         </section>
 
         {/* KIMI K3 */}
@@ -390,8 +364,8 @@ function Home() {
           <div className="mt-6 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
             {kimiBenchmarks.map((b) => (
               <div key={b.label} className="rounded-2xl border border-line-strong bg-canvas p-5">
-                <div className="text-[26px] font-semibold leading-none text-lime tabular-nums">
-                  {b.value}
+                <div className="flex items-center gap-2 text-[26px] font-semibold leading-none text-lime tabular-nums">
+                  <span aria-hidden="true">🏆</span>#1
                 </div>
                 <h3 className="mt-2.5 text-[15px] font-semibold text-ink">{b.label}</h3>
                 <p className="mt-1.5 text-[13.5px] leading-relaxed text-muted">{b.detail}</p>
