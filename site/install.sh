@@ -11,7 +11,10 @@
 # After install, the CLI prompts once for a Nebius API key on first use
 # (Enter skips - the key is optional). The CLI self-updates in the background.
 
-set -euo pipefail
+set -eu
+# pipefail is not POSIX; the documented one-liner pipes into `sh`, which is
+# dash on Debian/Ubuntu. Enable it only where the shell supports it.
+if (set -o pipefail) 2>/dev/null; then set -o pipefail; fi
 
 ORIGIN="${KIMIRELAY_ORIGIN:-https://kimirelay.com}"
 INSTALL_DIR="${KIMIRELAY_HOME:-$HOME/.kimirelay}"
