@@ -229,3 +229,10 @@ fi
 
 bold "Done. Run \`kimirelay help\` to get started."
 info "On first run, kimirelay will ask for your Nebius API key (Enter to skip)."
+
+# The PATH hint above scrolls away easily; if the command still isn't
+# reachable in THIS shell, repeat it as the very last thing the user sees.
+if ! command -v kimirelay >/dev/null 2>&1; then
+  bold "One more step for this terminal (or just open a new one):"
+  info "  export PATH=\"$BIN_DIR:\$PATH\""
+fi

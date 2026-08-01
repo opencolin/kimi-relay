@@ -25,6 +25,10 @@ bottom. This revision reflects what has shipped and proposes what comes next.
 
 ### 1. Cursor support (`kursor`)
 
+**Status (2026-08-01): spiked — shipped as a recipe.** `cursor-agent` has no
+endpoint override to inject (see `docs/CURSOR.md` for the recipe and the full
+reasoning); revisit if Cursor adds provider overrides to the CLI.
+
 Add Cursor as the fifth harness. Two candidate mechanisms, spike decides:
 
 - **Cursor CLI (`cursor-agent`)**: if it honors an OpenAI-compatible base URL
@@ -42,6 +46,12 @@ command plus site/README updates, or an honest write-up of why it's
 recipe-only.
 
 ### 2. Remote sessions on Token Factory Sandboxes
+
+**Status (2026-08-01): first pass shipped** — `kimirelay sandbox
+status|run|advisory` plus headless `klaude --sandbox` / `kodex --sandbox`
+against pushed git state (`docs/SANDBOXES.md`). Interactive TTY, artifact
+download, and prebaked images remain open; live verification is blocked on
+beta access.
 
 The flagship differentiator (see decision log): run the harness _inside_ a
 [Token Factory Sandbox](https://tokenfactory.nebius.com/sandboxes/about)
