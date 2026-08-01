@@ -9,18 +9,18 @@ export const Route = createRootRoute({
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       {
-        title: "Kimi Relay - Run Claude Code, Codex, OpenCode & Pi Code on Nebius",
+        title: "Kimi Relay - Connect Claude Code, Codex, OpenCode & Pi Code to Kimi K3",
       },
       {
         name: "description",
         content:
-          "A local relay that points Claude Code, Codex, OpenCode, and Pi Code at open models on Nebius Token Factory - short commands, zero edits to your real tool config.",
+          "A local relay that connects Claude Code, Codex, OpenCode, and Pi Code to Kimi K3 and other open models on Nebius Token Factory - short commands, zero edits to your real tool config.",
       },
       { property: "og:title", content: "Kimi Relay" },
       {
         property: "og:description",
         content:
-          "Run your coding agents on Nebius Token Factory open models. One install, four harnesses, config-free.",
+          "Connect your coding agents to Kimi K3 on Nebius Token Factory. One install, four harnesses, config-free.",
       },
       { property: "og:image", content: "/nebius-token-factory.png" },
       { property: "og:type", content: "website" },
