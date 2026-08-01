@@ -115,6 +115,8 @@ const stats = [
   { value: "0", label: "config files rewritten" },
 ];
 
+const heroAgents = ["Claude", "Codex", "OpenCode", "Pi"];
+
 const kimiModelCardUrl = "https://huggingface.co/moonshotai/Kimi-K3";
 const artificialAnalysisUrl = "https://artificialanalysis.ai/models";
 
@@ -148,7 +150,15 @@ export const Route = createFileRoute("/")({
 function Home() {
   const [copyState, setCopyState] = useState<"idle" | "copied" | "select">("idle");
   const [release, setRelease] = useState<{ version?: string; age?: string }>({});
+  const [heroAgentIndex, setHeroAgentIndex] = useState(0);
   const commandRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setHeroAgentIndex((i) => (i + 1) % heroAgents.length);
+    }, 2000);
+    return () => window.clearInterval(id);
+  }, []);
 
   useEffect(() => {
     fetch("/latest.json", { cache: "no-store" })
@@ -251,7 +261,11 @@ function Home() {
           </a>
 
           <h1 className="mx-auto max-w-[860px] text-balance text-[clamp(36px,6.4vw,60px)] font-semibold leading-[1.04] tracking-[-0.02em] text-ink">
-            Connect your coding agents to{" "}
+            Connect{" "}
+            <span key={heroAgents[heroAgentIndex]} className="hero-agent-swap inline-block">
+              {heroAgents[heroAgentIndex]}
+            </span>{" "}
+            to{" "}
             <span className="relative whitespace-nowrap">
               <span
                 aria-hidden="true"

@@ -64,3 +64,20 @@
     color: #ffffff;
   }
 }
+
+/* Hero agent-name rotation: React remounts the span (keyed by name) every
+   swap, replaying the entrance animation. */
+.hero-agent-swap {
+  animation: hero-agent-in 0.35s ease;
+}
+
+@keyframes hero-agent-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.3em);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
