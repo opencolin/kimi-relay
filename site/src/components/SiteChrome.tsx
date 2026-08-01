@@ -4,50 +4,63 @@ export const githubUrl = "https://github.com/opencolin/kimi-relay";
 export const docsUrl = "https://github.com/opencolin/kimi-relay/blob/main/README.md";
 export const nebiusApiKeysUrl = "https://tokenfactory.nebius.com/?modals=create-api-key";
 export const llmsUrl = "/llms.txt";
+export const freeCreditsUrl =
+  "https://nebius.com/promo-code?utm_promo_event_code=tokenfactory-credits-50&utm_promo_code_type=Token_Factory&utm_promo_activation_code=TOKENFACTORY-50-KUE&utm_promo_campaign_id=FUTURECARIBBEAN";
 
 export function SiteNav() {
   return (
-    <header className="flex items-center gap-3 py-5">
-      <a href="/" className="flex items-center gap-2.5">
-        <BrandMark />
-        <span className="flex items-baseline gap-1.5">
-          <span className="text-[15.5px] font-semibold tracking-tight text-ink">Kimi.Guide</span>
-        </span>
+    <>
+      <a
+        href={freeCreditsUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mx-[calc(50%-50vw)] flex items-center justify-center gap-2 border-b border-line bg-lime/10 px-6 py-2 text-center text-[13px] font-medium text-lime transition hover:bg-lime/15"
+      >
+        🎁 New: $50 in free Token Factory credits for new accounts — claim yours
+        <ArrowUpRight />
       </a>
-      <nav className="ml-auto flex items-center gap-1 text-[14px] font-medium text-muted">
-        <Link
-          className="hidden rounded-lg px-3 py-2 transition hover:bg-code hover:text-ink sm:block"
-          to="/showcase"
-        >
-          Showcase
-        </Link>
-        <a
-          className="hidden rounded-lg px-3 py-2 transition hover:bg-code hover:text-ink sm:block"
-          href={docsUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Docs
+      <header className="flex items-center gap-3 py-5">
+        <a href="/" className="flex items-center gap-2.5">
+          <BrandMark />
+          <span className="flex items-baseline gap-1.5">
+            <span className="text-[15.5px] font-semibold tracking-tight text-ink">Kimi.Guide</span>
+          </span>
         </a>
-        <a
-          className="hidden rounded-lg px-3 py-2 transition hover:bg-code hover:text-ink sm:block"
-          href={githubUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          GitHub
-        </a>
-        <a
-          className="ml-1 inline-flex items-center gap-1.5 rounded-lg bg-violet px-3.5 py-2 text-[13.5px] font-semibold text-white shadow-[0_1px_2px_rgba(10,10,10,.14),0_8px_20px_-8px_rgba(106,92,243,.7)] transition hover:brightness-[1.06] active:scale-[.98]"
-          href={nebiusApiKeysUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Get API key
-          <ArrowUpRight />
-        </a>
-      </nav>
-    </header>
+        <nav className="ml-auto flex items-center gap-1 text-[14px] font-medium text-muted">
+          <Link
+            className="hidden rounded-lg px-3 py-2 transition hover:bg-code hover:text-ink sm:block"
+            to="/showcase"
+          >
+            Showcase
+          </Link>
+          <a
+            className="hidden rounded-lg px-3 py-2 transition hover:bg-code hover:text-ink sm:block"
+            href={docsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Docs
+          </a>
+          <a
+            className="hidden rounded-lg px-3 py-2 transition hover:bg-code hover:text-ink sm:block"
+            href={githubUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GitHub
+          </a>
+          <a
+            className="ml-1 inline-flex items-center gap-1.5 rounded-lg bg-violet px-3.5 py-2 text-[13.5px] font-semibold text-white shadow-[0_1px_2px_rgba(10,10,10,.14),0_8px_20px_-8px_rgba(106,92,243,.7)] transition hover:brightness-[1.06] active:scale-[.98]"
+            href={nebiusApiKeysUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Get API key
+            <ArrowUpRight />
+          </a>
+        </nav>
+      </header>
+    </>
   );
 }
 
