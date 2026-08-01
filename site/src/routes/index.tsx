@@ -244,7 +244,6 @@ function Home() {
 
         {/* HERO */}
         <section className="relative pt-14 pb-6 text-center max-[520px]:pt-10">
-          <HeroRobot className="pointer-events-none absolute top-[252px] right-[-56px] hidden h-[360px] w-[280px] min-[1200px]:block" />
           <a
             href={nebiusApiKeysUrl}
             target="_blank"
@@ -263,17 +262,17 @@ function Home() {
           </a>
 
           <h1 className="mx-auto max-w-[860px] text-balance text-[clamp(36px,6.4vw,60px)] font-semibold leading-[1.04] tracking-[-0.02em] text-ink">
-            Connect{" "}
-            <span key={heroAgents[heroAgentIndex]} className="hero-agent-swap inline-block">
-              {heroAgents[heroAgentIndex]}
-            </span>{" "}
-            to{" "}
+            Add{" "}
             <span className="relative whitespace-nowrap">
               <span
                 aria-hidden="true"
                 className="absolute inset-x-0 -bottom-1 h-[10px] rounded-full bg-lime/40"
               />
               <span className="relative">Kimi K3</span>
+            </span>{" "}
+            to{" "}
+            <span key={heroAgents[heroAgentIndex]} className="hero-agent-swap inline-block">
+              {heroAgents[heroAgentIndex]}
             </span>
           </h1>
           <p className="mx-auto mt-6 mb-9 max-w-[600px] text-pretty text-[18.5px] leading-relaxed text-muted">
@@ -360,6 +359,10 @@ function Home() {
               </div>
             ))}
           </div>
+
+          {/* mascot: in-flow below the stats on narrow screens, floating beside
+              the install card on wide ones */}
+          <HeroRobot className="pointer-events-none relative mx-auto mt-8 h-[240px] w-[220px] min-[1200px]:absolute min-[1200px]:top-[252px] min-[1200px]:right-[-56px] min-[1200px]:mx-0 min-[1200px]:mt-0 min-[1200px]:h-[360px] min-[1200px]:w-[280px]" />
         </section>
 
         {/* START / HOW IT WORKS */}
