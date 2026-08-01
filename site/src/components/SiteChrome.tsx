@@ -4,6 +4,7 @@ export const githubUrl = "https://github.com/opencolin/kimi-relay";
 export const docsUrl = "https://github.com/opencolin/kimi-relay/blob/main/README.md";
 export const nebiusApiKeysUrl = "https://tokenfactory.nebius.com/?modals=create-api-key";
 export const llmsUrl = "/llms.txt";
+export const tavilyKeysUrl = "https://app.tavily.com";
 export const freeCreditsUrl = "https://dev.nebius.com/builders";
 
 export function SiteNav() {
@@ -105,6 +106,14 @@ export function SiteFooter() {
           rel="noopener noreferrer"
         >
           Nebius keys
+        </a>
+        <a
+          className="transition hover:text-ink"
+          href={tavilyKeysUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Tavily keys
         </a>
         <span className="text-faint">
           MIT licensed · a friendly fork of{" "}
