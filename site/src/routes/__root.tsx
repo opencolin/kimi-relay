@@ -9,14 +9,14 @@ export const Route = createRootRoute({
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       {
-        title: "Kimi Relay - Connect Claude Code, Codex, OpenCode & Pi Code to Kimi K3",
+        title: "Kimi.Guide - Kimi K3 for Claude Code, Codex, OpenCode & Pi Code",
       },
       {
         name: "description",
         content:
           "A local relay that connects Claude Code, Codex, OpenCode, and Pi Code to Kimi K3 and other open models on Nebius Token Factory - short commands, zero edits to your real tool config.",
       },
-      { property: "og:title", content: "Kimi Relay" },
+      { property: "og:title", content: "Kimi.Guide" },
       {
         property: "og:description",
         content:
@@ -25,7 +25,7 @@ export const Route = createRootRoute({
       { property: "og:image", content: "/nebius-token-factory.png" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:title", content: "Kimi Relay" },
+      { name: "twitter:title", content: "Kimi.Guide" },
       { name: "twitter:image", content: "/nebius-token-factory.png" },
     ],
     links: [
