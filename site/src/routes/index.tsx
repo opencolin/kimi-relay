@@ -266,7 +266,6 @@ function Home() {
           <HeroRobot className="pointer-events-none relative mx-auto mb-2 h-[210px] w-[200px] min-[1200px]:absolute min-[1200px]:top-[252px] min-[1200px]:right-[-56px] min-[1200px]:mx-0 min-[1200px]:mb-0 min-[1200px]:h-[360px] min-[1200px]:w-[280px]" />
 
           <h1 className="mx-auto max-w-[860px] text-balance text-[clamp(36px,6.4vw,60px)] font-semibold leading-[1.04] tracking-[-0.02em] text-ink">
-            Add{" "}
             <span className="relative whitespace-nowrap">
               <span
                 aria-hidden="true"
@@ -274,7 +273,7 @@ function Home() {
               />
               <span className="relative">Kimi K3</span>
             </span>{" "}
-            to{" "}
+            for{" "}
             <span key={heroAgents[heroAgentIndex]} className="hero-agent-swap inline-block">
               {heroAgents[heroAgentIndex]}
             </span>
