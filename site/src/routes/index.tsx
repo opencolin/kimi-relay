@@ -335,6 +335,81 @@ function Home() {
           </div>
         </section>
 
+        {/* KIMI K3 */}
+        <section className="mt-20" id="kimi-k3">
+          <SectionEyebrow>The model</SectionEyebrow>
+          <h2 className="mt-3 max-w-[620px] text-[26px] font-semibold tracking-tight text-ink">
+            What is Kimi K3?
+          </h2>
+          <p className="mt-3 max-w-[700px] text-[15px] leading-relaxed text-muted">
+            Kimi K3 is Moonshot AI&apos;s open-weight frontier model: a 2.8-trillion-parameter
+            mixture-of-experts (104B active per token) with a 1-million-token context window, built
+            for agentic coding. On Moonshot&apos;s published evals it beats leading proprietary
+            models on long-horizon software engineering and agentic search — and through Nebius
+            Token Factory every token is served from EU datacenters.
+          </p>
+          <div className="mt-6 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+            {kimiBenchmarks.map((b) => (
+              <div key={b.label} className="rounded-2xl border border-line-strong bg-canvas p-5">
+                <div className="text-[26px] font-semibold leading-none text-lime tabular-nums">
+                  {b.value}
+                </div>
+                <h3 className="mt-2.5 text-[15px] font-semibold text-ink">{b.label}</h3>
+                <p className="mt-1.5 text-[13.5px] leading-relaxed text-muted">{b.detail}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 text-[13px] text-faint">
+            Scores from the official{" "}
+            <a
+              className="font-medium underline decoration-faint/40 underline-offset-2 transition hover:text-ink"
+              href={kimiModelCardUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Kimi K3 model card
+            </a>{" "}
+            and{" "}
+            <a
+              className="font-medium underline decoration-faint/40 underline-offset-2 transition hover:text-ink"
+              href={artificialAnalysisUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Artificial Analysis
+            </a>
+            .
+          </p>
+        </section>
+
+        {/* AGENT GRID */}
+        <section className="mt-20">
+          <SectionEyebrow>Supported harnesses</SectionEyebrow>
+          <h2 className="mt-3 mb-7 max-w-[620px] text-[26px] font-semibold tracking-tight text-ink">
+            The coding agents you already use, on open models.
+          </h2>
+          <div className="grid gap-3.5 sm:grid-cols-2">
+            {agents.map((a) => (
+              <article
+                key={a.name}
+                className="group flex flex-col rounded-2xl border border-line-strong bg-canvas p-6 transition hover:border-faint hover:shadow-[0_1px_2px_rgba(10,10,10,.04),0_16px_40px_-24px_rgba(10,15,30,.28)]"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="flex size-11 items-center justify-center rounded-xl border border-line-strong bg-code text-ink">
+                    {a.mark}
+                  </span>
+                  <StatusBadge status={a.status} />
+                </div>
+                <div className="mt-4 flex items-baseline gap-2.5">
+                  <h3 className="text-[17px] font-semibold text-ink">{a.name}</h3>
+                  <code className="font-mono text-[13px] text-violet">{a.command}</code>
+                </div>
+                <p className="mt-2 text-[14.5px] leading-relaxed text-muted">{a.blurb}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
         {/* START / HOW IT WORKS */}
         <section className="mt-20 grid gap-4 lg:grid-cols-[1.35fr_1fr]">
           <div className="rounded-2xl border border-line-strong bg-canvas p-7 max-[520px]:p-6">
@@ -399,81 +474,6 @@ function Home() {
           </div>
         </section>
 
-        {/* AGENT GRID */}
-        <section className="mt-20">
-          <SectionEyebrow>Supported harnesses</SectionEyebrow>
-          <h2 className="mt-3 mb-7 max-w-[620px] text-[26px] font-semibold tracking-tight text-ink">
-            The coding agents you already use, on open models.
-          </h2>
-          <div className="grid gap-3.5 sm:grid-cols-2">
-            {agents.map((a) => (
-              <article
-                key={a.name}
-                className="group flex flex-col rounded-2xl border border-line-strong bg-canvas p-6 transition hover:border-faint hover:shadow-[0_1px_2px_rgba(10,10,10,.04),0_16px_40px_-24px_rgba(10,15,30,.28)]"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="flex size-11 items-center justify-center rounded-xl border border-line-strong bg-code text-ink">
-                    {a.mark}
-                  </span>
-                  <StatusBadge status={a.status} />
-                </div>
-                <div className="mt-4 flex items-baseline gap-2.5">
-                  <h3 className="text-[17px] font-semibold text-ink">{a.name}</h3>
-                  <code className="font-mono text-[13px] text-violet">{a.command}</code>
-                </div>
-                <p className="mt-2 text-[14.5px] leading-relaxed text-muted">{a.blurb}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        {/* KIMI K3 */}
-        <section className="mt-20" id="kimi-k3">
-          <SectionEyebrow>The model</SectionEyebrow>
-          <h2 className="mt-3 max-w-[620px] text-[26px] font-semibold tracking-tight text-ink">
-            What is Kimi K3?
-          </h2>
-          <p className="mt-3 max-w-[700px] text-[15px] leading-relaxed text-muted">
-            Kimi K3 is Moonshot AI&apos;s open-weight frontier model: a 2.8-trillion-parameter
-            mixture-of-experts (104B active per token) with a 1-million-token context window, built
-            for agentic coding. On Moonshot&apos;s published evals it beats leading proprietary
-            models on long-horizon software engineering and agentic search — and through Nebius
-            Token Factory every token is served from EU datacenters.
-          </p>
-          <div className="mt-6 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
-            {kimiBenchmarks.map((b) => (
-              <div key={b.label} className="rounded-2xl border border-line-strong bg-canvas p-5">
-                <div className="text-[26px] font-semibold leading-none text-lime tabular-nums">
-                  {b.value}
-                </div>
-                <h3 className="mt-2.5 text-[15px] font-semibold text-ink">{b.label}</h3>
-                <p className="mt-1.5 text-[13.5px] leading-relaxed text-muted">{b.detail}</p>
-              </div>
-            ))}
-          </div>
-          <p className="mt-4 text-[13px] text-faint">
-            Scores from the official{" "}
-            <a
-              className="font-medium underline decoration-faint/40 underline-offset-2 transition hover:text-ink"
-              href={kimiModelCardUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Kimi K3 model card
-            </a>{" "}
-            and{" "}
-            <a
-              className="font-medium underline decoration-faint/40 underline-offset-2 transition hover:text-ink"
-              href={artificialAnalysisUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Artificial Analysis
-            </a>
-            .
-          </p>
-        </section>
-
         {/* FEATURES */}
         <section className="mt-20">
           <SectionEyebrow>Why route through the Relay</SectionEyebrow>
@@ -491,7 +491,7 @@ function Home() {
         {/* CLOSING CTA */}
         <section className="mt-20 mb-6 overflow-hidden rounded-2xl border border-line-strong bg-canvas px-8 py-12 text-center max-[520px]:px-5">
           <h2 className="mx-auto max-w-[560px] text-balance text-[28px] font-semibold tracking-tight text-ink">
-            Point your agents at Nebius in one line.
+            Add Kimi K3 to your agents in one line.
           </h2>
           <p className="mx-auto mt-3 mb-7 max-w-[480px] text-[15px] leading-relaxed text-muted">
             Free to install, config-free, and reversible. Your subscriptions and logins stay exactly
