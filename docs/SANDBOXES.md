@@ -22,12 +22,43 @@ console - it is not a beta-access problem.
 ## Commands
 
 ```sh
-kimirelay sandbox status          # does your key have Sandboxes access?
+kimirelay sandbox status          # your key's exact Sandboxes permissions (via /whoami)
 kimirelay sandbox run echo hello  # one shell command in a disposable sandbox
 kimirelay sandbox run --image tag:ubuntu:latest --timeout 300 -- apt-get moo
+kimirelay sandbox run --keep -- make build       # snapshot the filesystem on success
+kimirelay sandbox run --fetch /work/report.md -- "make report"  # download artifacts after
+kimirelay sandbox fetch <image-uuid> /work/out.txt --out out.txt
+kimirelay sandbox prebake         # bake tooling into tag:kimirelay:prebaked
 kimirelay sandbox advisory        # print the agent-instructions advisory block
 kimirelay sandbox advisory --write  # append it to ~/.claude/CLAUDE.md + ~/.codex/AGENTS.md
 ```
+
+## Artifacts (result images)
+
+Every **non-disposable** run snapshots its full filesystem into an immutable
+result image on success. `--keep` turns that on; `--fetch <path>` (implying
+`--keep`) downloads files from the snapshot right after the run, and
+`kimirelay sandbox fetch <image-uuid> <path>` pulls files from any past
+result image. `klaude --sandbox --keep …` prints the result image UUID so a
+remote session's outputs (the repo lives at `/work`) can be retrieved without
+asking the agent to push. Untagged images are retained for 180 days.
+
+## Prebaked images
+
+`kimirelay sandbox prebake` runs the tooling install (kimirelay + Claude Code
+
+- Codex CLIs) once in a non-disposable sandbox and tags the result image
+  (default `kimirelay:prebaked`). Because every bootstrap install is
+  `command -v`-guarded, later runs with `--image tag:kimirelay:prebaked` skip
+  the ~1-minute cold bootstrap entirely:
+
+```sh
+kimirelay sandbox prebake
+klaude --sandbox --image tag:kimirelay:prebaked -p "fix the failing test"
+```
+
+Re-run `prebake` whenever you want the baked tooling refreshed (the tag moves
+to the new image).
 
 ## Remote harness sessions
 
@@ -50,13 +81,16 @@ Honest limitations of this first pass:
 - **Pushed state only.** The sandbox clones `origin`; local uncommitted
   changes do not travel. The CLI says so at launch. Private repositories work
   only if the clone URL embeds credentials the sandbox can use.
-- **Results live in the transcript.** The agent's commits stay inside the
-  disposable sandbox unless the task itself pushes them (e.g. ask the agent
-  to push a branch). Artifact download via the inspect API is a planned
-  follow-up.
-- **Cold bootstrap.** Each run installs tooling from scratch (~a minute).
-  Prebaked images via the Sandboxes image-import API are the obvious
-  optimization once access is settled.
+- **Results live in the transcript by default.** Run with `--keep` to
+  snapshot the sandbox filesystem into a result image and pull files out via
+  `kimirelay sandbox fetch` (see Artifacts above); or ask the agent to push.
+- **Cold bootstrap on the stock image.** Each `tag:ubuntu:latest` run
+  installs tooling from scratch (~a minute); `kimirelay sandbox prebake`
+  eliminates this (see Prebaked images above).
+- **No true TTY, by API design.** The API has no PTY/attach/resize surface -
+  all I/O is HTTP (stdin POSTs + an SSE event stream); even Nebius's own
+  `contree shell` is a client-side line-mode REPL. Full-screen TUIs will not
+  run remotely; headless tasks are the supported shape.
 
 ## Advisory block
 

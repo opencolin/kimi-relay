@@ -10,6 +10,7 @@ import {
 } from "../../cli/src/lib/sandbox/contree.js";
 import {
   buildHarnessBootstrap,
+  buildPrebakeBootstrap,
   createOutputRenderer,
   shellQuote,
   writeAdvisoryBlock,
@@ -211,5 +212,89 @@ describe("Project header handling (live-observed API behavior)", () => {
     const err = await client.checkAccess().catch((e: unknown) => e);
     expect(err).toBeInstanceOf(SandboxAccessError);
     expect((err as Error).message).toContain("Request access");
+  });
+});
+
+describe("round 2: artifacts, whoami, prebake", () => {
+  test("whoami parses permissions and limits", async () => {
+    const client = new ContreeClient({
+      apiKey: "test-key",
+      project: "default",
+      fetchImpl: async () =>
+        jsonResponse({
+          token_uuid: "t-1",
+          permissions: { spawn: true, list: false },
+          limits: { instance_max_timeout: 3600, instance_max_concurrency: 50 },
+        }),
+    });
+    const who = await client.whoami();
+    expect(who.permissions.spawn).toBe(true);
+    expect(who.permissions.list).toBe(false);
+    expect(who.limits.instance_max_timeout).toBe(3600);
+  });
+
+  test("downloadFile hits the inspect endpoint with an encoded path", async () => {
+    const seen: { url?: string } = {};
+    const client = new ContreeClient({
+      apiKey: "test-key",
+      fetchImpl: async (input) => {
+        seen.url = String(input);
+        return new Response(new Uint8Array([104, 105]), { status: 200 });
+      },
+    });
+    const bytes = await client.downloadFile("img-123", "/work/out dir/report.md");
+    expect(seen.url).toBe(
+      "https://api.tokenfactory.nebius.com/sandboxes/v1/inspect/img-123/download?path=%2Fwork%2Fout%20dir%2Freport.md",
+    );
+    expect(Array.from(bytes)).toEqual([104, 105]);
+  });
+
+  test("tagImage PATCHes the tag body", async () => {
+    const seen: { url?: string; method?: string; body?: string } = {};
+    const client = new ContreeClient({
+      apiKey: "test-key",
+      fetchImpl: async (input, init) => {
+        seen.url = String(input);
+        seen.method = init?.method;
+        seen.body = String(init?.body);
+        return jsonResponse({ ok: true });
+      },
+    });
+    await client.tagImage("img-123", "kimirelay:prebaked");
+    expect(seen.url).toBe("https://api.tokenfactory.nebius.com/sandboxes/v1/images/img-123/tag");
+    expect(seen.method).toBe("PATCH");
+    expect(JSON.parse(seen.body ?? "{}")).toEqual({ tag: "kimirelay:prebaked" });
+  });
+
+  test("normalizeOperation surfaces result_image_uuid", () => {
+    const status = normalizeOperation({
+      state: "SUCCESS",
+      result_image_uuid: "img-999",
+      result: { exit_code: 0, stdout: "ok" },
+    });
+    expect(status.resultImageUuid).toBe("img-999");
+    expect(status.exitCode).toBe(0);
+  });
+
+  test("harness bootstrap guards every install so prebaked images skip them", () => {
+    const script = buildHarnessBootstrap({
+      harness: "claude",
+      passthrough: ["-p", "task"],
+      repoUrl: "https://github.com/o/r.git",
+      apiKey: "secret-key",
+    });
+    expect(script).toContain("command -v kimirelay >/dev/null 2>&1 || curl -fsSL");
+    expect(script).toContain(
+      "command -v claude >/dev/null 2>&1 || npm install -g @anthropic-ai/claude-code",
+    );
+    expect(script).not.toContain("secret-key");
+  });
+
+  test("prebake bootstrap installs both agent CLIs and never clones a repo", () => {
+    const script = buildPrebakeBootstrap();
+    expect(script).toContain("npm install -g @anthropic-ai/claude-code");
+    expect(script).toContain("npm install -g @openai/codex");
+    expect(script).toContain("kimirelay-prebake-complete");
+    expect(script).not.toContain("git clone");
   });
 });

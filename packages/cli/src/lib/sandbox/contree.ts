@@ -85,6 +85,15 @@ export type OperationStatus = {
   stdout: string;
   stderr: string;
   exitCode: number | undefined;
+  /** Snapshot image produced by non-disposable runs (set on SUCCESS only). */
+  resultImageUuid: string | undefined;
+};
+
+/** GET /v1/whoami - token permission map + account limits. */
+export type SandboxWhoAmI = {
+  raw: Record<string, unknown>;
+  permissions: Record<string, boolean>;
+  limits: Record<string, number>;
 };
 
 const TERMINAL_STATES = new Set(["succeeded", "failed", "cancelled", "error", "done", "finished"]);
@@ -141,6 +150,44 @@ export class ContreeClient {
    */
   async checkAccess(): Promise<void> {
     await this.request("/v1/operations", { method: "GET" });
+  }
+
+  /**
+   * GET /v1/whoami - the definitive access report: which Sandboxes
+   * permissions (spawn, spawn_disposable, list, import, set_image_tag,
+   * cancel) this key holds for the addressed project, plus account limits.
+   */
+  async whoami(): Promise<SandboxWhoAmI> {
+    const res = await this.request("/v1/whoami", { method: "GET" });
+    const raw = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+    const permissions = (raw.permissions ?? {}) as Record<string, boolean>;
+    const limits = (raw.limits ?? {}) as Record<string, number>;
+    return { raw, permissions, limits };
+  }
+
+  /**
+   * GET /v1/inspect/{imageUUID}/download?path=... - read one file out of a
+   * result/checkpoint image (the artifact-download path for finished
+   * non-disposable runs).
+   */
+  async downloadFile(imageUuid: string, filePath: string): Promise<Uint8Array> {
+    const res = await this.request(
+      `/v1/inspect/${encodeURIComponent(imageUuid)}/download?path=${encodeURIComponent(filePath)}`,
+      { method: "GET" },
+    );
+    return new Uint8Array(await res.arrayBuffer());
+  }
+
+  /**
+   * PATCH /v1/images/{imageUUID}/tag - name a checkpoint image so it can be
+   * reused via `image: "tag:<name>"` and survives the 180-day untagged
+   * retention window.
+   */
+  async tagImage(imageUuid: string, tag: string): Promise<void> {
+    await this.request(`/v1/images/${encodeURIComponent(imageUuid)}/tag`, {
+      method: "PATCH",
+      body: JSON.stringify({ tag }),
+    });
   }
 
   /** POST /v1/instances - spawn a container instance running `spec.command`. */
@@ -211,6 +258,7 @@ export function normalizeOperation(raw: Record<string, unknown>): OperationStatu
     stdout: extractStream(result.stdout),
     stderr: extractStream(result.stderr),
     exitCode: firstNumber(result.exit_code, result.exitCode, result.code),
+    resultImageUuid: firstString(raw.result_image_uuid, result.result_image_uuid),
   };
 }
 
