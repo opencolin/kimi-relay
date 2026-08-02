@@ -56,13 +56,16 @@ describe("resolveSandboxProvider", () => {
     );
   });
 
-  test("defaults to contree - a Tenki credential alone never switches providers", () => {
-    expect(resolveSandboxProvider(undefined, {} as NodeJS.ProcessEnv)).toBe("contree");
-    expect(resolveSandboxProvider(undefined, { TENKI_API_KEY: "tk_x" } as NodeJS.ProcessEnv)).toBe(
-      "contree",
+  test("defaults to tenki - credentials never switch providers, explicit contree works", () => {
+    expect(resolveSandboxProvider(undefined, {} as NodeJS.ProcessEnv)).toBe("tenki");
+    expect(resolveSandboxProvider(undefined, { NEBIUS_API_KEY: "k" } as NodeJS.ProcessEnv)).toBe(
+      "tenki",
     );
+    expect(resolveSandboxProvider("contree", {} as NodeJS.ProcessEnv)).toBe("contree");
     expect(
-      resolveSandboxProvider(undefined, { TENKI_AUTH_TOKEN: "tok" } as NodeJS.ProcessEnv),
+      resolveSandboxProvider(undefined, {
+        KIMIRELAY_SANDBOX_PROVIDER: "contree",
+      } as NodeJS.ProcessEnv),
     ).toBe("contree");
   });
 });

@@ -71,9 +71,9 @@ Selection (first match wins):
 
 1. `--provider tenki|contree` on any sandbox command / `--sandbox` hoist
 2. `KIMIRELAY_SANDBOX_PROVIDER` env
-3. Default: `contree`. No credential sniffing — a `TENKI_API_KEY` in the env
-   never switches providers on its own (Collin, 2026-08-02: sandboxes and
-   providers alike are explicit opt-in, in the spirit of `--sandbox` itself).
+3. Default: `tenki` (Collin, 2026-08-02, superseding same-day `contree`).
+   No credential sniffing — credentials in the env never switch providers
+   on their own; `--provider contree` selects Nebius explicitly.
 
 `kimirelay sandbox status` reports both providers' auth/permission state and
 which one the current flags/env select.
@@ -162,5 +162,13 @@ fetch` and `sandbox prebake` on tenki; pause/resume surfacing.
 The 2026-07-29 decision "Sandbox layer is Token Factory Sandboxes, not
 Tenki" is revised: TF remains the inference-affine default, but its double
 gate (beta access + per-key permissions) makes a second, ungated provider
-necessary for the feature to exist in practice. Revision recorded in
+necessary for the feature to exist in practice.
+
+Revised again later on 2026-08-02 (Collin): **tenki is the default
+provider.** Rationale: tenki is open-signup and live-verified in CI on
+every gauntlet run, while ConTree remains double-gated and unverified for
+this account; the default should be the path that works out of the box.
+ConTree stays fully supported behind `--provider contree` /
+`KIMIRELAY_SANDBOX_PROVIDER=contree` and becomes a candidate for default
+again if/when its gates open up. Revision recorded in
 `docs/ROADMAP.md`'s decision log with this PRD as rationale.

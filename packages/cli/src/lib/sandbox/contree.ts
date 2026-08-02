@@ -15,8 +15,9 @@ export const SANDBOX_ACCESS_HINT =
   "Request access at https://tokenfactory.nebius.com/sandboxes/about, then retry.";
 
 export const SANDBOX_PROJECT_HINT =
-  "Pass your Nebius project via `--project <id>` or `NEBIUS_PROJECT=<id>` " +
-  "(shown in the Token Factory console).";
+  "Pass your Nebius project via `--project <id>` or `NEBIUS_PROJECT=<id>`, or store " +
+  "it once with `kimirelay sandbox project <id>` (the id is shown in the Token " +
+  "Factory console - there is no API to discover it).";
 
 export class SandboxAccessError extends Error {
   readonly status: number;
