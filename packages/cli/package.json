@@ -1,6 +1,6 @@
 {
   "name": "@kimirelay/cli",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "CLI for routing Claude Code, OpenCode, Codex, and Pi Code through Nebius Token Factory",
   "license": "MIT",
   "bin": {
@@ -20,7 +20,8 @@
   },
   "dependencies": {
     "@clack/prompts": "^0.8.2",
-    "@kimirelay/models": "workspace:*"
+    "@kimirelay/models": "workspace:*",
+    "@tenkicloud/sandbox": "^0.5.4"
   },
   "engines": {
     "node": ">=18"

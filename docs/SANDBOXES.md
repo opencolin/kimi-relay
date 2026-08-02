@@ -7,6 +7,21 @@ you already use for inference. The product is in beta behind an access
 request; every kimirelay sandbox command maps a 401/403 to a message pointing
 at the request form.
 
+## Providers
+
+Two sandbox backends share this surface (see `docs/TENKI-SANDBOXES-PRD.md`):
+
+- **contree** - Nebius Token Factory Sandboxes: same `NEBIUS_API_KEY` as
+  inference, but a gated beta (access request + per-key permission grants).
+- **tenki** - [tenki.cloud](https://tenki.cloud): open signup; set
+  `TENKI_API_KEY` (a `tk_…` key). `--fetch` reads files from the live
+  session; post-hoc fetch/prebake land with snapshots (PRD milestone 2).
+
+Select with `--provider <contree|tenki>` or `KIMIRELAY_SANDBOX_PROVIDER`;
+auto-selection prefers Nebius when usable and otherwise picks tenki when a
+Tenki credential is set. Harness keys reach tenki sessions via the create
+request body over TLS - never argv, never disk.
+
 ## Project header
 
 Some Nebius accounts require a project on every Sandboxes call (the API

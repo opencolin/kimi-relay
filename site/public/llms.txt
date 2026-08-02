@@ -203,6 +203,8 @@ Per-task cost varies a lot with how verbose the agent is. Mechanical, well-scope
 
 ## Sandboxes (beta)
 
+Two providers: Nebius Token Factory Sandboxes (gated beta, `NEBIUS_API_KEY`) and tenki.cloud (open signup, `TENKI_API_KEY`; select with `--provider tenki` or `KIMIRELAY_SANDBOX_PROVIDER=tenki`).
+
 Token Factory Sandboxes support (disposable microVMs on the same Nebius key):
 
 ```
