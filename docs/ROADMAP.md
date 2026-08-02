@@ -15,9 +15,10 @@ bottom. This revision reflects what has shipped and proposes what comes next.
 - **Four harnesses, all stable**: `klaude` (Claude Code), `kodex` (Codex CLI),
   `openkode` (OpenCode), `kpi` (Pi Code) - beta flags dropped 2026-08-02 after
   the full live gauntlet went green in CI (all five suites, real Nebius
-  inference). Cursor shipped as a
-  documented recipe (`docs/CURSOR.md`) — `cursor-agent` has no endpoint
-  override to inject; revisit if that changes.
+  inference). Cursor is out of
+  scope (dropped 2026-08-02): `cursor-agent` has no endpoint override to
+  inject and agent inference runs on Cursor's backend; revisit if that
+  changes.
 - **Remote sessions on Token Factory Sandboxes** (first pass): `kimirelay
 sandbox status|run|advisory` plus headless `klaude --sandbox` /
   `kodex --sandbox` against pushed git state (`docs/SANDBOXES.md`).
@@ -113,8 +114,10 @@ the "curl | sh" trust objection and gives macOS users upgrades via
 ### 2026-08-01
 
 - **Cursor ships as a recipe, not a harness**: `cursor-agent` exposes no
-  base-URL/provider override, so there is nothing to inject
-  (`docs/CURSOR.md` has the full reasoning). Revisit on CLI changes.
+  base-URL/provider override, so there is nothing to inject. Superseded
+  2026-08-02: Cursor support (including the recipe doc) was removed
+  entirely after re-verifying the CLI still has no seam and that Cursor's
+  backend blocks agent features from external keys. Revisit on CLI changes.
 - **Sandboxes shipped headless-first**: `--sandbox` runs `-p`/`exec` style
   sessions against pushed git state; interactive TTY deferred to round 2.
 

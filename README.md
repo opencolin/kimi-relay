@@ -122,10 +122,6 @@ The installed binary keeps itself up to date from `kimirelay.com`, throttled to 
 
 [Nebius Token Factory Sandboxes](https://tokenfactory.nebius.com/sandboxes/about) integration ships as a first pass: `kimirelay sandbox status|run|advisory`, plus headless remote sessions with `klaude --sandbox -p "<task>"` / `kodex --sandbox exec "<task>"` — the harness runs inside a disposable microVM against your repo's pushed state, on the same Nebius key as inference. Round 2 adds `sandbox status` permission reports, artifact download from result images (`--keep` / `--fetch` / `sandbox fetch`), and `sandbox prebake` for warm images that skip the cold bootstrap. Because Token Factory Sandboxes is a gated beta, [tenki.cloud](https://tenki.cloud) is the **default** provider (open signup; set `TENKI_API_KEY`), with Nebius selectable via `--provider contree` - see [`docs/TENKI-SANDBOXES-PRD.md`](docs/TENKI-SANDBOXES-PRD.md). Sandboxes itself is a beta behind an access request; the CLI says so when access is missing. Details, limitations, and the advisory block: [`docs/SANDBOXES.md`](docs/SANDBOXES.md).
 
-## Cursor
-
-Cursor has no injectable CLI endpoint yet, so there is no `kursor` command — the editor recipe (pointing Cursor's custom-model slot straight at Nebius) and the reasoning live in [`docs/CURSOR.md`](docs/CURSOR.md).
-
 ## For AI agents
 
 An LLM-readable doc is published at <https://kimirelay.com/llms.txt>. If you are an agent asked to install, configure, or drive kimirelay (including headless), read that first. It covers install, configure, every command, the models, and headless usage patterns.
