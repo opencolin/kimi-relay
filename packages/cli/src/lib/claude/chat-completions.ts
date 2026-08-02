@@ -39,6 +39,7 @@ type ClaudeChatOptions = {
   debug?: boolean | undefined;
   claudeCodeMaxOutputTokens?: number | undefined;
   claudeCodeMaxOutputTokensUserSet?: boolean | undefined;
+  tavilyMcpInjected?: boolean | undefined;
   isCompactionRequest?: boolean | undefined;
   costTracker?: CostTracker | undefined;
   /** Raw byte length of the inbound Anthropic-JSON request body, from readJsonBodyWithSize. */
@@ -55,14 +56,18 @@ export async function callNebiusChatCompletions(
     perf?.spanSync("translate_request", () => {
       const targetModel = resolveTargetModel(body.model, options);
       const nativeTools = nativeServerTools(body.tools);
-      const messages = toOpenAIMessages(body, targetModel.definition);
+      const messages = toOpenAIMessages(body, targetModel.definition, {
+        tavilyMcpInjected: options.tavilyMcpInjected,
+      });
       const tools = toOpenAITools(body.tools, options);
       return { targetModel, nativeTools, messages, tools };
     }) ??
     (() => {
       const targetModel = resolveTargetModel(body.model, options);
       const nativeTools = nativeServerTools(body.tools);
-      const messages = toOpenAIMessages(body, targetModel.definition);
+      const messages = toOpenAIMessages(body, targetModel.definition, {
+        tavilyMcpInjected: options.tavilyMcpInjected,
+      });
       const tools = toOpenAITools(body.tools, options);
       return { targetModel, nativeTools, messages, tools };
     })();

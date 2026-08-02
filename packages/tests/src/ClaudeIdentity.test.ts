@@ -30,6 +30,21 @@ describe("claude model-identity prompt", () => {
     expect(content).toContain("name your backend model");
   });
 
+  test("mentions the ephemeral Tavily MCP server only when the launcher injected it", () => {
+    const withInject = systemContent(
+      toOpenAIMessages({ messages: [{ role: "user", content: "is tavily set up?" }] }, KIMI_K3, {
+        tavilyMcpInjected: true,
+      }),
+    );
+    expect(withInject).toContain("ephemeral Tavily MCP server");
+    expect(withInject).toContain("does not appear in `claude mcp list`");
+
+    const withoutInject = systemContent(
+      toOpenAIMessages({ messages: [{ role: "user", content: "hi" }] }, KIMI_K3),
+    );
+    expect(withoutInject).not.toContain("Tavily MCP");
+  });
+
   test("keeps the harness system prompt after the identity line", () => {
     const content = systemContent(
       toOpenAIMessages(

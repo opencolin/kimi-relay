@@ -50,6 +50,7 @@ type ClaudeStreamOptions = {
   debug?: boolean | undefined;
   claudeCodeMaxOutputTokens?: number | undefined;
   claudeCodeMaxOutputTokensUserSet?: boolean | undefined;
+  tavilyMcpInjected?: boolean | undefined;
   isCompactionRequest?: boolean | undefined;
   costTracker?: CostTracker | undefined;
   /** Raw byte length of the inbound Anthropic-JSON request body, from readJsonBodyWithSize. */
@@ -74,7 +75,9 @@ export async function streamAnthropicFromNebius(
   // fallback branches. Behavior is unchanged.
   const run = () => {
     const targetModel = resolveTargetModel(body.model, options);
-    const messages = toOpenAIMessages(body, targetModel.definition);
+    const messages = toOpenAIMessages(body, targetModel.definition, {
+      tavilyMcpInjected: options.tavilyMcpInjected,
+    });
     const nativeTools = nativeServerTools(body.tools);
     const upstreamMessages =
       nativeTools.length > 0 ? withClaudeNativeToolSystemPrompt(messages, nativeTools) : messages;

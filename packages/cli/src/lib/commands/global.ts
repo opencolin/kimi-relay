@@ -83,7 +83,7 @@ export async function runConfigure(home = os.homedir()): Promise<boolean> {
   if (!tavilyApiKey) {
     const enteredTavily = await clack.password({
       message:
-        "Tavily API key for web search (from https://app.tavily.com - press Enter to skip; web search will be disabled):",
+        "Tavily API key - OPTIONAL, press Enter to skip (recommended: unlocks live web search + Tavily tools; free key at https://app.tavily.com):",
       validate: (value) => (value.trim() || value === "" ? undefined : undefined),
     });
     if (clack.isCancel(enteredTavily)) {
@@ -100,7 +100,9 @@ export async function runConfigure(home = os.homedir()): Promise<boolean> {
   if (tavilyApiKey) {
     clack.log.success("Tavily web search enabled.");
   } else {
-    clack.log.info("Tavily key skipped - web search will be unavailable in your agents.");
+    clack.log.info(
+      "Tavily key skipped - agents run fine without it, just with no live web search. Add one anytime with `kimirelay configure`.",
+    );
   }
 
   const launchable = ALL_HARNESSES.filter(

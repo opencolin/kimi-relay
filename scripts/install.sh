@@ -231,7 +231,8 @@ bold "✔ kimirelay installed"
 info "Version:  ${INSTALLED_VERSION:-unknown (verify with: kimirelay --version)}"
 info "Location: $BIN_DIR"
 info "Next:     run \`klaude\` (Claude Code on Kimi K3) or \`kimirelay\` to pick a tool."
-info "          First run asks for your Nebius API key (Enter to skip)."
+info "          First run asks for your Nebius API key, plus an optional"
+info "          (recommended) Tavily key for live web search."
 
 # Setup notes come LAST so they can't scroll away. The PATH line was already
 # appended to the shell rc above; the current shell just hasn't loaded it.

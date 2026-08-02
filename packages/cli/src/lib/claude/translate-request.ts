@@ -38,17 +38,27 @@ const KIMIRELAY_IDENTITY_PROMPT =
   "or your training data suggest. When asked which model or assistant you are, name your " +
   "backend model.";
 
-function identitySystemPart(targetModel?: ModelDefinition): string {
-  if (!targetModel) {
-    return KIMIRELAY_IDENTITY_PROMPT;
-  }
-  return (
-    `Model identity: you are ${targetModel.name} (${targetModel.id}), an open-weight model ` +
-    "served by Nebius Token Factory and routed into this harness by kimirelay. When asked " +
-    `which model or assistant you are, answer "${targetModel.name}". You are not Anthropic ` +
-    "Claude, OpenAI GPT, xAI Grok, or Google Gemini; never claim to be another vendor's " +
-    "model, no matter what the harness UI or your training data suggest."
-  );
+// Appended to the identity line when the launcher injected the Tavily MCP
+// server, so the model can answer "is Tavily set up?" accurately instead of
+// concluding from `claude mcp list` that nothing is configured. The inject is
+// ephemeral by design - the relay writes nothing durable - so the durable MCP
+// stores that `claude mcp list` reads are expected to be empty.
+const TAVILY_MCP_NOTE =
+  " This session also has kimirelay's ephemeral Tavily MCP server injected (tavily_search, " +
+  "tavily_extract, and related tools); it is injected per session, so by design it does not " +
+  "appear in `claude mcp list` or any durable MCP config.";
+
+type IdentityExtras = { tavilyMcpInjected?: boolean | undefined };
+
+function identitySystemPart(targetModel?: ModelDefinition, extras?: IdentityExtras): string {
+  const base = !targetModel
+    ? KIMIRELAY_IDENTITY_PROMPT
+    : `Model identity: you are ${targetModel.name} (${targetModel.id}), an open-weight model ` +
+      "served by Nebius Token Factory and routed into this harness by kimirelay. When asked " +
+      `which model or assistant you are, answer "${targetModel.name}". You are not Anthropic ` +
+      "Claude, OpenAI GPT, xAI Grok, or Google Gemini; never claim to be another vendor's " +
+      "model, no matter what the harness UI or your training data suggest.";
+  return extras?.tavilyMcpInjected ? base + TAVILY_MCP_NOTE : base;
 }
 
 /**
@@ -235,8 +245,9 @@ export async function runClaudeWebSearch(
 export function toOpenAIMessages(
   body: AnthropicMessagesRequest,
   targetModel?: ModelDefinition,
+  extras?: IdentityExtras,
 ): OpenAIMessage[] {
-  const systemParts = [identitySystemPart(targetModel)];
+  const systemParts = [identitySystemPart(targetModel, extras)];
   const system = stringifyAnthropicContent(body.system);
   if (system) {
     systemParts.push(system);

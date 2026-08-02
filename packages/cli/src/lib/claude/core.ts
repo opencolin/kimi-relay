@@ -38,6 +38,8 @@ export type ClaudeLaunchOptions = {
   baseUrl: string;
   modelId?: string;
   args?: string[];
+  /** True when the launcher injected the ephemeral Tavily MCP server. */
+  tavilyMcpInjected?: boolean;
 };
 
 export type ClaudeLaunchResult = {
@@ -154,13 +156,17 @@ export async function runClaudeNebius(options: ClaudeLaunchOptions): Promise<Cla
         process.env.CLAUDE_CODE_MAX_OUTPUT_TOKENS,
       ),
       claudeCodeMaxOutputTokensUserSet: process.env.CLAUDE_CODE_MAX_OUTPUT_TOKENS !== undefined,
+      ...(options.tavilyMcpInjected ? { tavilyMcpInjected: true } : {}),
     },
     args,
     binary: "claude",
     keepaliveLabel: "Claude session",
     preserveSessionAfterExit: claudeRunsInBackground(args),
     banner: (modelName) =>
-      `Kimi Relay ▸ Routing Claude Code → Nebius Token Factory (${modelName}). Not Anthropic.\n`,
+      `Kimi Relay ▸ Routing Claude Code → Nebius Token Factory (${modelName}). Not Anthropic.\n` +
+      (options.tavilyMcpInjected
+        ? "Kimi Relay ▸ Tavily MCP injected for this session (ephemeral - won't appear in `claude mcp list`).\n"
+        : ""),
     buildEnv: ({ proxyUrl, authToken, modelId, modelName }) =>
       buildClaudeEnv({ ...options, modelId, modelName, proxyUrl, authToken }),
     buildArgs: ({ args: launchArgs, authToken }) => buildClaudeLaunchArgs(launchArgs, authToken),
