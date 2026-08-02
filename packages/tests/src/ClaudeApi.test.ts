@@ -41,6 +41,33 @@ describe("Claude proxy compatibility API", () => {
     ]);
   });
 
+  test("auth env: helper-only on the normal path, bearer fallback with user --settings", () => {
+    const base = {
+      apiKey: "test-nebius-key",
+      baseUrl: "https://api.tokenfactory.nebius.com/v1",
+      modelId: GLM_5_2.anthropicAlias ?? GLM_5_2.id,
+      modelName: GLM_5_2.name,
+      proxyUrl: "http://127.0.0.1:7878/session/test",
+      authToken: "local-token",
+    };
+
+    // Normal path: the injected apiKeyHelper carries the token, so the env
+    // must NOT also set ANTHROPIC_AUTH_TOKEN - both together make Claude Code
+    // print "Both ANTHROPIC_AUTH_TOKEN and apiKeyHelper set" at startup.
+    const normal = buildClaudeEnv({ ...base, args: ["--print", "do work"] });
+    expect(normal.ANTHROPIC_AUTH_TOKEN).toBeUndefined();
+    const launchArgs = buildClaudeLaunchArgs(["--print", "do work"], "local-token");
+    const settingsJson = launchArgs[launchArgs.indexOf("--settings") + 1] ?? "{}";
+    expect(JSON.parse(settingsJson)).toMatchObject({
+      apiKeyHelper: 'printf %s "local-token"',
+    });
+
+    // User --settings blocks the helper inject, so the bearer env var is the
+    // session credential there.
+    const userSettings = buildClaudeEnv({ ...base, args: ["--settings", "{}", "--print", "x"] });
+    expect(userSettings.ANTHROPIC_AUTH_TOKEN).toBe("local-token");
+  });
+
   test("explicitly enables Claude tool search for the custom proxy", () => {
     vi.stubEnv("ENABLE_TOOL_SEARCH", "");
 
