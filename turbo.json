@@ -16,6 +16,7 @@
       "outputs": ["dist/**"]
     },
     "test:gauntlet:core": {
+      "cache": false,
       "dependsOn": ["^build"],
       "inputs": [
         "package.json",
@@ -29,6 +30,7 @@
       "outputs": []
     },
     "test:gauntlet:claude": {
+      "cache": false,
       "dependsOn": ["^build"],
       "inputs": [
         "package.json",
@@ -52,6 +54,7 @@
       "outputs": []
     },
     "test:gauntlet:codex": {
+      "cache": false,
       "dependsOn": ["^build"],
       "inputs": [
         "package.json",
@@ -76,6 +79,7 @@
       "outputs": []
     },
     "test:gauntlet:live-models-check": {
+      "cache": false,
       "dependsOn": ["^build"],
       "inputs": [
         "package.json",
@@ -95,6 +99,7 @@
       "outputs": []
     },
     "test:gauntlet:opencode": {
+      "cache": false,
       "dependsOn": ["^build"],
       "inputs": [
         "package.json",
@@ -115,6 +120,7 @@
       "outputs": []
     },
     "test:gauntlet:pi": {
+      "cache": false,
       "dependsOn": ["^build"],
       "inputs": [
         "package.json",
