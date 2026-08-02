@@ -10,6 +10,8 @@ import {
 export type GlobalConfig = {
   apiKey: string;
   tavilyApiKey: string;
+  /** Nebius project id for Token Factory Sandboxes calls (not a secret). */
+  sandboxProject: string;
 };
 
 export function kimirelayHome(home = os.homedir()): string {
@@ -25,6 +27,7 @@ export async function readGlobalConfig(home = os.homedir()): Promise<GlobalConfi
   return {
     apiKey: config.apiKey ?? "",
     tavilyApiKey: config.tavilyApiKey ?? "",
+    sandboxProject: config.sandboxProject ?? "",
   };
 }
 
@@ -41,6 +44,12 @@ export async function setGlobalApiKey(home: string, apiKey: string): Promise<voi
 export async function setGlobalTavilyApiKey(home: string, tavilyApiKey: string): Promise<void> {
   const config = await readGlobalConfig(home);
   config.tavilyApiKey = tavilyApiKey;
+  await writeGlobalConfig(home, config);
+}
+
+export async function setGlobalSandboxProject(home: string, sandboxProject: string): Promise<void> {
+  const config = await readGlobalConfig(home);
+  config.sandboxProject = sandboxProject;
   await writeGlobalConfig(home, config);
 }
 

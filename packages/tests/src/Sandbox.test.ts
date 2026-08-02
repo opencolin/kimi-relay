@@ -16,6 +16,8 @@ import {
   shellQuote,
   writeAdvisoryBlock,
 } from "../../cli/src/lib/sandbox/run.js";
+import { resolveSandboxProject } from "../../cli/src/lib/commands/sandbox.js";
+import { setGlobalSandboxProject } from "../../cli/src/lib/global-config.js";
 
 function jsonResponse(
   body: unknown,
@@ -308,5 +310,34 @@ describe("round 2: artifacts, whoami, prebake", () => {
     expect(script).toContain("npm install -g @openai/codex");
     expect(script).toContain("kimirelay-prebake-complete");
     expect(script).not.toContain("git clone");
+  });
+});
+
+describe("resolveSandboxProject", () => {
+  test("flag beats NEBIUS_PROJECT beats the stored config", async () => {
+    const home = await mkdtemp(path.join(os.tmpdir(), "kimirelay-project-"));
+    await setGlobalSandboxProject(home, "stored-proj");
+    expect(
+      await resolveSandboxProject(
+        "flag-proj",
+        { NEBIUS_PROJECT: "env-proj" } as NodeJS.ProcessEnv,
+        home,
+      ),
+    ).toBe("flag-proj");
+    expect(
+      await resolveSandboxProject(
+        undefined,
+        { NEBIUS_PROJECT: "env-proj" } as NodeJS.ProcessEnv,
+        home,
+      ),
+    ).toBe("env-proj");
+    expect(await resolveSandboxProject(undefined, {} as NodeJS.ProcessEnv, home)).toBe(
+      "stored-proj",
+    );
+  });
+
+  test("undefined when nothing is configured anywhere", async () => {
+    const home = await mkdtemp(path.join(os.tmpdir(), "kimirelay-project-"));
+    expect(await resolveSandboxProject(undefined, {} as NodeJS.ProcessEnv, home)).toBeUndefined();
   });
 });

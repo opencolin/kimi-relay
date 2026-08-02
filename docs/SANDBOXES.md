@@ -17,17 +17,21 @@ Two sandbox backends share this surface (see `docs/TENKI-SANDBOXES-PRD.md`):
   `TENKI_API_KEY` (a `tk_…` key). `--fetch` reads files from the live
   session; post-hoc fetch/prebake land with snapshots (PRD milestone 2).
 
-Select with `--provider <contree|tenki>` or `KIMIRELAY_SANDBOX_PROVIDER`.
-The default is contree; setting `TENKI_API_KEY` alone never switches
-providers - tenki runs only when explicitly selected. Harness keys reach
-tenki sessions via the create request body over TLS - never argv, never disk.
+Select with `--provider <tenki|contree>` or `KIMIRELAY_SANDBOX_PROVIDER`.
+The default is tenki (open signup, CI-verified live); select Nebius with
+`--provider contree`. Credentials in the env never switch providers on
+their own. Harness keys reach tenki sessions via the create request body
+over TLS - never argv, never disk.
 
 ## Project header
 
 Some Nebius accounts require a project on every Sandboxes call (the API
 answers `400 Missing "Project" header` otherwise). Pass it per command with
-`--project <id>` or once via `NEBIUS_PROJECT=<id>`; the id is shown in the
-Token Factory console. Live-observed permission model: a key can hold the
+`--project <id>`, per shell via `NEBIUS_PROJECT=<id>`, or store it once with
+`kimirelay sandbox project <id>` (kept in `~/.kimirelay/config.json`). The id
+is shown in the Token Factory console - there is no discovery API: `/v1/projects`
+404s on both the Token Factory and Sandboxes APIs (probed 2026-08-02), and
+`whoami` rejects a missing Project header before even checking auth. Live-observed permission model: a key can hold the
 `spawn` permission without `list`, so `kimirelay sandbox status` reports a
 list-permission 403 as qualified success and the definitive check is
 `kimirelay sandbox run -- echo ok`. A `403 Insufficient permissions: spawn`

@@ -2,7 +2,11 @@ import { writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { resolveNebiusApiKey } from "../nebius-core.js";
-import { readGlobalConfig, resolveStoredTavilyApiKey } from "../global-config.js";
+import {
+  readGlobalConfig,
+  resolveStoredTavilyApiKey,
+  setGlobalSandboxProject,
+} from "../global-config.js";
 import {
   ContreeClient,
   SANDBOX_PROJECT_HINT,
@@ -31,6 +35,8 @@ import {
 
 const USAGE = `Usage:
   kimirelay sandbox status [--project <id>]   Report your key's Sandboxes permissions
+  kimirelay sandbox project [<id>|--clear]    Show, store, or clear the Nebius project id
+                                              sent on contree (Token Factory) calls
   kimirelay sandbox run [--image <tag>] [--timeout <s>] [--keep] [--fetch <path>]... <command...>
                                               Run a shell command in a sandbox. --keep
                                               snapshots the filesystem into a result image;
@@ -46,13 +52,15 @@ const USAGE = `Usage:
   kimirelay sandbox advisory [--write]        Print (or append) the agent-instructions
                                               block steering agents toward sandboxes
 
-Providers: Nebius Token Factory Sandboxes (contree, gated beta) and
-tenki.cloud (tenki, open signup - set TENKI_API_KEY). Default is contree;
-tenki runs only when explicitly selected with --provider tenki or
-KIMIRELAY_SANDBOX_PROVIDER=tenki. See docs/TENKI-SANDBOXES-PRD.md.
+Providers: tenki.cloud (tenki, open signup - set TENKI_API_KEY) and Nebius
+Token Factory Sandboxes (contree, gated beta). Default is tenki; select
+Nebius with --provider contree or KIMIRELAY_SANDBOX_PROVIDER=contree.
+See docs/TENKI-SANDBOXES-PRD.md.
 
-Some accounts require a Nebius project on every Sandboxes call; pass it with
---project or set NEBIUS_PROJECT (the id is in the Token Factory console).
+Some accounts require a Nebius project on every contree call; pass it with
+--project, set NEBIUS_PROJECT, or store it once with
+"kimirelay sandbox project <id>" (the id is in the Token Factory console -
+there is no API to discover it).
 
 Remote harness sessions (headless, requires a pushed git repo):
   klaude --sandbox -p "<task>"                Claude Code on Kimi K3 inside a sandbox
@@ -77,10 +85,24 @@ type SandboxCliOptions = {
 /**
  * The Nebius project the Sandboxes API should bill/authorize against. Some
  * accounts require it on every call (the API answers 400 "Missing Project
- * header" otherwise); find the id in the Token Factory console.
+ * header" otherwise). There is no discovery API - the id only exists in the
+ * Token Factory console - so `kimirelay sandbox project <id>` stores it once
+ * in the global config as the last-resort fallback.
  */
-export function resolveSandboxProject(flag?: string): string | undefined {
-  return flag?.trim() || process.env.NEBIUS_PROJECT?.trim() || undefined;
+export async function resolveSandboxProject(
+  flag?: string,
+  env: NodeJS.ProcessEnv = process.env,
+  home = os.homedir(),
+): Promise<string | undefined> {
+  const direct = flag?.trim() || env.NEBIUS_PROJECT?.trim();
+  if (direct) {
+    return direct;
+  }
+  try {
+    return (await readGlobalConfig(home)).sandboxProject.trim() || undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 function parseSandboxArgs(args: string[]): SandboxCliOptions {
@@ -150,7 +172,7 @@ async function buildClient(apiKeyFlag?: string, projectFlag?: string): Promise<C
   if (!apiKey) {
     throw new Error("No Nebius API key found. Run `kimirelay configure` or set NEBIUS_API_KEY.");
   }
-  const project = resolveSandboxProject(projectFlag);
+  const project = await resolveSandboxProject(projectFlag);
   return new ContreeClient({ apiKey, ...(project ? { project } : {}) });
 }
 
@@ -173,6 +195,34 @@ export async function runSandboxCli(args: string[]): Promise<void> {
     return;
   }
 
+  if (verb === "project") {
+    const [value] = rest;
+    if (value === undefined) {
+      const effective = await resolveSandboxProject();
+      if (!effective) {
+        console.log(
+          "No Nebius project configured. Store one with `kimirelay sandbox project <id>` " +
+            "(the id is shown in the Token Factory console).",
+        );
+        return;
+      }
+      const source = process.env.NEBIUS_PROJECT?.trim() ? "NEBIUS_PROJECT" : "stored config";
+      console.log(`Nebius project: ${effective} (from ${source}).`);
+      return;
+    }
+    if (value === "--clear") {
+      await setGlobalSandboxProject(os.homedir(), "");
+      console.log("Cleared the stored Nebius project.");
+      return;
+    }
+    await setGlobalSandboxProject(os.homedir(), value.trim());
+    console.log(
+      `Stored Nebius project ${value.trim()} in ~/.kimirelay/config.json - ` +
+        "contree sandbox calls now send it automatically.",
+    );
+    return;
+  }
+
   if (verb === "status") {
     const opts = parseSandboxArgs(rest);
     const provider = resolveSandboxProvider(opts.provider);
@@ -188,7 +238,7 @@ export async function runSandboxCli(args: string[]): Promise<void> {
       }
       console.log(
         "Tenki sandboxes: credential present; prove it end to end with: " +
-          "kimirelay sandbox run --provider tenki -- echo ok",
+          "kimirelay sandbox run -- echo ok",
       );
       return;
     }
@@ -470,7 +520,7 @@ export async function runHarnessSandbox(
     await renderTenkiResult(result);
     return;
   }
-  const project = resolveSandboxProject(flags.project);
+  const project = await resolveSandboxProject(flags.project);
   const client = new ContreeClient({ apiKey, ...(project ? { project } : {}) });
   try {
     await client.checkAccess();
