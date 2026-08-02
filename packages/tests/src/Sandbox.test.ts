@@ -158,3 +158,58 @@ describe("writeAdvisoryBlock", () => {
     expect(content).toContain("Sandboxed execution");
   });
 });
+
+describe("Project header handling (live-observed API behavior)", () => {
+  test("sends the Project header when configured", async () => {
+    const seen: { project?: string | null } = {};
+    const client = new ContreeClient({
+      apiKey: "test-key",
+      project: "my-project",
+      fetchImpl: async (_input, init) => {
+        seen.project = new Headers(init?.headers).get("project");
+        return jsonResponse({ operations: [] });
+      },
+    });
+    await client.checkAccess();
+    expect(seen.project).toBe("my-project");
+  });
+
+  test("400 missing-Project-header responses carry the --project hint", async () => {
+    const client = new ContreeClient({
+      apiKey: "test-key",
+      fetchImpl: async () =>
+        jsonResponse({ status: 400, error: 'Missing \\"Project\\" header' }, { status: 400 }),
+    });
+    const err = await client.checkAccess().catch((e: unknown) => e);
+    expect(err).toBeInstanceOf(SandboxApiError);
+    expect((err as Error).message).toContain("--project");
+    expect((err as Error).message).toContain("NEBIUS_PROJECT");
+  });
+
+  test("insufficient-permission 403s explain the key/project fix, not beta access", async () => {
+    const client = new ContreeClient({
+      apiKey: "test-key",
+      project: "default",
+      fetchImpl: async () =>
+        jsonResponse(
+          { status: 403, error: "Insufficient permissions: spawn_disposable or spawn" },
+          { status: 403 },
+        ),
+    });
+    const err = await client.checkAccess().catch((e: unknown) => e);
+    expect(err).toBeInstanceOf(SandboxAccessError);
+    expect((err as Error).message).toContain("Insufficient permissions");
+    expect((err as Error).message).toContain("Token Factory console");
+    expect((err as Error).message).not.toContain("Request access");
+  });
+
+  test("plain 403s still point at the beta access request", async () => {
+    const client = new ContreeClient({
+      apiKey: "test-key",
+      fetchImpl: async () => jsonResponse({ detail: "forbidden" }, { status: 403 }),
+    });
+    const err = await client.checkAccess().catch((e: unknown) => e);
+    expect(err).toBeInstanceOf(SandboxAccessError);
+    expect((err as Error).message).toContain("Request access");
+  });
+});
