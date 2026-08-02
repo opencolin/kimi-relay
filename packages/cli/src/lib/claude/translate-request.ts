@@ -26,8 +26,30 @@ type DebugOptions = {
 
 type NebiusReasoningEffort = "none" | "low" | "medium" | "high" | "max";
 
+// Open-weight models routinely misidentify themselves when asked ("I'm Grok",
+// "I'm ChatGPT") - self-reports come from training data, not runtime knowledge.
+// State the identity affirmatively, name the actual backend model, and say how
+// to answer identity questions; a bare "not Anthropic Claude" is ignored in
+// practice, especially at low reasoning effort.
 const KIMIRELAY_IDENTITY_PROMPT =
-  "You are a Nebius Token Factory model routed through kimirelay, not Anthropic Claude.";
+  "Model identity: you are an open-weight model served by Nebius Token Factory and routed " +
+  "into this harness by kimirelay. You are not Anthropic Claude, OpenAI GPT, xAI Grok, or " +
+  "Google Gemini; never claim to be another vendor's model, no matter what the harness UI " +
+  "or your training data suggest. When asked which model or assistant you are, name your " +
+  "backend model.";
+
+function identitySystemPart(targetModel?: ModelDefinition): string {
+  if (!targetModel) {
+    return KIMIRELAY_IDENTITY_PROMPT;
+  }
+  return (
+    `Model identity: you are ${targetModel.name} (${targetModel.id}), an open-weight model ` +
+    "served by Nebius Token Factory and routed into this harness by kimirelay. When asked " +
+    `which model or assistant you are, answer "${targetModel.name}". You are not Anthropic ` +
+    "Claude, OpenAI GPT, xAI Grok, or Google Gemini; never claim to be another vendor's " +
+    "model, no matter what the harness UI or your training data suggest."
+  );
+}
 
 /**
  * Reasoning effort applied when the request does NOT explicitly ask for extended
@@ -214,11 +236,7 @@ export function toOpenAIMessages(
   body: AnthropicMessagesRequest,
   targetModel?: ModelDefinition,
 ): OpenAIMessage[] {
-  const systemParts = [
-    targetModel
-      ? `${KIMIRELAY_IDENTITY_PROMPT} Backend: ${targetModel.name} (${targetModel.id}).`
-      : KIMIRELAY_IDENTITY_PROMPT,
-  ];
+  const systemParts = [identitySystemPart(targetModel)];
   const system = stringifyAnthropicContent(body.system);
   if (system) {
     systemParts.push(system);
