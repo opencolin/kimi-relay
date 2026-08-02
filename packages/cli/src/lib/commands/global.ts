@@ -51,11 +51,14 @@ Usage:
   kimirelay claude [...]      (alias: klaude)
   kimirelay pi [...]          (alias: kpi)
   kimirelay opencode [...]    (alias: openkode)
-  kimirelay sandbox status|run|advisory    (beta: Token Factory Sandboxes)
+  kimirelay sandbox status|project|run|fetch|prebake|advisory
+                              Cloud sandboxes - tenki.cloud by default (set TENKI_API_KEY);
+                              Nebius Token Factory Sandboxes via --provider contree (gated beta)
 
 Extra args after codex/claude/pi/opencode are passed through.
 
-Sandbox sessions (beta, needs Sandboxes access on your Nebius account):
+Sandbox sessions (default provider: tenki.cloud - open signup, set TENKI_API_KEY;
+Nebius Token Factory with --provider contree needs Sandboxes beta access):
   klaude --sandbox -p "<task>"    Claude Code on Kimi K3 in a disposable microVM,
                                   against your repo's pushed state. Headless only.
   kodex --sandbox exec "<task>"   Same for Codex.
