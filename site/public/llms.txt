@@ -38,7 +38,7 @@ Before the first launch you need a Nebius API key (get one at https://tokenfacto
 kimirelay configure
 ```
 
-This stores your Nebius API key in `~/.kimirelay/` and optionally an Exa API key (https://exa.ai) that powers web-search emulation in Claude Code. Web search is optional - without it, searches return a clear "TAVILY_API_KEY not set" error instead of failing silently.
+This stores your Nebius API key in `~/.kimirelay/` and optionally a Tavily API key (https://app.tavily.com) that powers web-search emulation in Claude Code and Codex. Web search is optional - without it, searches return a clear "TAVILY_API_KEY not set" error instead of failing silently. When a Tavily key is configured, `klaude` also auto-injects Tavily's remote MCP server per session (ephemeral `--mcp-config`; skipped with `--strict-mcp-config`; disable with `KIMIRELAY_DISABLE_TAVILY_MCP=1`), adding explicit `tavily_search` / `tavily_extract` tools alongside the emulated native search.
 
 You can also set the key non-interactively:
 
@@ -262,7 +262,7 @@ kimirelay daemon stop
 
 - **"No Nebius API key found"** - run `kimirelay configure` or set `NEBIUS_API_KEY`.
 - **A tool command is not found** - kimirelay does not install the agent CLIs for you. It prints the official install command (e.g. `npm install -g @openai/codex`) and the docs link when the tool is missing; install it, then re-run.
-- **Web search fails in Claude Code** - set an Exa API key via `kimirelay configure`. Without it, searches return a clear "TAVILY_API_KEY not set" error.
+- **Web search fails in Claude Code** - set a Tavily API key via `kimirelay configure`. Without it, searches return a clear "TAVILY_API_KEY not set" error.
 - **Headless run hangs and produces no edits** - you forgot `< /dev/null`. Close stdin and relaunch; see the Headless usage section.
 - **Cost seems high for a small change** - the agent over-documented. Scope the task tighter and add a "don't over-explain" instruction.
 - **Want your normal config back** - stop using the wrappers. No agent config was saved, so your OpenCode / Claude Code / Codex CLI / Pi Code setup is untouched. For ChatGPT Desktop, run `kimirelay chatgpt --restore`.

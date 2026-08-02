@@ -36,6 +36,8 @@ sandbox status|run|advisory` plus headless `klaude --sandbox` /
 
 ### 1. Tavily MCP auto-inject for `klaude`
 
+**Status (2026-08-02): shipped in v0.11.0.**
+
 The relay already emulates Claude Code's native `web_search` via Tavily. When
 a Tavily key is configured, `klaude` additionally injects Tavily's remote MCP
 server per run (generated `--mcp-config`, ephemeral like everything else),

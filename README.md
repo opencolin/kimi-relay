@@ -99,6 +99,8 @@ Claude Code and Codex are text-native; image blocks are auto-routed to a vision-
 
 Claude Code and Codex expose a native `web_search` tool. The relay backs it with [Tavily](https://tavily.com): if a Tavily key is configured, searches return real results with citations. Without one, a search returns a clear "TAVILY_API_KEY not set" message instead of failing silently. Nebius has no hosted search tool, so this is how agents get live web access.
 
+With a Tavily key configured, `klaude` also injects [Tavily's remote MCP server](https://docs.tavily.com) into the session (via an ephemeral `--mcp-config` file - nothing durable is written), so the agent gets the explicit `tavily_search` / `tavily_extract` toolset alongside the emulated native search. It is skipped automatically when you pass `--strict-mcp-config`, and can be disabled with `KIMIRELAY_DISABLE_TAVILY_MCP=1`.
+
 ## Configuration & env vars
 
 | Variable                         | Effect                                                                                                                                           |
@@ -108,6 +110,7 @@ Claude Code and Codex expose a native `web_search` tool. The relay backs it with
 | `NEBIUS_BASE_URL`                | Override the API base (default `https://api.tokenfactory.nebius.com/v1`).                                                                        |
 | `KIMIRELAY_REASONING_EFFORT`     | `none`\|`low`\|`medium`\|`high`\|`max`. Default `none` for speed; raise for harder tasks.                                                        |
 | `KIMIRELAY_FALLBACK_MODEL`       | Model to fail over to when the target model returns no response headers (down/overloaded). Default `moonshotai/Kimi-K2.6`; set `off` to disable. |
+| `KIMIRELAY_DISABLE_TAVILY_MCP=1` | Skip the Tavily MCP server auto-inject in `klaude` sessions.                                                                                     |
 | `KIMIRELAY_DISABLE_AUTOUPDATE=1` | Stop the installed binary from self-updating.                                                                                                    |
 | `KIMIRELAY_TELEMETRY_URL`        | Opt in to telemetry by pointing at your own collector. Off by default.                                                                           |
 
