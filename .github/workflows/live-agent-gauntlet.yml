@@ -20,6 +20,14 @@ on:
           - live-models-check
           - opencode
           - pi
+  # Push-to-run escape hatch: pushing this branch runs the full gauntlet
+  # (harness defaults to "all" for non-dispatch events). Exists because the
+  # repo's GitHub App integration cannot call the workflow-dispatch API
+  # (403, no actions:write), but it can push. Re-run by pushing an empty
+  # commit to the branch; keep the branch pointed at the code you want tested.
+  push:
+    branches:
+      - trigger/live-gauntlet
 
 concurrency:
   group: live-agent-gauntlet-${{ github.ref }}
