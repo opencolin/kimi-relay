@@ -77,6 +77,10 @@ jobs:
       - name: Install workspace dependencies
         run: pnpm install --frozen-lockfile --config.confirmModulesPurge=false
 
+      # Speeds up the `build` tasks only. The test:gauntlet:* tasks are
+      # "cache": false in turbo.json - live tests validate an external system
+      # (Nebius + the installed agent CLIs), so a cached PASS proves nothing
+      # about the current key or backend and must never be replayed.
       - name: Restore Turborepo cache
         uses: actions/cache/restore@v4
         with:
