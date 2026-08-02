@@ -45,9 +45,9 @@ const USAGE = `Usage:
                                               block steering agents toward sandboxes
 
 Providers: Nebius Token Factory Sandboxes (contree, gated beta) and
-tenki.cloud (tenki, open signup - set TENKI_API_KEY). Select with
---provider <contree|tenki> or KIMIRELAY_SANDBOX_PROVIDER; auto picks tenki
-when only a Tenki credential is usable. See docs/TENKI-SANDBOXES-PRD.md.
+tenki.cloud (tenki, open signup - set TENKI_API_KEY). Default is contree;
+tenki runs only when explicitly selected with --provider tenki or
+KIMIRELAY_SANDBOX_PROVIDER=tenki. See docs/TENKI-SANDBOXES-PRD.md.
 
 Some accounts require a Nebius project on every Sandboxes call; pass it with
 --project or set NEBIUS_PROJECT (the id is in the Token Factory console).
@@ -176,7 +176,7 @@ export async function runSandboxCli(args: string[]): Promise<void> {
     const provider = resolveSandboxProvider(opts.provider);
     const tenkiAuth = resolveTenkiAuth();
     console.log(
-      `Provider: ${provider}${opts.provider || process.env.KIMIRELAY_SANDBOX_PROVIDER ? "" : " (auto)"}. ` +
+      `Provider: ${provider}${opts.provider || process.env.KIMIRELAY_SANDBOX_PROVIDER ? "" : " (default)"}. ` +
         `Tenki credential: ${tenkiAuth ? "set" : `not set (get one at tenki.cloud - ${TENKI_DOCS_URL})`}.`,
     );
     if (provider === "tenki") {

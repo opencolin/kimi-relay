@@ -49,6 +49,9 @@ jobs:
       # emulation + the Tavily MCP auto-inject). Without it those tests see
       # the documented "TAVILY_API_KEY not set" path instead of live search.
       TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
+      # Optional: enables the tenki.cloud sandbox live smoke below. Provider
+      # selection is explicit-only, so this key alone changes nothing else.
+      TENKI_API_KEY: ${{ secrets.TENKI_API_KEY }}
       KIMIRELAY_DEBUG: "1"
       VITEST_RETRY: "3"
       HARNESS: ${{ github.event.inputs.harness || 'all' }}
@@ -171,6 +174,22 @@ jobs:
               echo "Unknown harness: $HARNESS" >&2
               exit 1
               ;;
+          esac
+
+      # Live-verifies the tenki provider end to end (SDK auth, VM create,
+      # exec, teardown) - the one sandbox path CI can cover, since the Nebius
+      # ConTree side is gated behind console-granted key permissions.
+      - name: Tenki sandbox live smoke
+        run: |
+          if [ -z "$TENKI_API_KEY" ]; then
+            echo "TENKI_API_KEY not set - skipping tenki live smoke."
+            exit 0
+          fi
+          out="$(node packages/cli/dist/bin/kimirelay.js sandbox run --provider tenki -- echo kimirelay-tenki-ok)"
+          echo "$out"
+          case "$out" in
+            *kimirelay-tenki-ok*) echo "tenki smoke passed." ;;
+            *) echo "tenki smoke: expected marker missing from output." >&2; exit 1 ;;
           esac
 
       - name: Stop kimirelay daemon

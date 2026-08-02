@@ -17,10 +17,10 @@ Two sandbox backends share this surface (see `docs/TENKI-SANDBOXES-PRD.md`):
   `TENKI_API_KEY` (a `tk_…` key). `--fetch` reads files from the live
   session; post-hoc fetch/prebake land with snapshots (PRD milestone 2).
 
-Select with `--provider <contree|tenki>` or `KIMIRELAY_SANDBOX_PROVIDER`;
-auto-selection prefers Nebius when usable and otherwise picks tenki when a
-Tenki credential is set. Harness keys reach tenki sessions via the create
-request body over TLS - never argv, never disk.
+Select with `--provider <contree|tenki>` or `KIMIRELAY_SANDBOX_PROVIDER`.
+The default is contree; setting `TENKI_API_KEY` alone never switches
+providers - tenki runs only when explicitly selected. Harness keys reach
+tenki sessions via the create request body over TLS - never argv, never disk.
 
 ## Project header
 

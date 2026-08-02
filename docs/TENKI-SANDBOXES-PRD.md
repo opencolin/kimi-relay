@@ -71,11 +71,12 @@ Selection (first match wins):
 
 1. `--provider tenki|contree` on any sandbox command / `--sandbox` hoist
 2. `KIMIRELAY_SANDBOX_PROVIDER` env
-3. Auto: `tenki` when a Tenki credential is set and Nebius sandbox access is
-   not established; otherwise `contree` (Nebius stays default-when-usable).
+3. Default: `contree`. No credential sniffing — a `TENKI_API_KEY` in the env
+   never switches providers on its own (Collin, 2026-08-02: sandboxes and
+   providers alike are explicit opt-in, in the spirit of `--sandbox` itself).
 
 `kimirelay sandbox status` reports both providers' auth/permission state and
-which one auto-selection would pick.
+which one the current flags/env select.
 
 ### Why the SDK (not the CLI, not the MCP server)
 
@@ -144,16 +145,17 @@ fetch` and `sandbox prebake` on tenki; pause/resume surfacing.
   always set, `close()` always called, and the session id printed so a leak
   is traceable.
 
-## Open questions (for Collin)
+## Open questions — resolved 2026-08-02 (Collin), except 3
 
-1. Get a `tk_…` key for live verification (open signup at tenki.cloud) —
-   and should it also land in the repo's `production` environment so the
-   gauntlet can cover the tenki path?
-2. Auto-selection default when _both_ credentials work: keep Nebius-first
-   (inference-account affinity) or prefer tenki (richer surface)? M1 ships
-   Nebius-first.
-3. M3 MCP inject: default-on like Tavily's, or opt-in (`KIMIRELAY_TENKI_MCP=1`)
-   given the tools can spend money? PRD leans **opt-in** for cost safety.
+1. **Answered.** `TENKI_API_KEY` now lives in the repo's `production`
+   environment; the live gauntlet runs a tenki smoke
+   (`sandbox run --provider tenki`) whenever the secret resolves.
+2. **Answered.** No auto-selection at all: providers are explicit opt-in
+   (`--provider tenki` / `KIMIRELAY_SANDBOX_PROVIDER=tenki`), default
+   `contree`. The credential-based fallback M1 briefly shipped was removed.
+3. **Still open.** M3 MCP inject default-on vs opt-in
+   (`KIMIRELAY_TENKI_MCP=1`): Collin is undecided; PRD keeps leaning
+   **opt-in** for cost safety, to be settled before M3 starts.
 
 ## Decision-log update
 
