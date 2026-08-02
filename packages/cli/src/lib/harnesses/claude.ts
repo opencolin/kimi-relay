@@ -56,6 +56,7 @@ export default defineHarness({
       baseUrl: resolveNebiusBaseUrl(),
       modelId: selectedModel.alias,
       ...(args.length > 0 ? { args } : {}),
+      ...(tavilyMcp ? { tavilyMcpInjected: true } : {}),
     };
     try {
       const result = await runClaudeNebius(launchOptions);

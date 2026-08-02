@@ -43,10 +43,10 @@ kimirelay configure
 
 You'll be asked for two keys:
 
-| Key                | Where to get it                                          | Required?                     |
-| ------------------ | -------------------------------------------------------- | ----------------------------- |
-| **Nebius API key** | <https://tokenfactory.nebius.com/?modals=create-api-key> | Yes                           |
-| **Tavily API key** | <https://app.tavily.com>                                 | Optional (enables web search) |
+| Key                | Where to get it                                          | Required?                                              |
+| ------------------ | -------------------------------------------------------- | ------------------------------------------------------ |
+| **Nebius API key** | <https://tokenfactory.nebius.com/?modals=create-api-key> | Yes                                                    |
+| **Tavily API key** | <https://app.tavily.com>                                 | Optional, recommended (live web search + Tavily tools) |
 
 Both are stored in `~/.kimirelay/` and never leave your machine. You can also set `NEBIUS_API_KEY` / `TAVILY_API_KEY` in the environment instead.
 
