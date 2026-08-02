@@ -2,6 +2,7 @@ import { spawn } from "node:child_process";
 import { OPENCODE_DEFAULT_MODEL, OPENCODE_PROVIDER_ID } from "../opencode/defaults.js";
 import { buildOpencodeConfigJson, buildOpencodeEnv } from "../opencode/core.js";
 import { resolveNebiusApiKey } from "../nebius-core.js";
+import { resolveTavilyMcpKey } from "../tavily-mcp-key.js";
 import { defineHarness } from "../harness-types.js";
 import { HARNESS } from "../harness.js";
 import type { HarnessContext, HarnessResult } from "../harness-types.js";
@@ -44,8 +45,17 @@ export default defineHarness({
     }
 
     const modelId = ctx.main ?? OPENCODE_DEFAULT_MODEL;
-    const configJson = buildOpencodeConfigJson({ modelId });
+    // Tavily MCP auto-inject: OpenCode talks straight to Nebius (no relay
+    // proxy, no emulated web_search), so the injected Tavily server is its
+    // only live-web path. Config-only; the key resolves from the environment.
+    const tavilyMcp = Boolean(resolveTavilyMcpKey());
+    const configJson = buildOpencodeConfigJson({ modelId, tavilyMcp });
     const env = buildOpencodeEnv({ apiKey, configJson });
+    if (tavilyMcp) {
+      process.stderr.write(
+        "Kimi Relay ▸ Tavily MCP injected for this session (ephemeral - config is never written to disk).\n",
+      );
+    }
 
     if (process.env.KIMIRELAY_DEBUG === "1") {
       process.stderr.write(`[kimirelay opencode] custom model: ${modelId}\n`);

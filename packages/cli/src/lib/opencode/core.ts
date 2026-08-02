@@ -1,5 +1,6 @@
 import { NEBIUS_BASE_URL } from "@kimirelay/models";
 import { NEBIUS_API_KEY_ENV_REF } from "../nebius-core.js";
+import { TAVILY_MCP_BASE_URL } from "../tavily-mcp-key.js";
 import {
   OPENCODE_PROVIDER_ID,
   OPENCODE_DEFAULT_MODEL,
@@ -15,6 +16,8 @@ type OpencodeConfig = {
   model?: string;
   provider?: Record<string, Record<string, unknown>>;
   agent?: Record<string, Record<string, unknown>>;
+  /** MCP servers; used for the optional Tavily remote-server auto-inject. */
+  mcp?: Record<string, Record<string, unknown>>;
   /**
    * Provider ids OpenCode won't auto-load. We disable "opencode" - the Zen
    * gateway provider (its models are registered under the `opencode/*`
@@ -66,11 +69,14 @@ export function buildOpencodeConfigJson({
   apiKeyEnvRef = NEBIUS_API_KEY_ENV_REF,
   buildPrompt = OPENCODE_BUILD_PROMPT,
   visionPrompt = OPENCODE_VISION_AGENT_PROMPT,
+  tavilyMcp = false,
 }: {
   modelId?: string;
   apiKeyEnvRef?: string;
   buildPrompt?: string;
   visionPrompt?: string;
+  /** Add Tavily's remote MCP server (auth via `{env:TAVILY_API_KEY}`). */
+  tavilyMcp?: boolean;
 } = {}): OpencodeConfig {
   // Register every model in the live Nebius catalog (the full set /models
   // shows) with their real metadata + tip-bearing display names. The `@vision`
@@ -103,6 +109,24 @@ export function buildOpencodeConfigJson({
     provider: {
       [OPENCODE_PROVIDER_ID]: provider,
     },
+    // Tavily MCP auto-inject, mirroring klaude/kodex. OpenCode is a spawned
+    // harness that talks straight to Nebius - there is no relay proxy to
+    // emulate web_search - so this is its only live-web path. The key stays in
+    // the environment: `{env:TAVILY_API_KEY}` resolves inside opencode
+    // (verified live: Tavily's MCP endpoint accepts `Authorization: Bearer`),
+    // and this config itself rides OPENCODE_CONFIG_CONTENT, never disk.
+    ...(tavilyMcp
+      ? {
+          mcp: {
+            tavily: {
+              type: "remote",
+              url: TAVILY_MCP_BASE_URL,
+              enabled: true,
+              headers: { Authorization: "Bearer {env:TAVILY_API_KEY}" },
+            },
+          },
+        }
+      : {}),
     // Slash form: provider/model. The selected model is the primary; sub-agents
     // without an explicit model inherit it automatically. The `vision` subagent
     // explicitly pins a vision-capable Nebius model (Kimi-K2.7-Code) so a

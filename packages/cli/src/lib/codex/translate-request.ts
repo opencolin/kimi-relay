@@ -51,8 +51,18 @@ type CodexTranslateOptions = {
   targetModelId: string;
   modelName: string;
   modelDefinition: ModelDefinition;
+  tavilyMcpInjected?: boolean | undefined;
   debug?: boolean | undefined;
 };
+
+// Appended to the identity message when the launcher injected the Tavily MCP
+// server, so the model answers "is Tavily set up?" accurately: the server is
+// configured per session via launch flags, so durable stores (`codex mcp
+// list`, ~/.codex/config.toml) are expected not to show it.
+const CODEX_TAVILY_MCP_NOTE =
+  " This session also has kimirelay's ephemeral Tavily MCP server injected (tavily_search, " +
+  "tavily_extract, and related tools); it is configured per session via launch flags, so by " +
+  "design it does not appear in `codex mcp list` or ~/.codex/config.toml.";
 
 type DebugOptions = {
   debug?: boolean | undefined;
@@ -131,7 +141,9 @@ function toChatMessages(
   const messages: ChatMessage[] = [
     {
       role: "system",
-      content: `${CODEX_IDENTITY_PROMPT}\nSelected Nebius backend: ${options.modelName} (${options.targetModelId}).`,
+      content:
+        `${CODEX_IDENTITY_PROMPT}\nSelected Nebius backend: ${options.modelName} (${options.targetModelId}).` +
+        (options.tavilyMcpInjected ? CODEX_TAVILY_MCP_NOTE : ""),
     },
   ];
   if (body.instructions) {
