@@ -281,6 +281,7 @@ async function main() {
     let rest = invocation.flags.passthrough.slice(1);
     let image: string | undefined;
     let project: string | undefined;
+    let keep = false;
     for (;;) {
       if (rest[0] === "--image" && rest[1] !== undefined) {
         image = rest[1];
@@ -290,6 +291,11 @@ async function main() {
       if (rest[0] === "--project" && rest[1] !== undefined) {
         project = rest[1];
         rest = rest.slice(2);
+        continue;
+      }
+      if (rest[0] === "--keep") {
+        keep = true;
+        rest = rest.slice(1);
         continue;
       }
       break;
@@ -306,6 +312,7 @@ async function main() {
       apiKey: invocation.flags.apiKey,
       image,
       project,
+      keep,
     });
     return;
   }

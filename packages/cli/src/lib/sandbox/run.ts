@@ -29,9 +29,14 @@ export type SandboxRunSpec = {
   image?: string | undefined;
   env?: Record<string, string> | undefined;
   timeoutSeconds?: number | undefined;
+  /**
+   * Non-disposable runs snapshot their filesystem into a result image on
+   * success (the artifact-download / checkpoint path). Default: disposable.
+   */
+  keep?: boolean | undefined;
 };
 
-/** Runs one shell command in a disposable, networked sandbox instance. */
+/** Runs one shell command in a networked sandbox instance. */
 export async function runSandboxCommand(
   client: ContreeClient,
   spec: SandboxRunSpec,
@@ -43,7 +48,7 @@ export async function runSandboxCommand(
     shell: true,
     env: spec.env,
     networking: { enabled: true },
-    disposable: true,
+    disposable: !spec.keep,
     ...(spec.timeoutSeconds ? { timeout: spec.timeoutSeconds } : {}),
   });
   return client.waitForOperation(operationId, {
@@ -65,13 +70,37 @@ export type HarnessSandboxSpec = {
   tavilyApiKey?: string | undefined;
   image?: string | undefined;
   timeoutSeconds?: number | undefined;
+  /** Keep a result-image snapshot for artifact download (default disposable). */
+  keep?: boolean | undefined;
 };
 
 /** Per-harness agent CLI install command used inside the sandbox bootstrap. */
-const HARNESS_INSTALL: Record<HarnessSandboxSpec["harness"], { install: string; bin: string }> = {
-  claude: { install: "npm install -g @anthropic-ai/claude-code", bin: "klaude" },
-  codex: { install: "npm install -g @openai/codex", bin: "kodex" },
+const HARNESS_INSTALL: Record<
+  HarnessSandboxSpec["harness"],
+  { install: string; bin: string; binary: string }
+> = {
+  claude: { install: "npm install -g @anthropic-ai/claude-code", bin: "klaude", binary: "claude" },
+  codex: { install: "npm install -g @openai/codex", bin: "kodex", binary: "codex" },
 };
+
+/**
+ * Shared tooling-install preamble. Every install is `command -v`-guarded so
+ * a prebaked image (see buildPrebakeBootstrap) skips straight past the cold
+ * bootstrap - the same script costs ~a minute on tag:ubuntu:latest and ~0s
+ * on tag:kimirelay:prebaked.
+ */
+function bootstrapPreamble(): string[] {
+  return [
+    "set -eu",
+    "export DEBIAN_FRONTEND=noninteractive",
+    'export PATH="$HOME/.kimirelay/bin:$HOME/.bun/bin:$PATH"',
+    // ubuntu base ships without curl/git/node; install quietly when missing.
+    "command -v curl >/dev/null 2>&1 || { apt-get update -qq && apt-get install -y -qq curl ca-certificates; }",
+    "command -v git >/dev/null 2>&1 || { apt-get update -qq && apt-get install -y -qq git; }",
+    "command -v npm >/dev/null 2>&1 || { curl -fsSL https://deb.nodesource.com/setup_22.x | bash - >/dev/null && apt-get install -y -qq nodejs; }",
+    "command -v kimirelay >/dev/null 2>&1 || curl -fsSL https://kimirelay.com/install.sh | sh",
+  ];
+}
 
 /**
  * Builds the bootstrap script for a remote harness session: install kimirelay
@@ -80,22 +109,32 @@ const HARNESS_INSTALL: Record<HarnessSandboxSpec["harness"], { install: string; 
  * instance env (never embedded in the command string).
  */
 export function buildHarnessBootstrap(spec: HarnessSandboxSpec): string {
-  const { install, bin } = HARNESS_INSTALL[spec.harness];
+  const { install, bin, binary } = HARNESS_INSTALL[spec.harness];
   const branchArg = spec.branch ? `-b ${shellQuote(spec.branch)} ` : "";
   const args = spec.passthrough.map(shellQuote).join(" ");
   return [
-    "set -eu",
-    "export DEBIAN_FRONTEND=noninteractive",
-    // ubuntu base ships without curl/git/node; install quietly when missing.
-    "command -v curl >/dev/null 2>&1 || { apt-get update -qq && apt-get install -y -qq curl ca-certificates; }",
-    "command -v git >/dev/null 2>&1 || { apt-get update -qq && apt-get install -y -qq git; }",
-    "command -v npm >/dev/null 2>&1 || { curl -fsSL https://deb.nodesource.com/setup_22.x | bash - >/dev/null && apt-get install -y -qq nodejs; }",
-    "curl -fsSL https://kimirelay.com/install.sh | sh",
-    'export PATH="$HOME/.kimirelay/bin:$HOME/.bun/bin:$PATH"',
-    install,
+    ...bootstrapPreamble(),
+    `command -v ${binary} >/dev/null 2>&1 || ${install}`,
     `git clone --depth 1 ${branchArg}${shellQuote(spec.repoUrl)} /work`,
     "cd /work",
     `${bin} ${args}`.trim(),
+  ].join("\n");
+}
+
+/**
+ * Builds the one-time prebake script: install ALL the tooling (kimirelay and
+ * both harness CLIs), verify, and exit. Run non-disposably, the result image
+ * is a warm checkpoint; tagged (kimirelay:prebaked by default), later
+ * `--sandbox --image tag:<tag>` runs skip the cold bootstrap entirely thanks
+ * to the command -v guards above.
+ */
+export function buildPrebakeBootstrap(): string {
+  return [
+    ...bootstrapPreamble(),
+    HARNESS_INSTALL.claude.install,
+    HARNESS_INSTALL.codex.install,
+    "kimirelay --version",
+    "echo kimirelay-prebake-complete",
   ].join("\n");
 }
 
@@ -115,6 +154,7 @@ export async function runHarnessInSandbox(
       image: spec.image,
       env,
       timeoutSeconds: spec.timeoutSeconds ?? 1800,
+      keep: spec.keep,
     },
     onPoll,
   );
