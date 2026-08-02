@@ -46,6 +46,7 @@ describe("Claude proxy compatibility API", () => {
 
     const env = buildClaudeEnv({
       apiKey: "test-nebius-key",
+      baseUrl: "https://api.tokenfactory.nebius.com/v1",
       modelId: GLM_5_2.anthropicAlias ?? GLM_5_2.id,
       modelName: GLM_5_2.name,
       proxyUrl: "http://127.0.0.1:7878/session/test",
@@ -60,6 +61,7 @@ describe("Claude proxy compatibility API", () => {
 
     const env = buildClaudeEnv({
       apiKey: "test-nebius-key",
+      baseUrl: "https://api.tokenfactory.nebius.com/v1",
       modelId: GLM_5_2.anthropicAlias ?? GLM_5_2.id,
       modelName: GLM_5_2.name,
       proxyUrl: "http://127.0.0.1:7878/session/test",
@@ -355,6 +357,7 @@ describe("Claude proxy compatibility API", () => {
     try {
       const env = buildClaudeEnv({
         apiKey: "test-together-key",
+        baseUrl: "https://api.tokenfactory.nebius.com/v1",
         modelId: GLM_5_2.anthropicAlias ?? GLM_5_2.id,
         modelName: GLM_5_2.name,
         proxyUrl: "http://127.0.0.1:7878/session/test",
@@ -379,6 +382,7 @@ describe("Claude proxy compatibility API", () => {
 
     const env = buildClaudeEnv({
       apiKey: "test-together-key",
+      baseUrl: "https://api.tokenfactory.nebius.com/v1",
       modelId: GLM_5_2.anthropicAlias ?? GLM_5_2.id,
       modelName: GLM_5_2.name,
       proxyUrl: "http://127.0.0.1:7878/session/test",
@@ -1783,6 +1787,13 @@ class MemoryResponse extends EventEmitter {
   }
 }
 
+function hangingSseResponse(): Response {
+  // The upstream "hangs" by dying before emitting response headers; a thrown
+  // fetch is how the proxy's retry path observes that, matching the behavior
+  // this test has always exercised.
+  throw new Error("upstream connection dropped before headers");
+}
+
 function sseResponse(events: unknown[]): Response {
   const encoder = new TextEncoder();
   return new Response(
@@ -1805,6 +1816,7 @@ function sseResponse(events: unknown[]): Response {
 function proxyOptions(overrides: Partial<ClaudeProxyOptions> = {}): ClaudeProxyOptions {
   return {
     apiKey: "test-together-key",
+    baseUrl: "https://api.tokenfactory.nebius.com/v1",
     modelId: GLM_5_2.anthropicAlias ?? GLM_5_2.id,
     targetModelId: GLM_5_2.id,
     modelName: GLM_5_2.name,

@@ -29,7 +29,11 @@ describe("claude/nebius-call.ts fetchNebius retry contract (#1 characterization)
   test("200 OK returns the JSON body, no retry", async () => {
     const fetchMock = vi.fn(async () => jsonResponse(200, { id: "chatcmpl-1", choices: [] }));
     vi.stubGlobal("fetch", fetchMock);
-    const result = await fetchNebius({ model: "x" }, { apiKey: "k" }, GLM_5_2);
+    const result = await fetchNebius(
+      { model: "x" },
+      { apiKey: "k", baseUrl: "https://api.tokenfactory.nebius.com/v1" },
+      GLM_5_2,
+    );
     expect(result.ok).toBe(true);
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
@@ -41,7 +45,11 @@ describe("claude/nebius-call.ts fetchNebius retry contract (#1 characterization)
     ];
     let i = 0;
     vi.stubGlobal("fetch", async () => seq[i++] ?? seq[seq.length - 1]);
-    const result = await fetchNebius({ model: "x" }, { apiKey: "k" }, GLM_5_2);
+    const result = await fetchNebius(
+      { model: "x" },
+      { apiKey: "k", baseUrl: "https://api.tokenfactory.nebius.com/v1" },
+      GLM_5_2,
+    );
     expect(result.ok).toBe(true);
     expect(i).toBe(2); // one 429, then one 200
   });
@@ -49,7 +57,11 @@ describe("claude/nebius-call.ts fetchNebius retry contract (#1 characterization)
   test("401 does NOT retry - non-retryable surfaces immediately", async () => {
     const fetchMock = vi.fn(async () => jsonResponse(401, { error: { message: "bad key" } }));
     vi.stubGlobal("fetch", fetchMock);
-    const result = await fetchNebius({ model: "x" }, { apiKey: "bad" }, GLM_5_2);
+    const result = await fetchNebius(
+      { model: "x" },
+      { apiKey: "bad", baseUrl: "https://api.tokenfactory.nebius.com/v1" },
+      GLM_5_2,
+    );
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.error.status).toBe(401);
@@ -66,7 +78,11 @@ describe("claude/nebius-call.ts fetchNebius retry contract (#1 characterization)
     ];
     let i = 0;
     vi.stubGlobal("fetch", async () => seq[i++] ?? seq[seq.length - 1]);
-    const result = await fetchNebius({ model: "x" }, { apiKey: "k" }, GLM_5_2);
+    const result = await fetchNebius(
+      { model: "x" },
+      { apiKey: "k", baseUrl: "https://api.tokenfactory.nebius.com/v1" },
+      GLM_5_2,
+    );
     expect(result.ok).toBe(true);
     expect(i).toBe(2);
   });
@@ -76,7 +92,11 @@ describe("claude/nebius-call.ts fetchNebius retry contract (#1 characterization)
       throw new Error("ECONNRESET");
     });
     vi.stubGlobal("fetch", fetchMock);
-    const result = await fetchNebius({ model: "x" }, { apiKey: "k" }, GLM_5_2);
+    const result = await fetchNebius(
+      { model: "x" },
+      { apiKey: "k", baseUrl: "https://api.tokenfactory.nebius.com/v1" },
+      GLM_5_2,
+    );
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.error.anthropicType).toBe("overloaded_error");
