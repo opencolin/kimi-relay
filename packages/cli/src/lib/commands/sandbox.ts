@@ -18,6 +18,14 @@ import {
   runSandboxCommand,
   writeAdvisoryBlock,
 } from "../sandbox/run.js";
+import { resolveSandboxProvider, type SandboxProviderName } from "../sandbox/provider.js";
+import {
+  TENKI_DOCS_URL,
+  resolveTenkiAuth,
+  runTenkiCommand,
+  runTenkiHarness,
+  type TenkiRunResult,
+} from "../sandbox/tenki.js";
 
 const USAGE = `Usage:
   kimirelay sandbox status [--project <id>]   Report your key's Sandboxes permissions
@@ -36,6 +44,11 @@ const USAGE = `Usage:
   kimirelay sandbox advisory [--write]        Print (or append) the agent-instructions
                                               block steering agents toward sandboxes
 
+Providers: Nebius Token Factory Sandboxes (contree, gated beta) and
+tenki.cloud (tenki, open signup - set TENKI_API_KEY). Select with
+--provider <contree|tenki> or KIMIRELAY_SANDBOX_PROVIDER; auto picks tenki
+when only a Tenki credential is usable. See docs/TENKI-SANDBOXES-PRD.md.
+
 Some accounts require a Nebius project on every Sandboxes call; pass it with
 --project or set NEBIUS_PROJECT (the id is in the Token Factory console).
 
@@ -50,6 +63,7 @@ type SandboxCliOptions = {
   timeoutSeconds?: number;
   apiKey?: string;
   project?: string;
+  provider?: string;
   write?: boolean;
   keep?: boolean;
   fetches: string[];
@@ -79,6 +93,7 @@ function parseSandboxArgs(args: string[]): SandboxCliOptions {
       token === "--timeout" ||
       token === "--api-key" ||
       token === "--project" ||
+      token === "--provider" ||
       token === "--fetch" ||
       token === "--out" ||
       token === "--tag"
@@ -97,6 +112,8 @@ function parseSandboxArgs(args: string[]): SandboxCliOptions {
         opts.timeoutSeconds = parsed;
       } else if (token === "--project") {
         opts.project = value;
+      } else if (token === "--provider") {
+        opts.provider = value;
       } else if (token === "--fetch") {
         opts.fetches.push(value);
       } else if (token === "--out") {
@@ -156,6 +173,23 @@ export async function runSandboxCli(args: string[]): Promise<void> {
 
   if (verb === "status") {
     const opts = parseSandboxArgs(rest);
+    const provider = resolveSandboxProvider(opts.provider);
+    const tenkiAuth = resolveTenkiAuth();
+    console.log(
+      `Provider: ${provider}${opts.provider || process.env.KIMIRELAY_SANDBOX_PROVIDER ? "" : " (auto)"}. ` +
+        `Tenki credential: ${tenkiAuth ? "set" : `not set (get one at tenki.cloud - ${TENKI_DOCS_URL})`}.`,
+    );
+    if (provider === "tenki") {
+      if (!tenkiAuth) {
+        process.exitCode = 1;
+        return;
+      }
+      console.log(
+        "Tenki sandboxes: credential present; prove it end to end with: " +
+          "kimirelay sandbox run --provider tenki -- echo ok",
+      );
+      return;
+    }
     const client = await buildClient(opts.apiKey, opts.project);
     try {
       const who = await client.whoami();
@@ -203,6 +237,15 @@ export async function runSandboxCli(args: string[]): Promise<void> {
     if (!command) {
       throw new Error(`sandbox run needs a command.\n\n${USAGE}`);
     }
+    if (resolveSandboxProvider(opts.provider) === "tenki") {
+      const result = await runTenkiCommand({
+        command,
+        timeoutSeconds: opts.timeoutSeconds,
+        fetches: opts.fetches,
+      });
+      await renderTenkiResult(result, opts.out);
+      return;
+    }
     const keep = Boolean(opts.keep) || opts.fetches.length > 0;
     const client = await buildClient(opts.apiKey, opts.project);
     const status = await runSandboxCommand(
@@ -221,6 +264,12 @@ export async function runSandboxCli(args: string[]): Promise<void> {
 
   if (verb === "fetch") {
     const opts = parseSandboxArgs(rest);
+    if (resolveSandboxProvider(opts.provider) === "tenki") {
+      throw new Error(
+        "Post-hoc fetch on tenki lands with snapshots (PRD milestone 2). For now pass " +
+          "--fetch <path> on the run itself - tenki reads files from the live session.",
+      );
+    }
     const [imageUuid, remotePath] = opts.rest;
     if (!imageUuid || !remotePath) {
       throw new Error(`sandbox fetch needs an image uuid and a file path.\n\n${USAGE}`);
@@ -235,6 +284,12 @@ export async function runSandboxCli(args: string[]): Promise<void> {
 
   if (verb === "prebake") {
     const opts = parseSandboxArgs(rest);
+    if (resolveSandboxProvider(opts.provider) === "tenki") {
+      throw new Error(
+        "Prebake on tenki lands with templates/snapshots (PRD milestone 2); tenki's " +
+          "bootstrap already skips installed tooling via the command -v guards.",
+      );
+    }
     const tag = opts.tag ?? "kimirelay:prebaked";
     const client = await buildClient(opts.apiKey, opts.project);
     console.log("Prebaking: installing kimirelay + agent CLIs into a reusable image…");
@@ -286,6 +341,28 @@ export async function runSandboxCli(args: string[]): Promise<void> {
   }
 
   throw new Error(`Unknown "sandbox ${verb}" command.\n\n${USAGE}`);
+}
+
+/** Renders a tenki run: buffered output, artifact writes, exit code. */
+async function renderTenkiResult(result: TenkiRunResult, outDir?: string): Promise<void> {
+  if (result.status.stdout) {
+    process.stdout.write(result.status.stdout);
+  }
+  if (result.status.stderr) {
+    process.stderr.write(result.status.stderr);
+  }
+  if (result.status.exitCode !== undefined && result.status.exitCode !== 0) {
+    process.exitCode = result.status.exitCode;
+  }
+  for (const [remotePath, bytes] of result.artifacts) {
+    const dest = path.join(outDir ?? ".", path.basename(remotePath));
+    await writeFile(dest, bytes);
+    console.log(`${remotePath} → ${dest} (${bytes.byteLength} bytes)`);
+  }
+  for (const [remotePath, message] of result.fetchErrors) {
+    console.error(`Fetch failed for ${remotePath}: ${message}`);
+    process.exitCode = process.exitCode || 1;
+  }
 }
 
 /**
@@ -343,6 +420,7 @@ export async function runHarnessSandbox(
     image?: string | undefined;
     project?: string | undefined;
     keep?: boolean | undefined;
+    provider?: string | undefined;
   },
 ): Promise<void> {
   if (passthrough.length === 0) {
@@ -363,6 +441,22 @@ export async function runHarnessSandbox(
   const apiKey = await resolveNebiusApiKey({ apiKey: flags.apiKey, home: os.homedir() });
   if (!apiKey) {
     throw new Error("No Nebius API key found. Run `kimirelay configure` or set NEBIUS_API_KEY.");
+  }
+  if (resolveSandboxProvider(flags.provider) === "tenki") {
+    console.log(
+      `Tenki sandbox session: cloning ${origin.repoUrl}${origin.branch ? ` (${origin.branch})` : ""} - ` +
+        `local uncommitted changes are NOT included; output arrives when the run completes.`,
+    );
+    const result = await runTenkiHarness({
+      harness,
+      passthrough,
+      repoUrl: origin.repoUrl,
+      branch: origin.branch || undefined,
+      apiKey,
+      tavilyApiKey: await resolveTavilyKey(),
+    });
+    await renderTenkiResult(result);
+    return;
   }
   const project = resolveSandboxProject(flags.project);
   const client = new ContreeClient({ apiKey, ...(project ? { project } : {}) });

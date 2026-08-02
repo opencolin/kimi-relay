@@ -71,7 +71,10 @@ TTY is documented as unsupported by API design (no PTY/attach surface;
 line-mode exec over stdin+SSE remains an option). Beta access is confirmed
 live; the API key still needs Sandboxes permissions (`spawn`,
 `set_image_tag`) granted for the project in the Token Factory console -
-`kimirelay sandbox status` shows the exact grants.
+`kimirelay sandbox status` shows the exact grants. Because of that double
+gate, tenki.cloud ships as a second, open-signup provider (M1 in
+`docs/TENKI-SANDBOXES-PRD.md`; interactive SSH sessions and snapshots are
+its M2).
 
 ### 4. Distribution beyond curl
 
@@ -97,6 +100,15 @@ the "curl | sh" trust objection and gives macOS users upgrades via
    project in the Token Factory console so live verification can finish.
 
 ## Decision log
+
+### 2026-08-02
+
+- **Sandbox layer goes dual-provider**: the 2026-07-29 "not Tenki" decision
+  is revised. Token Factory Sandboxes stays the inference-affine default,
+  but its double gate (beta access + per-key permission grants) means the
+  feature is dormant for real users; tenki.cloud (open signup, official
+  TypeScript SDK) makes it real today. Rationale and design:
+  `docs/TENKI-SANDBOXES-PRD.md`.
 
 ### 2026-08-01
 
