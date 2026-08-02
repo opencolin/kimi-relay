@@ -33,6 +33,10 @@ jobs:
     env:
       CI: "true"
       NEBIUS_API_KEY: ${{ secrets.NEBIUS_API_KEY }}
+      # Optional: enables the web-search legs (Tavily-backed web_search
+      # emulation + the Tavily MCP auto-inject). Without it those tests see
+      # the documented "TAVILY_API_KEY not set" path instead of live search.
+      TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
       KIMIRELAY_DEBUG: "1"
       VITEST_RETRY: "3"
       HARNESS: ${{ github.event.inputs.harness || 'all' }}
