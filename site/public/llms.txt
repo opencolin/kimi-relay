@@ -38,7 +38,7 @@ Before the first launch you need a Nebius API key (get one at https://tokenfacto
 kimirelay configure
 ```
 
-This stores your Nebius API key in `~/.kimirelay/` and optionally a Tavily API key (https://app.tavily.com) that powers web-search emulation in Claude Code and Codex. Web search is optional - without it, searches return a clear "TAVILY_API_KEY not set" error instead of failing silently. When a Tavily key is configured, `klaude` also auto-injects Tavily's remote MCP server per session (ephemeral `--mcp-config`; skipped with `--strict-mcp-config`; disable with `KIMIRELAY_DISABLE_TAVILY_MCP=1`), adding explicit `tavily_search` / `tavily_extract` tools alongside the emulated native search.
+This stores your Nebius API key in `~/.kimirelay/` and optionally a Tavily API key (https://app.tavily.com) that powers web-search emulation in Claude Code and Codex. Web search is optional - without it, searches return a clear "TAVILY_API_KEY not set" error instead of failing silently. When a Tavily key is configured, `klaude`, `kodex`, and `openkode` auto-inject Tavily's remote MCP server per session (ephemeral, nothing durable written; skipped with `--strict-mcp-config` on klaude or `--no-mcp` on kodex; disable everywhere with `KIMIRELAY_DISABLE_TAVILY_MCP=1`), adding explicit `tavily_search` / `tavily_extract` tools. For openkode this is the only live-web path. kpi is excluded: pi has no MCP support by design.
 
 You can also set the key non-interactively:
 

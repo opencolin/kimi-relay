@@ -9,8 +9,9 @@
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { TAVILY_MCP_BASE_URL } from "../tavily-mcp-key.js";
 
-export const TAVILY_MCP_URL = "https://mcp.tavily.com/mcp/";
+export const TAVILY_MCP_URL = TAVILY_MCP_BASE_URL;
 
 export function shouldInjectTavilyMcp(args: string[], env: NodeJS.ProcessEnv): boolean {
   if (env.KIMIRELAY_DISABLE_TAVILY_MCP === "1") {
