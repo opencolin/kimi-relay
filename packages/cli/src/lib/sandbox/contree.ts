@@ -14,10 +14,32 @@ export const SANDBOX_ACCESS_HINT =
   "Token Factory Sandboxes is in beta and needs access approval for your Nebius account. " +
   "Request access at https://tokenfactory.nebius.com/sandboxes/about, then retry.";
 
+export const SANDBOX_PROJECT_HINT =
+  "Pass your Nebius project via `--project <id>` or `NEBIUS_PROJECT=<id>` " +
+  "(shown in the Token Factory console).";
+
 export class SandboxAccessError extends Error {
-  constructor(status: number) {
-    super(`Sandboxes API returned ${status}. ${SANDBOX_ACCESS_HINT}`);
+  readonly status: number;
+  readonly detail: string;
+
+  constructor(status: number, detail = "") {
+    // Live-observed distinction: a granted account can still get 403s of the
+    // form `{"error": "Insufficient permissions: spawn"}` when the key lacks
+    // Sandboxes permissions for the addressed project. That is a key/project
+    // configuration problem, not a beta-access problem - say so instead of
+    // pointing at the access-request form.
+    const insufficient = /insufficient permissions/i.test(detail);
+    super(
+      insufficient
+        ? `Sandboxes API returned ${status} (${detail.trim().slice(0, 200)}). The key ` +
+            "authenticates but lacks this permission - check the project " +
+            "(`--project` / `NEBIUS_PROJECT`) and grant the API key Sandboxes " +
+            "permissions in the Token Factory console."
+        : `Sandboxes API returned ${status}. ${SANDBOX_ACCESS_HINT}`,
+    );
     this.name = "SandboxAccessError";
+    this.status = status;
+    this.detail = detail;
   }
 }
 
@@ -97,11 +119,18 @@ export class ContreeClient {
       }),
     });
     if (res.status === 401 || res.status === 403) {
-      throw new SandboxAccessError(res.status);
+      const detail = (await res.text().catch(() => "")).slice(0, 500);
+      throw new SandboxAccessError(res.status, detail);
     }
     if (!res.ok) {
       const detail = (await res.text().catch(() => "")).slice(0, 500);
-      throw new SandboxApiError(res.status, detail || res.statusText);
+      // Live-observed: some accounts require a Project header on every call.
+      // The raw body escapes the quotes (Missing \"Project\" header), so match
+      // loosely across any non-letter junk between the words.
+      const withHint = /missing[^a-z]*project[^a-z]*header/i.test(detail)
+        ? `${detail} - ${SANDBOX_PROJECT_HINT}`
+        : detail;
+      throw new SandboxApiError(res.status, withHint || res.statusText);
     }
     return res;
   }

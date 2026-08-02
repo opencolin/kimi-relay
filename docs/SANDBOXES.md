@@ -7,6 +7,18 @@ you already use for inference. The product is in beta behind an access
 request; every kimirelay sandbox command maps a 401/403 to a message pointing
 at the request form.
 
+## Project header
+
+Some Nebius accounts require a project on every Sandboxes call (the API
+answers `400 Missing "Project" header` otherwise). Pass it per command with
+`--project <id>` or once via `NEBIUS_PROJECT=<id>`; the id is shown in the
+Token Factory console. Live-observed permission model: a key can hold the
+`spawn` permission without `list`, so `kimirelay sandbox status` reports a
+list-permission 403 as qualified success and the definitive check is
+`kimirelay sandbox run -- echo ok`. A `403 Insufficient permissions: spawn`
+means the key needs Sandboxes permissions granted for that project in the
+console - it is not a beta-access problem.
+
 ## Commands
 
 ```sh

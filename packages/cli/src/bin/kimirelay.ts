@@ -280,9 +280,19 @@ async function main() {
   ) {
     let rest = invocation.flags.passthrough.slice(1);
     let image: string | undefined;
-    if (rest[0] === "--image" && rest[1] !== undefined) {
-      image = rest[1];
-      rest = rest.slice(2);
+    let project: string | undefined;
+    for (;;) {
+      if (rest[0] === "--image" && rest[1] !== undefined) {
+        image = rest[1];
+        rest = rest.slice(2);
+        continue;
+      }
+      if (rest[0] === "--project" && rest[1] !== undefined) {
+        project = rest[1];
+        rest = rest.slice(2);
+        continue;
+      }
+      break;
     }
     if (rest[0] === "--") {
       rest = rest.slice(1);
@@ -295,6 +305,7 @@ async function main() {
     await runHarnessSandbox(invocation.command, rest, {
       apiKey: invocation.flags.apiKey,
       image,
+      project,
     });
     return;
   }

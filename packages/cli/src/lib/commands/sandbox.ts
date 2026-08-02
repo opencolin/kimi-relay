@@ -2,7 +2,7 @@ import os from "node:os";
 import path from "node:path";
 import { resolveNebiusApiKey } from "../nebius-core.js";
 import { readGlobalConfig, resolveStoredTavilyApiKey } from "../global-config.js";
-import { ContreeClient, SANDBOX_ACCESS_HINT } from "../sandbox/contree.js";
+import { ContreeClient, SandboxAccessError } from "../sandbox/contree.js";
 import {
   SANDBOX_ADVISORY_BLOCK,
   createOutputRenderer,
@@ -13,11 +13,14 @@ import {
 } from "../sandbox/run.js";
 
 const USAGE = `Usage:
-  kimirelay sandbox status                    Check Sandboxes access for your key
-  kimirelay sandbox run [--image <tag>] [--timeout <s>] <command...>
+  kimirelay sandbox status [--project <id>]   Check Sandboxes access for your key
+  kimirelay sandbox run [--image <tag>] [--timeout <s>] [--project <id>] <command...>
                                               Run a shell command in a disposable sandbox
   kimirelay sandbox advisory [--write]        Print (or append) the agent-instructions
                                               block steering agents toward sandboxes
+
+Some accounts require a Nebius project on every Sandboxes call; pass it with
+--project or set NEBIUS_PROJECT (the id is in the Token Factory console).
 
 Remote harness sessions (headless, requires a pushed git repo):
   klaude --sandbox -p "<task>"                Claude Code on Kimi K3 inside a sandbox
@@ -29,9 +32,19 @@ type SandboxCliOptions = {
   image?: string;
   timeoutSeconds?: number;
   apiKey?: string;
+  project?: string;
   write?: boolean;
   rest: string[];
 };
+
+/**
+ * The Nebius project the Sandboxes API should bill/authorize against. Some
+ * accounts require it on every call (the API answers 400 "Missing Project
+ * header" otherwise); find the id in the Token Factory console.
+ */
+export function resolveSandboxProject(flag?: string): string | undefined {
+  return flag?.trim() || process.env.NEBIUS_PROJECT?.trim() || undefined;
+}
 
 function parseSandboxArgs(args: string[]): SandboxCliOptions {
   const opts: SandboxCliOptions = { rest: [] };
@@ -40,7 +53,12 @@ function parseSandboxArgs(args: string[]): SandboxCliOptions {
     if (token === undefined) {
       continue;
     }
-    if (token === "--image" || token === "--timeout" || token === "--api-key") {
+    if (
+      token === "--image" ||
+      token === "--timeout" ||
+      token === "--api-key" ||
+      token === "--project"
+    ) {
       const value = args[i + 1];
       if (value === undefined) {
         throw new Error(`Flag ${token} expects a value`);
@@ -53,6 +71,8 @@ function parseSandboxArgs(args: string[]): SandboxCliOptions {
           throw new Error(`--timeout expects a positive number of seconds, got "${value}"`);
         }
         opts.timeoutSeconds = parsed;
+      } else if (token === "--project") {
+        opts.project = value;
       } else {
         opts.apiKey = value;
       }
@@ -72,12 +92,13 @@ function parseSandboxArgs(args: string[]): SandboxCliOptions {
   return opts;
 }
 
-async function buildClient(apiKeyFlag?: string): Promise<ContreeClient> {
+async function buildClient(apiKeyFlag?: string, projectFlag?: string): Promise<ContreeClient> {
   const apiKey = await resolveNebiusApiKey({ apiKey: apiKeyFlag, home: os.homedir() });
   if (!apiKey) {
     throw new Error("No Nebius API key found. Run `kimirelay configure` or set NEBIUS_API_KEY.");
   }
-  return new ContreeClient({ apiKey });
+  const project = resolveSandboxProject(projectFlag);
+  return new ContreeClient({ apiKey, ...(project ? { project } : {}) });
 }
 
 async function resolveTavilyKey(): Promise<string | undefined> {
@@ -101,8 +122,23 @@ export async function runSandboxCli(args: string[]): Promise<void> {
 
   if (verb === "status") {
     const opts = parseSandboxArgs(rest);
-    const client = await buildClient(opts.apiKey);
-    await client.checkAccess();
+    const client = await buildClient(opts.apiKey, opts.project);
+    try {
+      await client.checkAccess();
+    } catch (err) {
+      // The probe lists operations, but list permission is granted separately
+      // from spawn (live-observed) - a key can run sandboxes fine while its
+      // list calls 403. Report that as qualified success, not failure.
+      if (err instanceof SandboxAccessError && /insufficient permissions: list/i.test(err.detail)) {
+        console.log(
+          "Sandboxes access: key and project accepted; the key lacks the operations-list " +
+            "permission, which spawning does not need. Prove it end to end with: " +
+            "kimirelay sandbox run -- echo ok",
+        );
+        return;
+      }
+      throw err;
+    }
     console.log("Sandboxes access: OK - your Nebius key can use Token Factory Sandboxes.");
     return;
   }
@@ -113,7 +149,7 @@ export async function runSandboxCli(args: string[]): Promise<void> {
     if (!command) {
       throw new Error(`sandbox run needs a command.\n\n${USAGE}`);
     }
-    const client = await buildClient(opts.apiKey);
+    const client = await buildClient(opts.apiKey, opts.project);
     const status = await runSandboxCommand(
       client,
       { command, image: opts.image, timeoutSeconds: opts.timeoutSeconds },
@@ -159,7 +195,7 @@ export async function runSandboxCli(args: string[]): Promise<void> {
 export async function runHarnessSandbox(
   harness: "claude" | "codex",
   passthrough: string[],
-  flags: { apiKey?: string | undefined; image?: string | undefined },
+  flags: { apiKey?: string | undefined; image?: string | undefined; project?: string | undefined },
 ): Promise<void> {
   if (passthrough.length === 0) {
     throw new Error(
@@ -180,14 +216,19 @@ export async function runHarnessSandbox(
   if (!apiKey) {
     throw new Error("No Nebius API key found. Run `kimirelay configure` or set NEBIUS_API_KEY.");
   }
-  const client = new ContreeClient({ apiKey });
+  const project = resolveSandboxProject(flags.project);
+  const client = new ContreeClient({ apiKey, ...(project ? { project } : {}) });
   try {
     await client.checkAccess();
   } catch (err) {
-    if (err instanceof Error && err.name === "SandboxAccessError") {
-      throw new Error(SANDBOX_ACCESS_HINT);
+    // A list-permission 403 does not block spawning (live-observed); anything
+    // else propagates with its already-actionable message (beta access,
+    // missing Project header, or missing spawn permission).
+    if (
+      !(err instanceof SandboxAccessError && /insufficient permissions: list/i.test(err.detail))
+    ) {
+      throw err;
     }
-    throw err;
   }
 
   console.log(
