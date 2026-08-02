@@ -52,6 +52,18 @@ export class SandboxApiError extends Error {
   }
 }
 
+// Live-observed: some accounts require a Project header on every call. The
+// raw body escapes the quotes (Missing \"Project\" header), so match loosely
+// across any non-letter junk between the words.
+const MISSING_PROJECT_RE = /missing[^a-z]*project[^a-z]*header/i;
+
+/** True when the API rejected the call for lack of a Project header. */
+export function isMissingProjectError(err: unknown): boolean {
+  return (
+    err instanceof SandboxApiError && err.status === 400 && MISSING_PROJECT_RE.test(err.message)
+  );
+}
+
 export type ContreeClientOptions = {
   apiKey: string;
   /** Nebius project id, sent as the Project header when set. */
@@ -133,10 +145,7 @@ export class ContreeClient {
     }
     if (!res.ok) {
       const detail = (await res.text().catch(() => "")).slice(0, 500);
-      // Live-observed: some accounts require a Project header on every call.
-      // The raw body escapes the quotes (Missing \"Project\" header), so match
-      // loosely across any non-letter junk between the words.
-      const withHint = /missing[^a-z]*project[^a-z]*header/i.test(detail)
+      const withHint = MISSING_PROJECT_RE.test(detail)
         ? `${detail} - ${SANDBOX_PROJECT_HINT}`
         : detail;
       throw new SandboxApiError(res.status, withHint || res.statusText);

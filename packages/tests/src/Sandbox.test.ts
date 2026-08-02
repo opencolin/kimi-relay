@@ -6,6 +6,7 @@ import {
   ContreeClient,
   SandboxAccessError,
   SandboxApiError,
+  isMissingProjectError,
   normalizeOperation,
 } from "../../cli/src/lib/sandbox/contree.js";
 import {
@@ -185,6 +186,17 @@ describe("Project header handling (live-observed API behavior)", () => {
     expect(err).toBeInstanceOf(SandboxApiError);
     expect((err as Error).message).toContain("--project");
     expect((err as Error).message).toContain("NEBIUS_PROJECT");
+    expect(isMissingProjectError(err)).toBe(true);
+  });
+
+  test("isMissingProjectError matches only the missing-Project 400", () => {
+    expect(isMissingProjectError(new SandboxApiError(400, 'Missing \\"Project\\" header'))).toBe(
+      true,
+    );
+    expect(isMissingProjectError(new SandboxApiError(400, "Missing Project header"))).toBe(true);
+    expect(isMissingProjectError(new SandboxApiError(400, "bad request"))).toBe(false);
+    expect(isMissingProjectError(new SandboxApiError(500, "Missing Project header"))).toBe(false);
+    expect(isMissingProjectError(new Error("Missing Project header"))).toBe(false);
   });
 
   test("insufficient-permission 403s explain the key/project fix, not beta access", async () => {

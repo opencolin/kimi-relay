@@ -5,8 +5,10 @@ import { resolveNebiusApiKey } from "../nebius-core.js";
 import { readGlobalConfig, resolveStoredTavilyApiKey } from "../global-config.js";
 import {
   ContreeClient,
+  SANDBOX_PROJECT_HINT,
   SandboxAccessError,
   SandboxApiError,
+  isMissingProjectError,
   type OperationStatus,
 } from "../sandbox/contree.js";
 import {
@@ -221,6 +223,16 @@ export async function runSandboxCli(args: string[]): Promise<void> {
       }
       return;
     } catch (err) {
+      // A missing-project 400 is a configuration state, and reporting it is
+      // exactly this verb's job - render it instead of crashing.
+      if (isMissingProjectError(err)) {
+        console.log(
+          "Sandboxes access: your account requires a Nebius project on every " +
+            `Sandboxes call, and none is configured. ${SANDBOX_PROJECT_HINT}`,
+        );
+        process.exitCode = 1;
+        return;
+      }
       // Older deployments may not serve /whoami - fall back to the probe.
       if (!(err instanceof SandboxApiError && err.status === 404)) {
         throw err;
