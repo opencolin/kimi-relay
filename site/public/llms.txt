@@ -223,15 +223,6 @@ commands fail with a message pointing at the request form. Sandbox harness
 sessions are headless-only and run against pushed git state - local
 uncommitted changes do not travel.
 
-## Cursor
-
-There is no `kursor` command: Cursor's CLI (cursor-agent) has no
-OpenAI-compatible endpoint override to inject. The Cursor editor can point its
-custom-model slot straight at Nebius (base URL
-https://api.tokenfactory.nebius.com/v1, your Nebius key, model
-moonshotai/Kimi-K3) - see docs/CURSOR.md in the repository for the full
-recipe and caveats.
-
 ## Keeping kimirelay up to date
 
 The installed binary self-updates automatically in the background. The check is throttled and bounded, never throws, and runs before argument parsing - so even `kimirelay help` keeps an install current. The update is pulled from https://kimirelay.com/latest.json, which contains `version`, `url`, and `publishedAt`.

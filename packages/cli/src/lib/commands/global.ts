@@ -62,7 +62,6 @@ Nebius Token Factory with --provider contree needs Sandboxes beta access):
   klaude --sandbox -p "<task>"    Claude Code on Kimi K3 in a disposable microVM,
                                   against your repo's pushed state. Headless only.
   kodex --sandbox exec "<task>"   Same for Codex.
-Cursor: no injectable CLI endpoint yet - see the recipe in docs/CURSOR.md.
 ChatGPT App support is alpha; run \`kimirelay chatgpt --restore\` (alias: codex-app) to restore the previous desktop config.
 
 Codex flags:
