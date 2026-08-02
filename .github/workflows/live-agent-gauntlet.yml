@@ -30,6 +30,10 @@ jobs:
     name: Real inference harness tests
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    # The NEBIUS_API_KEY / TAVILY_API_KEY secrets are scoped to the
+    # "production" environment (not repository-level), so the job must declare
+    # that environment for `secrets.*` to resolve them.
+    environment: production
     env:
       CI: "true"
       NEBIUS_API_KEY: ${{ secrets.NEBIUS_API_KEY }}
