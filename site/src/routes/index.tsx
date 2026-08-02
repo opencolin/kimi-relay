@@ -27,7 +27,7 @@ const agents: Agent[] = [
     name: "Claude Code",
     command: "klaude",
     pill: "claude",
-    status: "Beta",
+    status: "Stable",
     mark: <ClaudeMark />,
     blurb:
       "Routes Claude Code through a local Anthropic-to-Nebius translation proxy. Your subscription, login, and config stay untouched.",
@@ -36,7 +36,7 @@ const agents: Agent[] = [
     name: "Codex CLI",
     command: "kodex",
     pill: "codex",
-    status: "Beta",
+    status: "Stable",
     mark: <CodexMark />,
     blurb:
       "Talks to Nebius through a local Responses-to-chat proxy, with headless exec support. Sessions stay resumable across providers.",
