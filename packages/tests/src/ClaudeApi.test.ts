@@ -941,7 +941,7 @@ describe("Claude proxy compatibility API", () => {
     expect(upstreamBodies).toHaveLength(1);
     const messages = upstreamMessages(upstreamBodies[0]);
     expect(messages.filter((message) => message.role === "system")).toHaveLength(1);
-    expect(messages[0]?.content).toContain("Nebius Token Factory model routed through kimirelay");
+    expect(messages[0]?.content).toContain("served by Nebius Token Factory");
     expect(messages[0]?.content).toContain("Generate a concise, sentence-case title");
     expect(upstreamBodies[0]).toMatchObject({
       model: CLAUDE_HAIKU_MODEL.id,
