@@ -12,8 +12,10 @@ bottom. This revision reflects what has shipped and proposes what comes next.
   modality-aware routing, context trimming, retries/fallback, and
   Tavily-backed `web_search` emulation streaming real Anthropic citation
   blocks.
-- **Four harnesses**: `klaude` (Claude Code, beta), `kodex` (Codex CLI, beta),
-  `openkode` (OpenCode, stable), `kpi` (Pi Code, stable). Cursor shipped as a
+- **Four harnesses, all stable**: `klaude` (Claude Code), `kodex` (Codex CLI),
+  `openkode` (OpenCode), `kpi` (Pi Code) - beta flags dropped 2026-08-02 after
+  the full live gauntlet went green in CI (all five suites, real Nebius
+  inference). Cursor shipped as a
   documented recipe (`docs/CURSOR.md`) — `cursor-agent` has no endpoint
   override to inject; revisit if that changes.
 - **Remote sessions on Token Factory Sandboxes** (first pass): `kimirelay
@@ -48,26 +50,28 @@ alongside the emulated native search. Opt out with
 
 ### 2. Beta → stable for `klaude` and `kodex`
 
-A verification matrix run against live Nebius: streaming tool calls,
-interleaved thinking + tool use, context trimming at the served 262K, vision
-routing via the modality-aware catalog (K2.6 carries vision on Nebius, K3 is
-text-only there). Green matrix flips the Beta badges on the site.
-
-**Blocked on keys**: the matrix needs `NEBIUS_API_KEY` (and `TAVILY_API_KEY`
-for the search leg) available where it runs — either as GitHub Actions
-secrets for a CI job, or run locally by someone holding the keys
-(`packages/tests` already contains the live gauntlet; it currently fails
-offline by design).
+**Status (2026-08-02): shipped.** The live gauntlet runs in CI against real
+Nebius inference (secrets in the repo's `production` environment; dispatch
+from the Actions tab or push `trigger/live-gauntlet`). Getting to green took
+three runs: run 1 caught latent test-package type errors, run 2 caught a test
+asserting a retry mechanism Nebius has since engineered away server-side
+(their backend now auto-clamps `max_tokens`; verified by direct probe), run 3
+passed all five suites. Beta badges dropped from the site and docs.
 
 ## Next
 
 ### 3. Sandboxes round 2
 
-Once beta access lands (`kimirelay sandbox status` confirms): live
-verification of the shipped first pass, then the deferred pieces —
-interactive TTY over the wire, artifact download from finished sessions, and
-prebaked images to cut the cold bootstrap (apt + installer + agent install on
-every run today).
+**Status (2026-08-02): features shipped in v0.13.0; live spawn pending one
+console grant.** Artifact download (`--keep` / `--fetch` / `sandbox fetch`
+via the inspect API on result images), `sandbox prebake` (tagged checkpoint
+images that skip the cold bootstrap), whoami-based `sandbox status`
+permission reports, and `--project` / `NEBIUS_PROJECT` plumbing. Interactive
+TTY is documented as unsupported by API design (no PTY/attach surface;
+line-mode exec over stdin+SSE remains an option). Beta access is confirmed
+live; the API key still needs Sandboxes permissions (`spawn`,
+`set_image_tag`) granted for the project in the Token Factory console -
+`kimirelay sandbox status` shows the exact grants.
 
 ### 4. Distribution beyond curl
 
@@ -89,10 +93,8 @@ the "curl | sh" trust objection and gives macOS users upgrades via
 
 1. Sandboxes: opt-in `--sandbox`, or sandbox-by-default with `--local` as the
    escape hatch? (Carried over, still undecided.)
-2. Does Sandboxes beta access exist for the account yet? Round 2 is blocked
-   on it.
-3. Beta → stable: add `NEBIUS_API_KEY` / `TAVILY_API_KEY` as GitHub Actions
-   secrets so the live matrix can run in CI, or prefer running it locally?
+2. Sandboxes: grant the API key `spawn` / `set_image_tag` permissions for the
+   project in the Token Factory console so live verification can finish.
 
 ## Decision log
 
