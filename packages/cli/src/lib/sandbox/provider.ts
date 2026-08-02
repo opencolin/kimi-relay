@@ -11,15 +11,14 @@ export const SANDBOX_DEFAULT_TENKI_CPU = 2;
 export const SANDBOX_DEFAULT_TENKI_MEMORY_MB = 4096;
 
 /**
- * First match wins: explicit flag → KIMIRELAY_SANDBOX_PROVIDER → auto.
- * Auto prefers Nebius (inference-account affinity) and falls back to tenki
- * when a Tenki credential exists - practically: TF stays default for the few
- * with granted access, tenki serves everyone else without a beta queue.
+ * First match wins: explicit flag → KIMIRELAY_SANDBOX_PROVIDER → contree.
+ * Deliberately no credential sniffing: a TENKI_API_KEY in the env never
+ * switches providers on its own (2026-08-02 decision, see the PRD) - tenki
+ * runs only when explicitly requested.
  */
 export function resolveSandboxProvider(
   flag: string | undefined,
   env: NodeJS.ProcessEnv = process.env,
-  nebiusUsable = false,
 ): SandboxProviderName {
   const requested = (flag ?? env.KIMIRELAY_SANDBOX_PROVIDER)?.trim().toLowerCase();
   if (requested === "tenki" || requested === "contree") {
@@ -29,10 +28,6 @@ export function resolveSandboxProvider(
     throw new Error(
       `Unknown sandbox provider "${requested}". Expected "contree" (Nebius Token Factory) or "tenki".`,
     );
-  }
-  const hasTenki = Boolean(env.TENKI_AUTH_TOKEN?.trim() || env.TENKI_API_KEY?.trim());
-  if (!nebiusUsable && hasTenki) {
-    return "tenki";
   }
   return "contree";
 }

@@ -56,13 +56,13 @@ describe("resolveSandboxProvider", () => {
     );
   });
 
-  test("auto prefers contree, falls back to tenki when only tenki is usable", () => {
-    expect(resolveSandboxProvider(undefined, {} as NodeJS.ProcessEnv, false)).toBe("contree");
+  test("defaults to contree - a Tenki credential alone never switches providers", () => {
+    expect(resolveSandboxProvider(undefined, {} as NodeJS.ProcessEnv)).toBe("contree");
+    expect(resolveSandboxProvider(undefined, { TENKI_API_KEY: "tk_x" } as NodeJS.ProcessEnv)).toBe(
+      "contree",
+    );
     expect(
-      resolveSandboxProvider(undefined, { TENKI_API_KEY: "tk_x" } as NodeJS.ProcessEnv, false),
-    ).toBe("tenki");
-    expect(
-      resolveSandboxProvider(undefined, { TENKI_API_KEY: "tk_x" } as NodeJS.ProcessEnv, true),
+      resolveSandboxProvider(undefined, { TENKI_AUTH_TOKEN: "tok" } as NodeJS.ProcessEnv),
     ).toBe("contree");
   });
 });
