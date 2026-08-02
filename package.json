@@ -1,6 +1,6 @@
 {
   "name": "kimirelay",
-  "version": "0.14.1",
+  "version": "0.14.2",
   "private": true,
   "description": "Use Nebius Token Factory models in Claude Code, OpenCode, Codex, and Pi Code",
   "license": "MIT",
