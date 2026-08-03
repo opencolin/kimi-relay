@@ -33,11 +33,19 @@ type NativeToolPromptOptions<Message, NativeTool> = {
   toolName?: (tool: NativeTool) => string;
 };
 
+const TAVILY_BASE_URL = "https://api.tavily.com";
+/** Tavily API root; overridable via TAVILY_BASE_URL (e.g. the demo broker relay). */
+export function resolveTavilyBaseUrl(env: NodeJS.ProcessEnv = process.env): string {
+  const override = env.TAVILY_BASE_URL?.trim();
+  return (override || TAVILY_BASE_URL).replace(/\/+$/, "");
+}
+
 export type WebSearchParams = {
   query: unknown;
   allowedDomains: string[];
   blockedDomains: string[];
   tavilyApiKey: string | undefined;
+  baseUrl?: string | undefined;
   queryKeys?: string[];
   debugLog?: (label: string, value: unknown) => void;
   missingApiKeyMessage?: string;
@@ -99,7 +107,7 @@ export async function runWebSearchDetailed(params: WebSearchParams): Promise<Web
   }
 
   params.debugLog?.("tavily search request", { query, hasApiKey: Boolean(tavilyApiKey), body });
-  const response = await fetch("https://api.tavily.com/search", {
+  const response = await fetch(`${params.baseUrl ?? resolveTavilyBaseUrl()}/search`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

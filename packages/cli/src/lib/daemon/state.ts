@@ -1,6 +1,6 @@
 import { CostTracker } from "../cost.js";
 import type { ModelDefinition } from "@kimirelay/models";
-import { NEBIUS_BASE_URL } from "../nebius-core.js";
+import { resolveNebiusBaseUrl } from "../nebius-core.js";
 import type { ClaudeProxyOptions } from "../claude/proxy.js";
 import type { CodexProxyOptions } from "../codex/proxy.js";
 import type { ProxyPerfPayload } from "../proxy-perf.js";
@@ -369,7 +369,7 @@ export function buildSession(req: RegisterSessionRequest): SessionState {
   const agent: AgentId = req.agent ?? "claude";
   const costTracker = new CostTracker(req.modelDefinition);
   const now = Date.now();
-  const baseUrl = req.baseUrl ?? NEBIUS_BASE_URL;
+  const baseUrl = req.baseUrl ?? resolveNebiusBaseUrl();
   const state: SessionState = {
     token: req.token,
     agent,

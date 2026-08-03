@@ -1,5 +1,4 @@
-import { NEBIUS_BASE_URL } from "@kimirelay/models";
-import { NEBIUS_API_KEY_ENV_REF } from "../nebius-core.js";
+import { NEBIUS_API_KEY_ENV_REF, resolveNebiusBaseUrl } from "../nebius-core.js";
 import { TAVILY_MCP_BASE_URL } from "../tavily-mcp-key.js";
 import {
   OPENCODE_PROVIDER_ID,
@@ -95,7 +94,7 @@ export function buildOpencodeConfigJson({
     // full suffix still fits without hitting the picker's truncation width
     // (opencode #20968).
     name: "Nebius Token Factory",
-    options: { apiKey: apiKeyEnvRef, baseURL: NEBIUS_BASE_URL },
+    options: { apiKey: apiKeyEnvRef, baseURL: resolveNebiusBaseUrl() },
     models,
     // Restrict /models to exactly the curated set. Without this, OpenCode also
     // shows Nebius's full catalog (hundreds of models) because the `models`
