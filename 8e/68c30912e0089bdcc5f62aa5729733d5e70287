@@ -1,0 +1,29 @@
+packages/cli/src/lib/claude/vision.ts
+  s_97f8cf2a895c6a::t_bb8be867f7eb7e 2-3,87
+packages/cli/src/lib/daemon/state.ts
+  s_97f8cf2a895c6a::t_ec26e4176157fe 3,372
+packages/cli/src/lib/harnesses/pi.ts
+  s_97f8cf2a895c6a::t_9df28bdda9d146 8,68
+packages/cli/src/lib/model-catalog-init.ts
+  s_97f8cf2a895c6a::t_0ca61cd9bd9f42 2,4-9,65
+packages/cli/src/lib/opencode/core.ts
+  s_97f8cf2a895c6a::t_115988f6231022 1,97
+packages/cli/src/lib/tavily-search.ts
+  s_97f8cf2a895c6a::t_94d8ae6d180006 36-42,48,110
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "8e68c30912e0089bdcc5f62aa5729733d5e70287",
+  "prompts": {},
+  "sessions": {
+    "s_97f8cf2a895c6a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6f46e670-3851-4b1c-8791-0dfcf3580094",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "opencolin <colin@lowenberg.com>"
+    }
+  }
+}
