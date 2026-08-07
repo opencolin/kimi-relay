@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { codexModelCatalogJson } from "./catalog.js";
 import { CODEX_AUTH_ENV, CODEX_PROVIDER_ID, resolveCodexModel } from "./defaults.js";
 import { codexArgsIgnoreUserConfig, ensureCodexGenericUserDefaults } from "./user-config.js";
+import { TAVILY_MCP_BASE_URL, resolveTavilyMcpKey } from "../tavily-mcp-key.js";
 import {} from "../daemon/launch.js";
 import { runProxiedSession, type ProxiedSessionResult } from "../proxied-session.js";
 
@@ -54,6 +55,12 @@ export async function runCodexNebius(options: CodexLaunchOptions): Promise<Codex
   if (!codexArgsIgnoreUserConfig(args)) {
     await ensureCodexGenericUserDefaults(options.home);
   }
+  // Tavily MCP auto-inject, mirroring klaude: hand the session Tavily's remote
+  // MCP server when a key is configured. Codex sends the key itself via
+  // bearer_token_env_var, so the launch flags carry only the env var NAME -
+  // never the key. Skipped under --no-mcp / --ignore-user-config (the user
+  // asked for an MCP-free or config-free startup).
+  const tavilyMcpInjected = Boolean(resolveTavilyMcpKey()) && !codexArgsIgnoreUserConfig(args);
 
   const selectedModel = resolveCodexModel(options.modelId);
   let catalog: { path: string; cleanup: () => void } | undefined;
@@ -68,8 +75,12 @@ export async function runCodexNebius(options: CodexLaunchOptions): Promise<Codex
     args,
     binary: "codex",
     keepaliveLabel: "Codex session",
+    ...(tavilyMcpInjected ? { extraRegistration: { tavilyMcpInjected: true } } : {}),
     banner: (modelName) =>
-      `Kimi Relay ▸ Routing Codex → Nebius Token Factory (${modelName}). Not OpenAI.\n`,
+      `Kimi Relay ▸ Routing Codex → Nebius Token Factory (${modelName}). Not OpenAI.\n` +
+      (tavilyMcpInjected
+        ? "Kimi Relay ▸ Tavily MCP injected for this session (ephemeral - won't appear in `codex mcp list`).\n"
+        : ""),
     beforeSpawn: () => {
       catalog = writeCodexModelCatalog();
       return catalog;
@@ -83,10 +94,27 @@ export async function runCodexNebius(options: CodexLaunchOptions): Promise<Codex
         modelId,
         (beforeSpawnResult as { path: string; cleanup: () => void } | undefined)?.path ?? "",
       ),
+      ...(tavilyMcpInjected ? codexTavilyMcpConfigArgs() : []),
     ],
     afterDeregister: () => catalog?.cleanup(),
   });
   return result;
+}
+
+/**
+ * `-c` overrides defining Tavily's remote MCP server for this run only.
+ * `bearer_token_env_var` makes codex read the key from TAVILY_API_KEY in its
+ * own environment (verified live: Tavily's MCP endpoint accepts
+ * `Authorization: Bearer`), so neither argv nor any config file ever carries
+ * the key, and nothing durable is written to ~/.codex.
+ */
+export function codexTavilyMcpConfigArgs(): string[] {
+  return [
+    "-c",
+    `mcp_servers.tavily.url="${TAVILY_MCP_BASE_URL}"`,
+    "-c",
+    `mcp_servers.tavily.bearer_token_env_var="TAVILY_API_KEY"`,
+  ];
 }
 
 function buildCodexEnv(authToken: string): NodeJS.ProcessEnv {

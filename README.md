@@ -43,10 +43,10 @@ kimirelay configure
 
 You'll be asked for two keys:
 
-| Key                | Where to get it                                          | Required?                     |
-| ------------------ | -------------------------------------------------------- | ----------------------------- |
-| **Nebius API key** | <https://tokenfactory.nebius.com/?modals=create-api-key> | Yes                           |
-| **Tavily API key** | <https://app.tavily.com>                                 | Optional (enables web search) |
+| Key                | Where to get it                                          | Required?                                              |
+| ------------------ | -------------------------------------------------------- | ------------------------------------------------------ |
+| **Nebius API key** | <https://tokenfactory.nebius.com/?modals=create-api-key> | Yes                                                    |
+| **Tavily API key** | <https://app.tavily.com>                                 | Optional, recommended (live web search + Tavily tools) |
 
 Both are stored in `~/.kimirelay/` and never leave your machine. You can also set `NEBIUS_API_KEY` / `TAVILY_API_KEY` in the environment instead.
 
@@ -99,6 +99,8 @@ Claude Code and Codex are text-native; image blocks are auto-routed to a vision-
 
 Claude Code and Codex expose a native `web_search` tool. The relay backs it with [Tavily](https://tavily.com): if a Tavily key is configured, searches return real results with citations. Without one, a search returns a clear "TAVILY_API_KEY not set" message instead of failing silently. Nebius has no hosted search tool, so this is how agents get live web access.
 
+With a Tavily key configured, `klaude`, `kodex`, and `openkode` also get [Tavily's remote MCP server](https://docs.tavily.com) injected per session, adding the explicit `tavily_search` / `tavily_extract` toolset. Each harness uses its native ephemeral mechanism (klaude: a temp `--mcp-config` file; kodex: `-c` launch flags with env-var bearer auth; openkode: the generated config) - nothing durable is written and the key never appears in argv. For OpenCode this is notable: as a spawned harness it has no relay-emulated `web_search`, so the MCP server is its only live-web path. `kpi` is excluded on purpose - Pi has no MCP support by design. The inject is skipped when you pass `--strict-mcp-config` (klaude) or `--no-mcp` (kodex), and `KIMIRELAY_DISABLE_TAVILY_MCP=1` disables it everywhere.
+
 ## Configuration & env vars
 
 | Variable                         | Effect                                                                                                                                           |
@@ -108,14 +110,17 @@ Claude Code and Codex expose a native `web_search` tool. The relay backs it with
 | `NEBIUS_BASE_URL`                | Override the API base (default `https://api.tokenfactory.nebius.com/v1`).                                                                        |
 | `KIMIRELAY_REASONING_EFFORT`     | `none`\|`low`\|`medium`\|`high`\|`max`. Default `none` for speed; raise for harder tasks.                                                        |
 | `KIMIRELAY_FALLBACK_MODEL`       | Model to fail over to when the target model returns no response headers (down/overloaded). Default `moonshotai/Kimi-K2.6`; set `off` to disable. |
+| `NEBIUS_PROJECT`                 | Nebius project id for Token Factory Sandboxes calls (or `--project`, or store once: `kimirelay sandbox project <id>`).                           |
+| `TENKI_API_KEY`                  | tenki.cloud credential (`tk_…`) for the default (tenki) sandbox provider.                                                                        |
+| `KIMIRELAY_DISABLE_TAVILY_MCP=1` | Skip the Tavily MCP server auto-inject (klaude, kodex, openkode).                                                                                |
 | `KIMIRELAY_DISABLE_AUTOUPDATE=1` | Stop the installed binary from self-updating.                                                                                                    |
 | `KIMIRELAY_TELEMETRY_URL`        | Opt in to telemetry by pointing at your own collector. Off by default.                                                                           |
 
-The installed binary keeps itself up to date from `kimirelay.com`, throttled to once an hour, and swallows every failure. Dev/source runs never self-update.
+The installed binary keeps itself up to date from `kimirelay.com`, throttled to once an hour, and swallows every failure. On the same cadence it refreshes the launcher wrappers (`kimirelay`, `klaude`, …) next to the bundle, so wrapper fixes reach existing installs too. Dev/source runs never self-update.
 
-## Sandboxing (roadmap)
+## Sandboxing (beta)
 
-Integration with [Nebius Token Factory Sandboxes](https://tokenfactory.nebius.com/sandboxes/about) — running agents inside disposable microVM sandboxes with branchable execution state, using the same Nebius account and key as inference — is **planned, not shipped**. See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the current plan.
+[Nebius Token Factory Sandboxes](https://tokenfactory.nebius.com/sandboxes/about) integration ships as a first pass: `kimirelay sandbox status|run|advisory`, plus headless remote sessions with `klaude --sandbox -p "<task>"` / `kodex --sandbox exec "<task>"` — the harness runs inside a disposable microVM against your repo's pushed state, on the same Nebius key as inference. Round 2 adds `sandbox status` permission reports, artifact download from result images (`--keep` / `--fetch` / `sandbox fetch`), and `sandbox prebake` for warm images that skip the cold bootstrap. Because Token Factory Sandboxes is a gated beta, [tenki.cloud](https://tenki.cloud) is the **default** provider (open signup; set `TENKI_API_KEY`), with Nebius selectable via `--provider contree` - see [`docs/TENKI-SANDBOXES-PRD.md`](docs/TENKI-SANDBOXES-PRD.md). Sandboxes itself is a beta behind an access request; the CLI says so when access is missing. Details, limitations, and the advisory block: [`docs/SANDBOXES.md`](docs/SANDBOXES.md).
 
 ## For AI agents
 

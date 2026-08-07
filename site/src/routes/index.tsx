@@ -27,7 +27,7 @@ const agents: Agent[] = [
     name: "Claude Code",
     command: "klaude",
     pill: "claude",
-    status: "Beta",
+    status: "Stable",
     mark: <ClaudeMark />,
     blurb:
       "Routes Claude Code through a local Anthropic-to-Nebius translation proxy. Your subscription, login, and config stay untouched.",
@@ -36,7 +36,7 @@ const agents: Agent[] = [
     name: "Codex CLI",
     command: "kodex",
     pill: "codex",
-    status: "Beta",
+    status: "Stable",
     mark: <CodexMark />,
     blurb:
       "Talks to Nebius through a local Responses-to-chat proxy, with headless exec support. Sessions stay resumable across providers.",
@@ -243,9 +243,10 @@ function Home() {
             <span className="text-ink">open models</span>
           </a>
 
-          {/* mascot: in-flow above the headline on narrow screens, floating
-              beside the install card on wide ones */}
-          <HeroRobot className="pointer-events-none absolute top-12 right-0 left-0 -z-10 mx-auto h-[220px] w-[190px] opacity-55 min-[1200px]:top-[190px] min-[1200px]:right-[-48px] min-[1200px]:left-auto min-[1200px]:mx-0 min-[1200px]:h-[300px] min-[1200px]:w-[240px] min-[1200px]:opacity-100" />
+          {/* mascot: centered behind the headline on narrow screens, docked on
+              the right edge from medium widths (smaller, no overhang so it
+              stays inside the viewport), full-size with overhang on wide */}
+          <HeroRobot className="pointer-events-none absolute top-12 right-0 left-0 -z-10 mx-auto h-[220px] w-[190px] opacity-55 min-[1000px]:top-[170px] min-[1000px]:left-auto min-[1000px]:mx-0 min-[1000px]:h-[225px] min-[1000px]:w-[180px] min-[1000px]:opacity-100 min-[1200px]:top-[190px] min-[1200px]:right-[-48px] min-[1200px]:h-[300px] min-[1200px]:w-[240px]" />
 
           <h1 className="mx-auto max-w-[860px] text-balance text-[clamp(36px,6.4vw,60px)] font-semibold leading-[1.04] tracking-[-0.02em] text-ink">
             <span className="relative whitespace-nowrap">
@@ -346,6 +347,19 @@ function Home() {
               </div>
             ))}
           </div>
+
+          {/* trust row */}
+          <div className="mx-auto mt-6 flex max-w-[640px] flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-[12.5px] text-faint">
+            <span className="inline-flex items-center gap-1.5">
+              <span aria-hidden="true">🔒</span>SOC 2-compliant data centers
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span aria-hidden="true">🇫🇷</span>Hosted in Paris, France
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span aria-hidden="true">🚫</span>Zero data retention supported
+            </span>
+          </div>
         </section>
 
         {/* KIMI K3 */}
@@ -359,7 +373,8 @@ function Home() {
             mixture-of-experts (104B active per token) with a 1-million-token context window, built
             for agentic coding. On Moonshot&apos;s published evals it beats leading proprietary
             models on long-horizon software engineering and agentic search — and through Nebius
-            Token Factory every token is served from EU datacenters.
+            Token Factory every token is served from SOC 2-compliant data centers in Paris, France,
+            with zero data retention supported.
           </p>
           <div className="mt-6 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
             {kimiBenchmarks.map((b) => (

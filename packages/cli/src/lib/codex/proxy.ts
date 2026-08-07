@@ -27,6 +27,7 @@ export type CodexProxyOptions = {
   modelName: string;
   modelDefinition: ModelDefinition;
   authToken: string;
+  tavilyMcpInjected?: boolean | undefined;
   debug?: boolean | undefined;
   costTracker?: CostTracker | undefined;
   perfSink?: ProxyPerfSink | undefined;

@@ -8,6 +8,7 @@ const realFetch = globalThis.fetch.bind(globalThis);
 
 const options: CodexProxyOptions = {
   apiKey: "test-together-key",
+  baseUrl: "https://api.tokenfactory.nebius.com/v1",
   modelId: GLM_5_2.id,
   targetModelId: GLM_5_2.id,
   modelName: GLM_5_2.name,

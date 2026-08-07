@@ -20,6 +20,14 @@ on:
           - live-models-check
           - opencode
           - pi
+  # Push-to-run escape hatch: pushing this branch runs the full gauntlet
+  # (harness defaults to "all" for non-dispatch events). Exists because the
+  # repo's GitHub App integration cannot call the workflow-dispatch API
+  # (403, no actions:write), but it can push. Re-run by pushing an empty
+  # commit to the branch; keep the branch pointed at the code you want tested.
+  push:
+    branches:
+      - trigger/live-gauntlet
 
 concurrency:
   group: live-agent-gauntlet-${{ github.ref }}
@@ -30,9 +38,20 @@ jobs:
     name: Real inference harness tests
     runs-on: tenki-standard-medium-4c-8g
     timeout-minutes: 45
+    # The NEBIUS_API_KEY / TAVILY_API_KEY secrets are scoped to the
+    # "production" environment (not repository-level), so the job must declare
+    # that environment for `secrets.*` to resolve them.
+    environment: production
     env:
       CI: "true"
       NEBIUS_API_KEY: ${{ secrets.NEBIUS_API_KEY }}
+      # Optional: enables the web-search legs (Tavily-backed web_search
+      # emulation + the Tavily MCP auto-inject). Without it those tests see
+      # the documented "TAVILY_API_KEY not set" path instead of live search.
+      TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
+      # Optional: enables the tenki.cloud sandbox live smoke below. Provider
+      # selection is explicit-only, so this key alone changes nothing else.
+      TENKI_API_KEY: ${{ secrets.TENKI_API_KEY }}
       KIMIRELAY_DEBUG: "1"
       VITEST_RETRY: "3"
       HARNESS: ${{ github.event.inputs.harness || 'all' }}
@@ -61,6 +80,10 @@ jobs:
       - name: Install workspace dependencies
         run: pnpm install --frozen-lockfile --config.confirmModulesPurge=false
 
+      # Speeds up the `build` tasks only. The test:gauntlet:* tasks are
+      # "cache": false in turbo.json - live tests validate an external system
+      # (Nebius + the installed agent CLIs), so a cached PASS proves nothing
+      # about the current key or backend and must never be replayed.
       - name: Restore Turborepo cache
         uses: actions/cache/restore@v4
         with:
@@ -130,7 +153,7 @@ jobs:
         run: |
           case "$HARNESS" in
             all)
-              VITEST_FILE_PARALLELISM=0 VITEST_MAX_CONCURRENCY=1 pnpm exec turbo run test:gauntlet:core test:gauntlet:claude test:gauntlet:codex test:gauntlet:opencode test:gauntlet:pi --filter @kimirelay/tests --concurrency=1
+              VITEST_FILE_PARALLELISM=0 VITEST_MAX_CONCURRENCY=1 pnpm exec turbo run test:gauntlet:core test:gauntlet:claude test:gauntlet:codex test:gauntlet:opencode test:gauntlet:pi --filter @kimirelay/tests --concurrency=1 --continue
               ;;
             claude)
               pnpm exec turbo run test:gauntlet:claude --filter @kimirelay/tests
@@ -151,6 +174,22 @@ jobs:
               echo "Unknown harness: $HARNESS" >&2
               exit 1
               ;;
+          esac
+
+      # Live-verifies the tenki provider end to end (SDK auth, VM create,
+      # exec, teardown) - the one sandbox path CI can cover, since the Nebius
+      # ConTree side is gated behind console-granted key permissions.
+      - name: Tenki sandbox live smoke
+        run: |
+          if [ -z "$TENKI_API_KEY" ]; then
+            echo "TENKI_API_KEY not set - skipping tenki live smoke."
+            exit 0
+          fi
+          out="$(node packages/cli/dist/bin/kimirelay.js sandbox run --provider tenki -- echo kimirelay-tenki-ok)"
+          echo "$out"
+          case "$out" in
+            *kimirelay-tenki-ok*) echo "tenki smoke passed." ;;
+            *) echo "tenki smoke: expected marker missing from output." >&2; exit 1 ;;
           esac
 
       - name: Stop kimirelay daemon

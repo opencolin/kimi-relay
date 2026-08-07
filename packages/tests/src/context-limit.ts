@@ -1,3 +1,10 @@
+// These live tests assert the user-visible CONTRACT: an oversized request
+// still succeeds and no context-length error reaches the client. They no
+// longer assert WHICH mechanism prevented it - live-probed 2026-08-02, the
+// Nebius backend now auto-clamps max_tokens to the remaining window
+// server-side (SGLang-style `matched_stop`), so the daemon's reactive
+// context-fit retry may legitimately never fire. That retry mechanism keeps
+// dedicated offline coverage in context-fit.test.ts with mocked 400s.
 import { assert, looksLikeContextError } from "./assert.js";
 import {
   deleteSession,
@@ -35,17 +42,6 @@ export async function assertClaudeContextLimitRetry(context: TestContext): Promi
       `expected context-limit retry to recover, got ${response.status}: ${text.slice(0, 1000)}`,
     );
     assert(!looksLikeContextError(text), "context-length error leaked to the client");
-    const stderr = daemon.stderr();
-    assert(
-      stderr.includes("[kimirelay proxy] context-fit retry") ||
-        stderr.includes('"maxTokens":28000') ||
-        stderr.includes("retrying nebius request with reduced max_tokens") ||
-        stderr.includes("clamped request max_tokens to estimated context budget") ||
-        stderr.includes("trimmed request input to reserve requested output") ||
-        (stderr.includes("kimirelay: trimmed") && stderr.includes("(retry path")) ||
-        (stderr.includes("kimirelay: DROPPED A LARGE PORTION") && stderr.includes("(retry path")),
-      `daemon did not log context-limit prevention; stderr=${stderr.slice(-2000)}`,
-    );
     assert(/CONTEXT_RETRY_OK/i.test(text), "retry response did not include expected final answer");
   } finally {
     await deleteSession(daemon, token);
@@ -80,10 +76,6 @@ export async function assertCodexContextLimitRetry(context: TestContext): Promis
       `expected context-limit retry to recover, got ${response.status}: ${text.slice(0, 1000)}`,
     );
     assert(!looksLikeContextError(text), "context-length error leaked to the client");
-    assert(
-      daemon.stderr().includes("[kimirelay proxy] context-fit retry"),
-      "daemon did not log Codex context-limit retry",
-    );
     assert(
       /CODEX_CONTEXT_RETRY_OK/i.test(text),
       "retry response did not include expected final answer",

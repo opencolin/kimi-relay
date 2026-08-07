@@ -38,7 +38,7 @@ Before the first launch you need a Nebius API key (get one at https://tokenfacto
 kimirelay configure
 ```
 
-This stores your Nebius API key in `~/.kimirelay/` and optionally an Exa API key (https://exa.ai) that powers web-search emulation in Claude Code. Web search is optional - without it, searches return a clear "TAVILY_API_KEY not set" error instead of failing silently.
+This stores your Nebius API key in `~/.kimirelay/` and optionally a Tavily API key (https://app.tavily.com) that powers web-search emulation in Claude Code and Codex. Web search is optional - without it, searches return a clear "TAVILY_API_KEY not set" error instead of failing silently. When a Tavily key is configured, `klaude`, `kodex`, and `openkode` auto-inject Tavily's remote MCP server per session (ephemeral, nothing durable written; skipped with `--strict-mcp-config` on klaude or `--no-mcp` on kodex; disable everywhere with `KIMIRELAY_DISABLE_TAVILY_MCP=1`), adding explicit `tavily_search` / `tavily_extract` tools. For openkode this is the only live-web path. kpi is excluded: pi has no MCP support by design.
 
 You can also set the key non-interactively:
 
@@ -201,6 +201,28 @@ Per-task cost varies a lot with how verbose the agent is. Mechanical, well-scope
 7. For Claude `-p`, pass `--dangerously-skip-permissions` so a headless subagent never blocks on a permission prompt. Codex `exec` is non-interactive by design; use `-s workspace-write` for edits and `--skip-git-repo-check` outside a git repo.
 8. If your current CLI has native subagents, delegate kimirelay launches to one of those subagents and let it return the result, instead of spending the main orchestrator's context on the full `kodex`/`klaude` run.
 
+## Sandboxes (beta)
+
+Two providers: tenki.cloud (the default; open signup, `TENKI_API_KEY`) and Nebius Token Factory Sandboxes (gated beta, `NEBIUS_API_KEY`; select with `--provider contree` or `KIMIRELAY_SANDBOX_PROVIDER=contree`; some accounts also need `kimirelay sandbox project <id>`).
+
+Token Factory Sandboxes support (disposable microVMs on the same Nebius key):
+
+```
+kimirelay sandbox status            # check Sandboxes access for your key
+kimirelay sandbox run <command...>  # one shell command in a disposable sandbox
+kimirelay sandbox advisory --write  # append the sandbox-preference advisory to
+                                    # ~/.claude/CLAUDE.md and ~/.codex/AGENTS.md
+klaude --sandbox -p "<task>"        # headless Claude Code session in a sandbox,
+                                    # cloned from your repo's pushed origin state
+kodex --sandbox exec "<task>"       # same for Codex
+```
+
+Sandboxes is a Nebius beta behind an access request
+(https://tokenfactory.nebius.com/sandboxes/about); without access these
+commands fail with a message pointing at the request form. Sandbox harness
+sessions are headless-only and run against pushed git state - local
+uncommitted changes do not travel.
+
 ## Keeping kimirelay up to date
 
 The installed binary self-updates automatically in the background. The check is throttled and bounded, never throws, and runs before argument parsing - so even `kimirelay help` keeps an install current. The update is pulled from https://kimirelay.com/latest.json, which contains `version`, `url`, and `publishedAt`.
@@ -233,7 +255,7 @@ kimirelay daemon stop
 
 - **"No Nebius API key found"** - run `kimirelay configure` or set `NEBIUS_API_KEY`.
 - **A tool command is not found** - kimirelay does not install the agent CLIs for you. It prints the official install command (e.g. `npm install -g @openai/codex`) and the docs link when the tool is missing; install it, then re-run.
-- **Web search fails in Claude Code** - set an Exa API key via `kimirelay configure`. Without it, searches return a clear "TAVILY_API_KEY not set" error.
+- **Web search fails in Claude Code** - set a Tavily API key via `kimirelay configure`. Without it, searches return a clear "TAVILY_API_KEY not set" error.
 - **Headless run hangs and produces no edits** - you forgot `< /dev/null`. Close stdin and relaunch; see the Headless usage section.
 - **Cost seems high for a small change** - the agent over-documented. Scope the task tighter and add a "don't over-explain" instruction.
 - **Want your normal config back** - stop using the wrappers. No agent config was saved, so your OpenCode / Claude Code / Codex CLI / Pi Code setup is untouched. For ChatGPT Desktop, run `kimirelay chatgpt --restore`.

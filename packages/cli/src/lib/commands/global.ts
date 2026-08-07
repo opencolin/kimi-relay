@@ -10,7 +10,35 @@ import {
   resolveStoredTavilyApiKey,
   setGlobalTavilyApiKey,
 } from "../global-config.js";
+import { resolveNebiusBaseUrl } from "../nebius-core.js";
 import { VERSION } from "../version.js";
+
+export type NebiusKeyCheck = "valid" | "invalid" | "unreachable";
+
+/**
+ * Live-check a Nebius key against the models endpoint. Only a definitive
+ * 401/403 marks it invalid - server errors and network failures return
+ * "unreachable" so configure never blocks or discards a key it cannot judge.
+ */
+export async function checkNebiusKey(
+  apiKey: string,
+  fetchImpl: typeof fetch = fetch,
+): Promise<NebiusKeyCheck> {
+  try {
+    const res = await fetchImpl(`${resolveNebiusBaseUrl()}/models`, {
+      headers: { authorization: `Bearer ${apiKey}` },
+    });
+    if (res.ok) {
+      return "valid";
+    }
+    if (res.status === 401 || res.status === 403) {
+      return "invalid";
+    }
+    return "unreachable";
+  } catch {
+    return "unreachable";
+  }
+}
 
 export function printHelp() {
   console.log(`kimirelay v${VERSION} - Nebius Token Factory for coding CLIs
@@ -23,8 +51,17 @@ Usage:
   kimirelay claude [...]      (alias: klaude)
   kimirelay pi [...]          (alias: kpi)
   kimirelay opencode [...]    (alias: openkode)
+  kimirelay sandbox status|project|run|fetch|prebake|advisory
+                              Cloud sandboxes - tenki.cloud by default (set TENKI_API_KEY);
+                              Nebius Token Factory Sandboxes via --provider contree (gated beta)
 
 Extra args after codex/claude/pi/opencode are passed through.
+
+Sandbox sessions (default provider: tenki.cloud - open signup, set TENKI_API_KEY;
+Nebius Token Factory with --provider contree needs Sandboxes beta access):
+  klaude --sandbox -p "<task>"    Claude Code on Kimi K3 in a disposable microVM,
+                                  against your repo's pushed state. Headless only.
+  kodex --sandbox exec "<task>"   Same for Codex.
 ChatGPT App support is alpha; run \`kimirelay chatgpt --restore\` (alias: codex-app) to restore the previous desktop config.
 
 Codex flags:
@@ -40,7 +77,10 @@ Docs: https://kimirelay.com/llms.txt
 `);
 }
 
-export async function runConfigure(home = os.homedir()): Promise<boolean> {
+export async function runConfigure(
+  home = os.homedir(),
+  checkKey: (apiKey: string) => Promise<NebiusKeyCheck> = checkNebiusKey,
+): Promise<boolean> {
   clack.intro("kimirelay configure");
 
   const detected = detectInstalledHarnesses();
@@ -55,7 +95,23 @@ export async function runConfigure(home = os.homedir()): Promise<boolean> {
 
   const existing = resolveStoredApiKey((await readGlobalConfig(home)).apiKey);
   let apiKey = existing || process.env.NEBIUS_API_KEY || "";
-  if (!apiKey) {
+  // Live-check an existing key so a rotated/revoked one re-opens the prompt -
+  // without this, configure silently keeps a dead stored key forever (the
+  // stored key beats the environment, so even a fresh export can't fix it).
+  if (apiKey) {
+    const check = await checkKey(apiKey);
+    if (check === "invalid") {
+      clack.log.warn(
+        "Your existing Nebius key was rejected by the API (unauthorized) - it may have been rotated or revoked. Enter a new one.",
+      );
+      apiKey = "";
+    } else if (check === "valid") {
+      clack.log.success("Nebius key: valid.");
+    } else {
+      clack.log.warn("Could not reach Nebius to verify the existing key - keeping it.");
+    }
+  }
+  while (!apiKey) {
     const entered = await clack.password({
       message: "Nebius API key (from https://tokenfactory.nebius.com/?modals=create-api-key):",
       validate: (value) => (value.trim() ? undefined : "An API key is required"),
@@ -64,7 +120,18 @@ export async function runConfigure(home = os.homedir()): Promise<boolean> {
       clack.cancel("Cancelled.");
       return false;
     }
-    apiKey = entered.trim();
+    const candidate = entered.trim();
+    const check = await checkKey(candidate);
+    if (check === "invalid") {
+      clack.log.warn("That key was rejected by Nebius (unauthorized) - check it and try again.");
+      continue;
+    }
+    if (check === "valid") {
+      clack.log.success("Nebius key: valid.");
+    } else {
+      clack.log.warn("Could not reach Nebius to verify the key - storing it anyway.");
+    }
+    apiKey = candidate;
   }
   await setGlobalApiKey(home, apiKey);
 
@@ -76,7 +143,7 @@ export async function runConfigure(home = os.homedir()): Promise<boolean> {
   if (!tavilyApiKey) {
     const enteredTavily = await clack.password({
       message:
-        "Tavily API key for web search (from https://app.tavily.com - press Enter to skip; web search will be disabled):",
+        "Tavily API key - OPTIONAL, press Enter to skip (recommended: unlocks live web search + Tavily tools; free key at https://app.tavily.com):",
       validate: (value) => (value.trim() || value === "" ? undefined : undefined),
     });
     if (clack.isCancel(enteredTavily)) {
@@ -93,7 +160,9 @@ export async function runConfigure(home = os.homedir()): Promise<boolean> {
   if (tavilyApiKey) {
     clack.log.success("Tavily web search enabled.");
   } else {
-    clack.log.info("Tavily key skipped - web search will be unavailable in your agents.");
+    clack.log.info(
+      "Tavily key skipped - agents run fine without it, just with no live web search. Add one anytime with `kimirelay configure`.",
+    );
   }
 
   const launchable = ALL_HARNESSES.filter(

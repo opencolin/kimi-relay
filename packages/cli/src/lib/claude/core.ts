@@ -38,6 +38,8 @@ export type ClaudeLaunchOptions = {
   baseUrl: string;
   modelId?: string;
   args?: string[];
+  /** True when the launcher injected the ephemeral Tavily MCP server. */
+  tavilyMcpInjected?: boolean;
 };
 
 export type ClaudeLaunchResult = {
@@ -50,6 +52,7 @@ export function buildClaudeEnv({
   modelId,
   proxyUrl,
   authToken,
+  args,
 }: ClaudeLaunchOptions & {
   modelId: string;
   modelName: string;
@@ -61,11 +64,17 @@ export function buildClaudeEnv({
     delete env[key];
   }
   env.ANTHROPIC_BASE_URL = proxyUrl;
-  // Use bearer-token mode for local proxy auth. Claude Code treats
-  // ANTHROPIC_API_KEY as a user-supplied provider key and prompts about it;
-  // ANTHROPIC_AUTH_TOKEN still sends Authorization: Bearer <token> to our
-  // local daemon without entering that custom-key flow.
-  env.ANTHROPIC_AUTH_TOKEN = authToken;
+  // Session auth rides on the injected apiKeyHelper (see
+  // claudeExtraSettingsArgs) plus the secret session URL in
+  // ANTHROPIC_BASE_URL, so the normal path sets no auth env var at all -
+  // setting ANTHROPIC_AUTH_TOKEN alongside the helper makes Claude Code print
+  // "Both ANTHROPIC_AUTH_TOKEN and apiKeyHelper set" at startup. The bearer
+  // env var remains only as the fallback for sessions where a user-supplied
+  // --settings blocks the helper inject. (Not ANTHROPIC_API_KEY there: Claude
+  // Code treats that as a user-supplied provider key and prompts about it.)
+  if (claudeUserPassedSettings(args)) {
+    env.ANTHROPIC_AUTH_TOKEN = authToken;
+  }
   env.CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY = "1";
   env.ANTHROPIC_MODEL = modelId;
   // Claude Code disables tool search automatically when ANTHROPIC_BASE_URL is
@@ -154,13 +163,17 @@ export async function runClaudeNebius(options: ClaudeLaunchOptions): Promise<Cla
         process.env.CLAUDE_CODE_MAX_OUTPUT_TOKENS,
       ),
       claudeCodeMaxOutputTokensUserSet: process.env.CLAUDE_CODE_MAX_OUTPUT_TOKENS !== undefined,
+      ...(options.tavilyMcpInjected ? { tavilyMcpInjected: true } : {}),
     },
     args,
     binary: "claude",
     keepaliveLabel: "Claude session",
     preserveSessionAfterExit: claudeRunsInBackground(args),
     banner: (modelName) =>
-      `Kimi Relay ▸ Routing Claude Code → Nebius Token Factory (${modelName}). Not Anthropic.\n`,
+      `Kimi Relay ▸ Routing Claude Code → Nebius Token Factory (${modelName}). Not Anthropic.\n` +
+      (options.tavilyMcpInjected
+        ? "Kimi Relay ▸ Tavily MCP injected for this session (ephemeral - won't appear in `claude mcp list`).\n"
+        : ""),
     buildEnv: ({ proxyUrl, authToken, modelId, modelName }) =>
       buildClaudeEnv({ ...options, modelId, modelName, proxyUrl, authToken }),
     buildArgs: ({ args: launchArgs, authToken }) => buildClaudeLaunchArgs(launchArgs, authToken),
@@ -261,11 +274,18 @@ function claudeCacheFriendlyArgs(args: string[]): string[] {
 // `--settings <json>` flag, which *merges* into the user's existing settings
 // rather than replacing them. We bail out entirely if the user already passed
 // `--settings` themselves, so we never clobber their explicit config.
+/**
+ * True when the user passed their own `--settings` - kimirelay then skips its
+ * settings inject entirely (including the apiKeyHelper), and buildClaudeEnv
+ * falls back to ANTHROPIC_AUTH_TOKEN for session auth.
+ */
+export function claudeUserPassedSettings(args: string[] | undefined): boolean {
+  return (args ?? []).some((arg) => arg === "--settings" || arg.startsWith("--settings="));
+}
+
 function claudeExtraSettingsArgs(args: string[], authToken?: string): string[] {
-  for (const arg of args) {
-    if (arg === "--settings" || arg.startsWith("--settings=")) {
-      return [];
-    }
+  if (claudeUserPassedSettings(args)) {
+    return [];
   }
 
   // skipWebFetchPreflight: the WebFetch tool pings api.anthropic.com directly

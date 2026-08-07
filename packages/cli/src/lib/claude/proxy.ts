@@ -40,6 +40,7 @@ export type ClaudeProxyOptions = {
   authToken: string;
   claudeCodeMaxOutputTokens?: number | undefined;
   claudeCodeMaxOutputTokensUserSet?: boolean | undefined;
+  tavilyMcpInjected?: boolean | undefined;
   debug?: boolean | undefined;
   costTracker?: CostTracker | undefined;
   perfSink?: ProxyPerfSink | undefined;

@@ -1,10 +1,10 @@
 # kimirelay roadmap
 
-Status: **for review** — updated 2026-08-01. The previous revision of this file
+Status: **for review** — updated 2026-08-02. The previous revision of this file
 was the pre-launch planning document; its decision history is preserved at the
 bottom. This revision reflects what has shipped and proposes what comes next.
 
-## Where we are (shipped as of 2026-08-01)
+## Where we are (shipped as of 2026-08-02)
 
 - **The relay**, forked from nebius-tf-relay: a local daemon translating
   Anthropic `/v1/messages` and OpenAI `/v1/responses` to Nebius Token Factory
@@ -12,92 +12,116 @@ bottom. This revision reflects what has shipped and proposes what comes next.
   modality-aware routing, context trimming, retries/fallback, and
   Tavily-backed `web_search` emulation streaming real Anthropic citation
   blocks.
-- **Four harnesses**: `klaude` (Claude Code, beta), `kodex` (Codex CLI, beta),
-  `openkode` (OpenCode, stable), `kpi` (Pi Code, stable).
+- **Four harnesses, all stable**: `klaude` (Claude Code), `kodex` (Codex CLI),
+  `openkode` (OpenCode), `kpi` (Pi Code) - beta flags dropped 2026-08-02 after
+  the full live gauntlet went green in CI (all five suites, real Nebius
+  inference). Cursor is out of
+  scope (dropped 2026-08-02): `cursor-agent` has no endpoint override to
+  inject and agent inference runs on Cursor's backend; revisit if that
+  changes.
+- **Remote sessions on Token Factory Sandboxes** (first pass): `kimirelay
+sandbox status|run|advisory` plus headless `klaude --sandbox` /
+  `kodex --sandbox` against pushed git state (`docs/SANDBOXES.md`).
+  Interactive TTY, artifact download, and prebaked images remain open; live
+  verification is blocked on beta access.
 - **Distribution**: `curl -fsSL https://kimirelay.com/install.sh | sh`
-  (POSIX-sh safe, self-updating v0.9.1), serving from kimirelay.com and
-  kimi.guide via Vercel git deploys.
-- **The site**: dark landing page ("Kimi K3 for ⟨agent⟩"), benchmark section,
-  community showcase at `/showcase` (PR-submittable), $25+$25
-  Token Factory/Tavily credits promo.
+  (POSIX-sh safe, self-updating, v0.10.1), serving from kimirelay.com and
+  kimi.guide via Vercel git deploys. Launcher wrappers are self-locating
+  (bun found via PATH or `~/.bun/bin`) and self-heal: the installed bundle
+  rewrites stale wrappers on its hourly update check.
+- **The site**: dark landing page ("Kimi K3 for ⟨agent⟩" with the robot
+  mascot), benchmark section, community showcase at `/showcase`
+  (PR-submittable), $25+$25 Token Factory/Tavily credits promo, and the
+  hosting trust row (SOC 2-compliant data centers, Paris, zero data
+  retention supported).
 
 ## Now
 
-### 1. Cursor support (`kursor`)
+### 1. Tavily MCP auto-inject for `klaude`
 
-Add Cursor as the fifth harness. Two candidate mechanisms, spike decides:
+**Status (2026-08-02): shipped in v0.11.0; extended to `kodex` and `openkode` in v0.12.0 (`kpi` excluded - pi rejects MCP by design).**
 
-- **Cursor CLI (`cursor-agent`)**: if it honors an OpenAI-compatible base URL
-  override (env or config), it slots into the spawned-harness family like
-  OpenCode/Pi — per-run config injection, nothing durable written.
-- **Cursor editor**: custom OpenAI base URL exists in settings but is a
-  durable, GUI-level change and disables some Cursor-native features (Tab
-  completions run on Cursor's own backend regardless). If the CLI path works,
-  the editor gets a documented recipe rather than automation.
+The relay already emulates Claude Code's native `web_search` via Tavily. When
+a Tavily key is configured, `klaude` additionally injects Tavily's remote MCP
+server per run (generated `--mcp-config`, ephemeral like everything else),
+giving Kimi K3 the explicit `tavily_search` / `tavily_extract` toolset
+alongside the emulated native search. Opt out with
+`KIMIRELAY_DISABLE_TAVILY_MCP=1`; never injected when the session passes
+`--strict-mcp-config`. ~Small; no relay changes needed.
 
-Spike questions: does `cursor-agent` accept base-URL/model overrides per
-invocation; which wire format does it speak (chat completions vs responses);
-does the relay's existing Codex bridge cover it. Deliverable: the `kursor`
-command plus site/README updates, or an honest write-up of why it's
-recipe-only.
+### 2. Beta → stable for `klaude` and `kodex`
 
-### 2. Remote sessions on Token Factory Sandboxes
-
-The flagship differentiator (see decision log): run the harness _inside_ a
-[Token Factory Sandbox](https://tokenfactory.nebius.com/sandboxes/about)
-microVM instead of locally — same Nebius account/key as inference, 0.4–2s
-cold start, branchable execution state, instant rollback.
-
-- `klaude --sandbox` / `kodex --sandbox` (or `--remote`): the wrapper starts a
-  sandbox, syncs the project in, runs the agent there, streams the TUI back.
-  Disposable full-permission/yolo sessions become safe by construction;
-  branchable state gives checkpoint/rollback on top.
-- Advisory layer: optional block in `~/.claude/CLAUDE.md` / `~/.codex/AGENTS.md`
-  steering agents to prefer sandboxes for risky commands (steering, not
-  enforcement — the wrapper enforces).
-- **Spike first** (unchanged from the original plan): project sync mechanics
-  (clone vs file sync), key handoff into the sandbox, interactive TUI over the
-  wire, latency/cost, beta access approval. Spike outcome decides whether this
-  ships as a flag or as a documented recipe.
+**Status (2026-08-02): shipped.** The live gauntlet runs in CI against real
+Nebius inference (secrets in the repo's `production` environment; dispatch
+from the Actions tab or push `trigger/live-gauntlet`). Getting to green took
+three runs: run 1 caught latent test-package type errors, run 2 caught a test
+asserting a retry mechanism Nebius has since engineered away server-side
+(their backend now auto-clamps `max_tokens`; verified by direct probe), run 3
+passed all five suites. Beta badges dropped from the site and docs.
 
 ## Next
 
-### 3. Tavily MCP auto-inject for `klaude`
+### 3. Sandboxes round 2
 
-The relay already emulates Claude Code's native `web_search` via Tavily. When
-a Tavily key is configured, `klaude` can additionally inject the official
-Tavily MCP server per run (generated `--mcp-config`, ephemeral like everything
-else), giving Kimi K3 the explicit `tavily_search` / `tavily_extract` toolset
-alongside the emulated native search. ~Small; no relay changes needed.
+**Status (2026-08-02): features shipped in v0.13.0; live spawn pending one
+console grant.** Artifact download (`--keep` / `--fetch` / `sandbox fetch`
+via the inspect API on result images), `sandbox prebake` (tagged checkpoint
+images that skip the cold bootstrap), whoami-based `sandbox status`
+permission reports, and `--project` / `NEBIUS_PROJECT` plumbing. Interactive
+TTY is documented as unsupported by API design (no PTY/attach surface;
+line-mode exec over stdin+SSE remains an option). Beta access is confirmed
+live; the API key still needs Sandboxes permissions (`spawn`,
+`set_image_tag`) granted for the project in the Token Factory console -
+`kimirelay sandbox status` shows the exact grants. Because of that double
+gate, tenki.cloud ships as a second, open-signup provider (M1 in
+`docs/TENKI-SANDBOXES-PRD.md`; interactive SSH sessions and snapshots are
+its M2).
 
-### 4. Beta → stable for `klaude` and `kodex`
+### 4. Distribution beyond curl
 
-A verification matrix run in CI against live Nebius: streaming tool calls,
-interleaved thinking + tool use, context trimming at the served 262K, vision
-routing via the modality-aware catalog (K2.6 carries vision on Nebius, K3 is
-text-only there). Green matrix flips the Beta badges on the site.
+npm package and/or Homebrew tap for the CLI. Homebrew in particular removes
+the "curl | sh" trust objection and gives macOS users upgrades via
+`brew upgrade`.
 
 ## Later
 
 - **Showcase growth**: keep merging community project PRs
   (`site/src/showcase/projects/`); consider surfacing GitHub stars on cards.
-- **Distribution beyond curl**: npm package and/or Homebrew tap for the CLI.
-- **Upstream sandbox support** to nebius-tf-relay once the sandbox spike
-  proves out — per the decision log, the fork's delta is branding + sandboxing,
+- **Upstream sandbox support** to nebius-tf-relay now that the first pass
+  exists — per the decision log, the fork's delta is branding + sandboxing,
   and upstreaming keeps the fork thin.
 - **Google provider slot** if/when Kimi K3 lands on Vertex AI (multi-provider
   remains out of scope until then; see decision log).
 
 ## Open questions (for Collin)
 
-1. Cursor: is CLI-only support acceptable for launch, with the editor as a
-   documented recipe?
-2. Sandboxes: opt-in `--sandbox`, or sandbox-by-default with `--local` as the
-   escape hatch? (Carried over from the original plan, still undecided.)
-3. Does Sandboxes beta access exist for the account yet? The spike is blocked
-   on it.
+1. Sandboxes: opt-in `--sandbox`, or sandbox-by-default with `--local` as the
+   escape hatch? (Carried over, still undecided.)
+2. Sandboxes: grant the API key `spawn` / `set_image_tag` permissions for the
+   project in the Token Factory console so live verification can finish.
 
-## Decision log (2026-07-29, condensed from the original plan)
+## Decision log
+
+### 2026-08-02
+
+- **Sandbox layer goes dual-provider**: the 2026-07-29 "not Tenki" decision
+  is revised. Token Factory Sandboxes stays the inference-affine default,
+  but its double gate (beta access + per-key permission grants) means the
+  feature is dormant for real users; tenki.cloud (open signup, official
+  TypeScript SDK) makes it real today. Rationale and design:
+  `docs/TENKI-SANDBOXES-PRD.md`.
+
+### 2026-08-01
+
+- **Cursor ships as a recipe, not a harness**: `cursor-agent` exposes no
+  base-URL/provider override, so there is nothing to inject. Superseded
+  2026-08-02: Cursor support (including the recipe doc) was removed
+  entirely after re-verifying the CLI still has no seam and that Cursor's
+  backend blocks agent features from external keys. Revisit on CLI changes.
+- **Sandboxes shipped headless-first**: `--sandbox` runs `-p`/`exec` style
+  sessions against pushed git state; interactive TTY deferred to round 2.
+
+### 2026-07-29 (condensed from the original plan)
 
 - **Fork nebius-tf-relay** as `opencolin/kimi-relay` (full-history port)
   rather than extending the Python proxy's installer; the relay engine and
