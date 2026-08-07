@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { ModelDefinition } from "@kimirelay/models";
-import { NEBIUS_BASE_URL } from "./nebius-core.js";
+import { resolveNebiusBaseUrl } from "./nebius-core.js";
 import { backoffMs, parseRetryAfter, sleep } from "./nebius-retry.js";
 import { persistRequestDiagnostic } from "./request-diagnostics.js";
 import {
@@ -345,7 +345,7 @@ async function fetchNebiusResponse(
   timeout.unref?.();
 
   try {
-    const response = await fetch(`${options.baseUrl ?? NEBIUS_BASE_URL}/chat/completions`, {
+    const response = await fetch(`${options.baseUrl ?? resolveNebiusBaseUrl()}/chat/completions`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${options.apiKey}`,

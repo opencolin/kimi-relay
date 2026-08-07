@@ -1,12 +1,12 @@
 import path from "node:path";
-import {
-  applyCatalog,
-  buildCatalog,
-  NEBIUS_BASE_URL,
-  type NebiusApiModel,
-} from "@kimirelay/models";
+import { applyCatalog, buildCatalog, type NebiusApiModel } from "@kimirelay/models";
 import { kimirelayHome } from "./global-config.js";
-import { readJsonIfExists, resolveNebiusApiKey, writeJsonAtomic } from "./nebius-core.js";
+import {
+  readJsonIfExists,
+  resolveNebiusApiKey,
+  resolveNebiusBaseUrl,
+  writeJsonAtomic,
+} from "./nebius-core.js";
 
 /**
  * Load the live Nebius model catalog and install it as the active one.
@@ -62,7 +62,7 @@ export async function initModelCatalog(options: InitModelCatalogOptions = {}): P
 async function loadCatalog(options: InitModelCatalogOptions): Promise<void> {
   const home = options.home;
   const now = options.now ?? Date.now();
-  const baseUrl = (options.baseUrl ?? NEBIUS_BASE_URL).replace(/\/$/, "");
+  const baseUrl = (options.baseUrl ?? resolveNebiusBaseUrl()).replace(/\/$/, "");
   const file = cachePath(home);
 
   const cached = await readJsonIfExists<CatalogCache>(file);

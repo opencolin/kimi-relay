@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
-import { NEBIUS_BASE_URL, VISION_PROMPT, getVisionModels } from "@kimirelay/models";
+import { VISION_PROMPT, getVisionModels } from "@kimirelay/models";
+import { resolveNebiusBaseUrl } from "../nebius-core.js";
 
 /**
  * Image interception for the Claude proxy. GLM-5.2 is text-only, so when Claude
@@ -83,7 +84,7 @@ async function callVisionModel(
   };
 
   try {
-    const response = await fetch(`${NEBIUS_BASE_URL}/chat/completions`, {
+    const response = await fetch(`${resolveNebiusBaseUrl()}/chat/completions`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${options.apiKey}`,

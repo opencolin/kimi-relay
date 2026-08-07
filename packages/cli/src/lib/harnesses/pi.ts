@@ -2,11 +2,10 @@ import { spawn } from "node:child_process";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
-import { NEBIUS_BASE_URL } from "@kimirelay/models";
 import { getCodexSupportedModels, resolveCodexModel } from "../codex/defaults.js";
 import { HARNESS } from "../harness.js";
 import { defineHarness, type HarnessContext, type HarnessResult } from "../harness-types.js";
-import { resolveNebiusApiKey } from "../nebius-core.js";
+import { resolveNebiusApiKey, resolveNebiusBaseUrl } from "../nebius-core.js";
 
 const PI_PROVIDER_ID = "nebius";
 function piSupportedModels(): string {
@@ -66,7 +65,7 @@ function writePiModelsJson(agentDir: string, apiKey: string): void {
             // Nebius is not a Pi built-in provider, so declare it as a custom
             // OpenAI-compatible provider: baseUrl + api="openai-completions"
             // route Pi's requests through the Nebius Token Factory endpoint.
-            baseUrl: NEBIUS_BASE_URL,
+            baseUrl: resolveNebiusBaseUrl(),
             api: "openai-completions",
             apiKey,
             // Nebius runs on vLLM, which does not understand the OpenAI
