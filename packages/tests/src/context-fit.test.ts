@@ -55,6 +55,42 @@ describe("contextLengthOverflow", () => {
       contextTokens: 262144,
     });
   });
+
+  test("parses the 'prompt contains at least' phrasing (live-observed 2026-08-07)", () => {
+    // Verbatim shape of the 400 that leaked to a real klaude session: the
+    // request was exactly one token over the window and none of the earlier
+    // matchers recognized this message, so the raw error reached Claude Code.
+    const liveMessage =
+      "Nebius API returned 400: This model's maximum context length is 262144 tokens. " +
+      "However, you requested 28000 output tokens and your prompt contains at least " +
+      "234145 input tokens, for a total of at least 262145 tokens. Please reduce the " +
+      "length of the input prompt or the number of requested output tokens. " +
+      "(parameter=input_tokens, value=234145)";
+    expect(contextLengthOverflow(liveMessage, model)).toEqual({
+      inputTokens: 234145,
+      contextTokens: 262144,
+    });
+    // The structured parameter tail alone is enough (most drift-proof part).
+    expect(
+      contextLengthOverflow(
+        "This model's maximum context length is 262144 tokens. (parameter=input_tokens, value=240000)",
+        model,
+      ),
+    ).toEqual({ inputTokens: 240000, contextTokens: 262144 });
+  });
+
+  test("generic '<N> input tokens' fallback requires the max-context statement", () => {
+    expect(
+      contextLengthOverflow(
+        "This model's maximum context length is 262144 tokens; got 250000 input tokens total.",
+        model,
+      ),
+    ).toEqual({ inputTokens: 250000, contextTokens: 262144 });
+    // An unrelated 400 that merely mentions input tokens is NOT an overflow.
+    expect(
+      contextLengthOverflow("invalid request: 1000 input tokens field is malformed", model),
+    ).toBeUndefined();
+  });
 });
 
 describe("trimPayloadMessages", () => {

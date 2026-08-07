@@ -74,7 +74,33 @@ export function parseNebiusContextLengthInputTokens(message: string): number | u
     return parseTokenCount(vllmMessagesMatch[1]);
   }
   const resolvedInputMatch = message.match(/request resolved to\s+([\d,_]+)\s+input tokens\b/is);
-  return parseTokenCount(resolvedInputMatch?.[1]);
+  if (resolvedInputMatch) {
+    return parseTokenCount(resolvedInputMatch[1]);
+  }
+  // Third live-observed drift (2026-08-07): "...you requested 28000 output
+  // tokens and your prompt contains at least 234145 input tokens, for a total
+  // of at least 262145 tokens... (parameter=input_tokens, value=234145)".
+  // Prefer the structured parameter tail - it's the most drift-proof part.
+  const parameterMatch = message.match(
+    /parameter\s*=\s*input_tokens\s*,\s*value\s*=\s*([\d,_]+)/is,
+  );
+  if (parameterMatch) {
+    return parseTokenCount(parameterMatch[1]);
+  }
+  const promptContainsMatch = message.match(
+    /prompt contains(?:\s+at least)?\s+([\d,_]+)\s+input tokens\b/is,
+  );
+  if (promptContainsMatch) {
+    return parseTokenCount(promptContainsMatch[1]);
+  }
+  // Last resort against future rephrasings: any "<N> input tokens" - but only
+  // in a message that also states the model's maximum context, so an unrelated
+  // 400 that merely mentions input tokens is never misclassified as overflow.
+  if (parseNebiusContextLengthMaxTokens(message) !== undefined) {
+    const genericMatch = message.match(/([\d,_]+)\s+input tokens\b/is);
+    return parseTokenCount(genericMatch?.[1]);
+  }
+  return undefined;
 }
 
 function parseTokenCount(value: string | undefined): number | undefined {
