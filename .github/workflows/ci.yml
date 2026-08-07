@@ -18,7 +18,7 @@ concurrency:
 jobs:
   check:
     name: Build, typecheck & offline tests
-    runs-on: ubuntu-latest
+    runs-on: tenki-standard-medium-4c-8g
     timeout-minutes: 20
     env:
       CI: "true"

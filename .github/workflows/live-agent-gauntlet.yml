@@ -36,7 +36,7 @@ concurrency:
 jobs:
   live:
     name: Real inference harness tests
-    runs-on: ubuntu-latest
+    runs-on: tenki-standard-medium-4c-8g
     timeout-minutes: 45
     # The NEBIUS_API_KEY / TAVILY_API_KEY secrets are scoped to the
     # "production" environment (not repository-level), so the job must declare
